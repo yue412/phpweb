@@ -1,0 +1,119 @@
+<html>
+
+<head>
+    <meta http-equiv="content-type" content="text/html;charset=utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>
+        爆炒江湖
+    </title>
+    <style type="text/css">
+        div.no {
+            font-size: 120%;
+            display: inline
+        }
+
+        div.yes {
+            font-size: 80%;
+            display: inline
+        }
+
+        div.content {
+            color: #FF0000;
+            display: inline
+        }
+
+        div.level {
+            display: inline
+        }
+    </style>
+    <script type="text/javascript" src="sg_common.js">
+    </script>
+    <script type="text/javascript">
+        function init_equipment_types()
+        {
+            do_ajax("https://foodgame.github.io/data/data.min.json", function (text) {
+                    var e = document.getElementById("content");
+                    var model = JSON.parse(text);
+
+                    // 菜谱
+                    var recipes = model.recipes;
+                    var s = "<table border='1'>";
+                    s += "<tr>";
+                    s += "<td>";
+                    s += "ID";
+                    s += "</td>";
+                    s += "<td>";
+                    s += "名称";
+                    s += "</td>";
+                    s += "<td>";
+                    s += "稀有度";
+                    s += "</td>";
+                    s += "<td>";
+                    s += "炒";
+                    s += "</td>";
+                    s += "<td>";
+                    s += "煮";
+                    s += "</td>";
+                    s += "<td>";
+                    s += "切";
+                    s += "</td>";
+                    s += "<td>";
+                    s += "炸";
+                    s += "</td>";
+                    s += "<td>";
+                    s += "烤";
+                    s += "</td>";
+                    s += "<td>";
+                    s += "蒸";
+                    s += "</td>";
+                    s += "</tr>";
+                    for (var i = 0; i < recipes.length; i++) {
+                        s += "<tr>";
+                        s += "<td>";
+                        s += recipes[i].galleryId;
+                        s += "</td>";
+                        s += "<td>";
+                        s += recipes[i].name;
+                        s += "</td>";
+                        s += "<td>";
+                        s += recipes[i].rarity;
+                        s += "</td>";
+                        s += "<td>";
+                        s += recipes[i].stirfry;
+                        s += "</td>";
+                        s += "<td>";
+                        s += recipes[i].boil;
+                        s += "</td>";
+                        s += "<td>";
+                        s += recipes[i].knife;
+                        s += "</td>";
+                        s += "<td>";
+                        s += recipes[i].fry;
+                        s += "</td>";
+                        s += "<td>";
+                        s += recipes[i].bake;
+                        s += "</td>";
+                        s += "<td>";
+                        s += recipes[i].steam;
+                        s += "</td>";
+                        s += "</tr>";
+                    }
+                    s += "</table>";
+                    e.innerHTML = s;
+            })
+        }
+    </script>
+</head>
+<body>
+    <!--级别：<input type="number" id="equipment_level" value="0"/>
+    类型：<select id="equipment_types"/>
+    <input type="button" onclick="query_hero()" value="查询" />
+    <br>-->
+    <div id="content"></div>
+    <script type="text/javascript">
+        init_equipment_types();
+    </script>
+
+</body>
+
+</html>

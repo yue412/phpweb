@@ -1,0 +1,100 @@
+<html>
+
+<head>
+    <meta http-equiv="content-type" content="text/html;charset=utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>
+        三国大亨
+    </title>
+    <style type="text/css">
+        div.no {
+            font-size: 120%;
+            display: inline
+        }
+
+        div.yes {
+            font-size: 80%;
+            display: inline
+        }
+
+        div.content {
+            color: #FF0000;
+            display: inline
+        }
+
+        div.level {
+            display: inline
+        }
+    </style>
+    <script type="text/javascript" src="sg_common.js">
+    </script>
+    <script type="text/javascript">
+        function init_equipment_types()
+        {
+            do_ajax("sg_get_equipment_type_dict.php", function (text) {
+                var type_dict = JSON.parse(text);
+                var e = document.getElementById("equipment_types");
+                for (var i = 0; i < type_dict.length; i++) {
+                    var option = document.createElement("option");  
+                    option.value = type_dict[i].id;  
+                    option.text = type_dict[i].name;  
+                    e.add(option, e.options[null]);  
+                }
+            })
+        }
+        function query_hero()
+        {
+            var e1 = document.getElementById("equipment_level");
+            var e2 = document.getElementById("equipment_types");
+            var level = e1.value;
+            var index = e2.selectedIndex;
+            var type = e2.options[index].value;
+            do_ajax("sg_query_hero.php?level="+level+"&type="+type, function (text) {
+                var e = document.getElementById("content");
+                var arr = JSON.parse(text);
+              
+                var s = "<table border='1'>";
+                s += "<tr>";
+                s += "<td>";
+                s += "ID";
+                s += "</td>";
+                s += "<td>";
+                s += "名称";
+                s += "</td>";
+                s += "<td>";
+                s += "级别";
+                s += "</td>";
+                s += "</tr>";
+                for (var i = 0; i < arr.length; i++) {
+                    s += "<tr>";
+                    s += "<td>";
+                    s += arr[i].id;
+                    s += "</td>";
+                    s += "<td>";
+                    s += arr[i].name;
+                    s += "</td>";
+                    s += "<td>";
+                    s += arr[i].level;
+                    s += "</td>";
+                    s += "</tr>";
+                }
+                s += "</table>";
+                e.innerHTML = s;
+//                e.innerText = text;
+            })
+        }
+    </script>
+</head>
+<body>
+    级别：<input type="number" id="equipment_level" value="0"/>
+    类型：<select id="equipment_types"/>
+    <input type="button" onclick="query_hero()" value="查询" />
+    <br>
+    <div id="content"></div>
+    <script type="text/javascript">
+        init_equipment_types();
+    </script>
+
+</body>
+
+</html>

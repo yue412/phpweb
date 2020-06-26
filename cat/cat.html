@@ -1,0 +1,140 @@
+
+<!-- saved from url=(0038)http://www.yue412.top/cat/cat.html -->
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+		
+		<title>cat</title>
+		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no">
+	</head>
+
+	<body>
+		<script type="text/javascript">
+			function getCookie(c_name)
+			{
+				if (document.cookie.length>0)
+				{
+					c_start=document.cookie.indexOf(c_name + "=")
+					if (c_start!=-1)
+					{ 
+						c_start=c_start + c_name.length+1 
+						c_end=document.cookie.indexOf(";",c_start)
+						if (c_end==-1) c_end=document.cookie.length
+						return unescape(document.cookie.substring(c_start,c_end))
+					} 
+				}
+				return ""
+			}
+			function setCookie(c_name,value,expiredays)
+			{
+				var exdate=new Date()
+				exdate.setDate(exdate.getDate()+expiredays)
+				document.cookie=c_name+ "=" +escape(value)+
+					((expiredays==null) ? "" : ";expires="+exdate.toGMTString())
+			}
+			var number_suffix = ['', 'k', 'm', 'b', 't'];
+			function priceToStr(price)
+			{
+				var p = Math.abs(price);
+				for(var i = 0; i< number_suffix.length; ++i)
+				{
+					t = Math.pow(10, i*3);
+					if(p < t*1000)
+					{
+						pp = price / t;
+						return pp.toPrecision(3)+number_suffix[i];
+					}
+				}
+				return price;
+			}
+			function strToPrice(str)
+			{
+				if(str == "")
+					return 0;
+				var c = str.charAt(str.length-1);
+				for(var i = 1; i< number_suffix.length; ++i)
+				{
+					if(c == number_suffix[i])
+					{
+						v = parseFloat(str.substr(0, str.length-1));
+						return v * Math.pow(10, i*3);
+					}
+				}
+				return parseFloat(str);
+			}
+			
+			function calccat()
+			{
+				var prices_list = document.getElementById("catPrice").value;
+				setCookie("cat_prices", prices_list, null);
+
+				var cat_price_str = prices_list.split(",");
+				var cat_class_cnt = cat_price_str.length; // 飞机种类
+				//var cat_price = [4730, 10388, 24078, 46012, 103317, 272576, 844985];
+				//var cat_price_inc = [0.07, 0.175, 0.175, 0.175, 0.175, 0.175, 0.175];
+				//var total_price = 130000000;
+				var cat_price_inc = new Array(cat_class_cnt); // 飞机价格增量
+				var cat_cnt = new Array(cat_class_cnt); // 每种飞机个数
+				var cat_factor = new Array(cat_class_cnt); // 每种飞机系数 1,2,4,8...
+				var cat_price = new Array(cat_class_cnt); // 飞机价格
+				var factor = 1;
+				// 初始化
+				for (var i = 0; i < cat_class_cnt; i++) {
+					cat_cnt[i] = 0;
+					cat_factor[i] = factor;
+					factor *= 2;
+					cat_price_inc[i] = i<2?0.07:0.175;
+					cat_price[i] = strToPrice(cat_price_str[i]);
+				}
+				var new_cat_class = document.getElementById("catClass").value;
+				var new_cat_factor = Math.pow(2,new_cat_class-1);
+				var total = 0;
+				var cat_list = new Array();
+				var cat_p_list = new Array();
+				while (new_cat_factor > 0){
+					// who is cheap
+					var min_index = 0;
+					for (var i = 1; i < cat_class_cnt; i++) {
+						if (cat_factor[i]>new_cat_factor)
+							break;
+						if (cat_price[i] / cat_factor[i] < cat_price[min_index] / cat_factor[min_index])
+							min_index = i;
+					}
+					new_cat_factor -= cat_factor[min_index];
+					cat_list.push(min_index);
+					total += cat_price[min_index];
+					cat_cnt[min_index] += 1;
+					cat_price[min_index] = Math.round(cat_price[min_index] * (1 + cat_price_inc[min_index]));
+					cat_p_list.push(cat_price.toString());
+				}
+				
+				var s = "";
+				for (var i = 0; i < cat_class_cnt; i++) {
+					s += (i + 1) + " : " + cat_cnt[i]+"<br>";
+				}
+				// s += "<br>";				
+				// for (var i = 0; i < cat_list.length; i++) {
+				// 	s += (cat_list[i] + 1) + " : " + cat_p_list[i]+"<br>";
+				// }
+				// s += "<br>";
+				for (var i = 0; i < cat_class_cnt; i++) {
+					s += priceToStr(cat_price[i]) + ",";
+				}
+				s += "<br>";
+				s += "total: " + priceToStr(total) + "<br>";
+		//		
+				document.getElementById("demo").innerHTML = s;
+			}
+		</script>
+		猫价格：<input type="text" id="catPrice" size="100"><br>
+		<script type="text/javascript">
+			var old = getCookie("cat_prices");
+			if(old=="")
+				old = "7740, 10200, 85800, 73300, 142000, 269000, 388000, 1190000";
+			document.getElementById("catPrice").value = old;
+		</script>
+		猫型号：<input type="number" id="catClass" value="9">
+		<button onclick="calccat()">计算</button>
+		<p id="demo"></p>
+	
+
+
+</body></html>

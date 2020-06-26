@@ -1,0 +1,238 @@
+<html>
+
+<head>
+    <meta http-equiv="content-type" content="text/html;charset=utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>
+        三国大亨
+    </title>
+    <style type="text/css">
+        div.no {
+            font-size: 120%;
+            display: inline
+        }
+
+        div.yes {
+            font-size: 80%;
+            display: inline
+        }
+
+        div.content {
+            color: #FF0000;
+            display: inline
+        }
+
+        div.level {
+            display: inline
+        }
+    </style>
+    <script type="text/javascript">
+
+        function checkbox_check2(ck, id, index) {
+            var checked = document.getElementById(ck).checked;
+            var url = "sg_set_equipment2.php?id=" + id + "&type=" + index + "&checked=" + checked;
+            do_ajax(url, function (text) {
+                var e = document.getElementById("div_" + id + "_" + index);
+                e.innerHTML = text;
+            });
+        }
+        function set_level(id, flag) {
+            var url = "sg_set_level2.php?id=" + id + "&opr=" + flag;
+            do_ajax(url, function (text) {
+                var e = document.getElementById("level_" + id);
+                e.innerHTML = text;
+            });
+        }
+
+        var g_hero_eqiupment;
+        function output_equipment_name(obj, id, index) {
+            var checkbox_id = "ck_" + id + "_" + index;
+            var div_id = "div_" + id + "_" + index;
+            var def_val = obj.status == 0 ? "checked=\"checked\"" : "";
+            var s = "<input type=\"checkbox\" id=\"" + checkbox_id + "\" onclick=\"checkbox_check2('" + checkbox_id + "'," + id + "," + index + ")\" " + def_val + "/>";
+            s += "<div class=\"content\" id=\"" + div_id + "\">";
+            if (obj.status == 1)
+                s += obj.name;
+/*             switch (obj.status) {
+                case 0: s += obj.name == 1 ? "是 <a href=\"sg_set_equipment.php?id="+id+"&type="+index+"&val=0\">丢</a>" : "";
+                    break;
+                case 1: s += "<font color=\"red\">" + obj.name + "</font> <a href=\"sg_set_equipment.php?id="+id+"&type="+index+"&val=1\">加</a>";
+                    break;
+            }
+ */            s += "</div>";
+            return s;
+        }
+        function output_collect_table() {
+            var s_content = "<table id=\"tb2\" border = 1>";
+            s_content += "<tr>";
+            s_content += "<td>ID</td>";
+            s_content += "<td>名称</td>";
+            s_content += "<td>级别</td>";
+            s_content += "<td>武器</td>";
+            s_content += "<td>衣服</td>";
+            s_content += "<td>帽子</td>";
+            s_content += "<td>护手</td>";
+            s_content += "<td>鞋子</td>";
+            s_content += "<td>其他1</td>";
+            s_content += "<td>其他2</td>";
+            s_content += "</tr>";
+            for (var i = 0; i < g_hero_eqiupment.length; i++) {
+                s_content += "<tr>";
+                s_content += "<td>";
+                s_content += g_hero_eqiupment[i].id;
+                s_content += "</td>";
+                s_content += "<td>";
+                s_content += g_hero_eqiupment[i].name;
+                s_content += "</td>";
+                s_content += "<td>";
+                s_content += "<div class=\"level\" id=\"level_" + g_hero_eqiupment[i].id + "\">";
+                s_content += g_hero_eqiupment[i].level + "</div> <a href=\"#\" onclick=\"set_level(" + g_hero_eqiupment[i].id +
+                    ", 1)\">加</a> <a href=\"#\" onclick=\"set_level(" + g_hero_eqiupment[i].id + ", -1)\">减</a>";
+                //s_content += g_hero_eqiupment[i].level + "</div> <a href=\"sg_set_level.php?id="+g_hero_eqiupment[i].id+"&opr=1\">加</a> <a href=\"sg_set_level.php?id="+g_hero_eqiupment[i].id+"&opr=-1\">减</a>";
+                s_content += "</td>";
+                s_content += "<td>";
+                s_content += output_equipment_name(g_hero_eqiupment[i].weapon, g_hero_eqiupment[i].id, 0);
+                s_content += "</td>";
+                s_content += "<td>";
+                s_content += output_equipment_name(g_hero_eqiupment[i].clothes, g_hero_eqiupment[i].id, 1);
+                s_content += "</td>";
+                s_content += "<td>";
+                s_content += output_equipment_name(g_hero_eqiupment[i].hat, g_hero_eqiupment[i].id, 2);
+                s_content += "</td>";
+                s_content += "<td>";
+                s_content += output_equipment_name(g_hero_eqiupment[i].bracer, g_hero_eqiupment[i].id, 3);
+                s_content += "</td>";
+                s_content += "<td>";
+                s_content += output_equipment_name(g_hero_eqiupment[i].shoes, g_hero_eqiupment[i].id, 4);
+                s_content += "</td>";
+                s_content += "<td>";
+                s_content += output_equipment_name(g_hero_eqiupment[i].other1, g_hero_eqiupment[i].id, 5);
+                s_content += "</td>";
+                s_content += "<td>";
+                s_content += output_equipment_name(g_hero_eqiupment[i].other2, g_hero_eqiupment[i].id, 6);
+                s_content += "</td>";
+                s_content += "</tr>";
+            }
+            s_content += "</table>"
+            var e = document.getElementById("content");
+            e.innerHTML = s_content;
+            var x = new TableSorter("tb2");            
+        }
+        function done_need(obj, map) {
+            if (obj.status == 1) {
+                var cnt = 0;
+                if (map.has(obj.name))
+                    cnt = map.get(obj.name);
+                map.set(obj.name, ++cnt);
+            }
+        }
+        function output_need_table() {
+            var m = new Map();
+            for (var i = 0; i < g_hero_eqiupment.length; i++) {
+                done_need(g_hero_eqiupment[i].weapon, m);
+                done_need(g_hero_eqiupment[i].clothes, m);
+                done_need(g_hero_eqiupment[i].hat, m);
+                done_need(g_hero_eqiupment[i].bracer, m);
+                done_need(g_hero_eqiupment[i].shoes, m);
+                done_need(g_hero_eqiupment[i].other1, m);
+                done_need(g_hero_eqiupment[i].other2, m);
+            }
+            var arr = Array.from(m);
+            arr.sort(function (a, b) {
+                return b[1] - a[1]
+            });
+            var s = "<table border = 1>";
+            for (var i = 0; i < arr.length; i++) {
+                s += "<tr>";
+                s += "<td>";
+                s += arr[i][0];
+                s += "</td>";
+                s += "<td>";
+                s += arr[i][1];
+                s += "</td>";
+                s += "</tr>";
+            };
+            s += "</table>";
+            var e = document.getElementById("content");
+            e.innerHTML = s;
+        }
+        function done_missed(obj, map) {
+            if (obj.status == -1) {
+                var arr = obj.type;
+                for (var i = 0; i < arr.length; i++) {
+                    var cnt = 0;
+                    if (map.has(arr[i]))
+                        cnt = map.get(arr[i]);
+                    map.set(arr[i], ++cnt);
+                }
+            }
+        }
+        function output_missed_table() {
+            var m = new Map();
+            for (var i = 0; i < g_hero_eqiupment.length; i++) {
+                done_missed(g_hero_eqiupment[i].weapon, m);
+                done_missed(g_hero_eqiupment[i].clothes, m);
+                done_missed(g_hero_eqiupment[i].hat, m);
+                done_missed(g_hero_eqiupment[i].bracer, m);
+                done_missed(g_hero_eqiupment[i].shoes, m);
+                done_missed(g_hero_eqiupment[i].other1, m);
+                done_missed(g_hero_eqiupment[i].other2, m);
+            }
+            var arr = Array.from(m);
+            arr.sort(function (a, b) {
+                return b[1] - a[1]
+            });
+            var s = "<table border = 1>";
+            for (var i = 0; i < arr.length; i++) {
+                s += "<tr>";
+                s += "<td>";
+                s += arr[i][0];
+                s += "</td>";
+                s += "<td>";
+                s += arr[i][1];
+                s += "</td>";
+                s += "</tr>";
+            };
+            s += "</table>";
+            var e = document.getElementById("content");
+            e.innerHTML = s;
+        }
+        function loadData(ofunc) {
+            do_ajax("sg_main_data.php", function (text) {
+                g_hero_eqiupment = JSON.parse(text);
+                ofunc();
+            })
+        }        
+    </script>
+    <script type="text/javascript" src="TableSorterV3.js">
+    </script>
+    <script type="text/javascript" src="sg_common.js">
+    </script>   
+
+</head>
+
+<body>
+    <a href="sg_equipment_factory.php">装备库</a>
+    <a href="sg_equipment_level.php">装备级别</a>
+    <a href="sg_hero_class.php">英雄模板</a>
+    <a href="sg_hero.php">英雄</a>
+    <!-- <a href="sg_equipment_query.html">装备查询</a> -->
+    <a href="sg_equipment_query.php">装备查询2</a>
+    <br>
+    <input type="button" onclick="loadData(output_collect_table)" value="汇总表" />
+    <input type="button" onclick="loadData(output_need_table)" value="需求表" />
+    <input type="button" onclick="loadData(output_missed_table)" value="缺口表" />
+    <br>
+    <div id="content"></div>
+    <script type="text/javascript">
+        loadData(output_collect_table);
+        // window.onpageshow = function (event) {
+        //         if (event.persisted) {
+        //             window.location.reload();
+        //         }
+        //     }        
+    </script>
+
+</body>
+
+</html>

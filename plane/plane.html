@@ -1,0 +1,101 @@
+<html>
+
+	<head>
+		<meta charset="utf-8">
+		<title>飞机大亨</title>
+		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+	</head>
+
+	<body>
+		<script type="text/javascript">
+			function getCookie(c_name)
+			{
+				if (document.cookie.length>0)
+				{
+					c_start=document.cookie.indexOf(c_name + "=")
+					if (c_start!=-1)
+					{ 
+						c_start=c_start + c_name.length+1 
+						c_end=document.cookie.indexOf(";",c_start)
+						if (c_end==-1) c_end=document.cookie.length
+						return unescape(document.cookie.substring(c_start,c_end))
+					} 
+				}
+				return ""
+			}
+			function setCookie(c_name,value,expiredays)
+			{
+				var exdate=new Date()
+				exdate.setDate(exdate.getDate()+expiredays)
+				document.cookie=c_name+ "=" +escape(value)+
+					((expiredays==null) ? "" : ";expires="+exdate.toGMTString())
+			}
+			
+			function calcPlane()
+			{
+				var prices_list = document.getElementById("planePrice").value;
+				setCookie("plane_prices", prices_list, null);
+
+				var plane_price_str = prices_list.split(",");
+				var plane_class_cnt = plane_price_str.length;
+				//var plane_price = [4730, 10388, 24078, 46012, 103317, 272576, 844985];
+				//var plane_price_inc = [0.07, 0.175, 0.175, 0.175, 0.175, 0.175, 0.175];
+				//var total_price = 130000000;
+				var plane_price_inc = new Array(plane_class_cnt);
+				var plane_cnt = new Array(plane_class_cnt);
+				var plane_factor = new Array(plane_class_cnt);
+				var plane_price = new Array(plane_class_cnt);
+				var factor = 1;
+				for (var i = 0; i < plane_class_cnt; i++) {
+					plane_cnt[i] = 0;
+					plane_factor[i] = factor;
+					factor *= 2;
+					plane_price_inc[i] = i==0?0.07:0.175;
+					plane_price[i] = parseInt(plane_price_str[i]);
+				}
+				var new_plane_class = document.getElementById("planeClass").value;
+				var new_plane_factor = Math.pow(2,new_plane_class-1);
+				var total = 0;
+				var plane_list = new Array();
+				var plane_p_list = new Array();
+				while (new_plane_factor > 0){
+					// who is cheap
+					var min_index = 0;
+					for (var i = 1; i < plane_class_cnt; i++) {
+						if (plane_price[i] / plane_factor[i] < plane_price[min_index] / plane_factor[min_index])
+							min_index = i;
+					}
+					new_plane_factor -= plane_factor[min_index];
+					plane_list.push(min_index);
+					total += plane_price[min_index];
+					plane_cnt[min_index] += 1;
+					plane_price[min_index] = Math.round(plane_price[min_index] * (1 + plane_price_inc[min_index]));
+					plane_p_list.push(plane_price.toString());
+				}
+				var s = "";
+				for (var i = 0; i < plane_list.length; i++) {
+					s += (plane_list[i] + 1) + " : " + plane_p_list[i]+"<br>";
+				}
+				s += "<br>";
+				for (var i = 0; i < plane_class_cnt; i++) {
+					s += plane_price[i] + ",";
+				}
+				s += "<br>";
+				s += "total: " + total + "<br>";
+		//		
+				document.getElementById("demo").innerHTML = s;
+			}
+		</script>
+		飞机价格：<input type="text" id="planePrice" size="100"><br>
+		<script type="text/javascript">
+			var old = getCookie("plane_prices");
+			if(old=="")
+				old = "4730, 10388, 24078, 46012, 103317, 272576, 844985";
+			document.getElementById("planePrice").value = old;
+		</script>
+		飞机型号：<input type="number" id="planeClass" value="9">
+		<button onclick="calcPlane()">计算</button>
+		<p id="demo"></p>
+	</body>
+
+</html>

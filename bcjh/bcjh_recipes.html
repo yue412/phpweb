@@ -28,46 +28,144 @@
     </style>
     <script type="text/javascript" src="common.js">
     </script>
+    <script type="text/javascript" src="bcjh_data.js">
+    </script>
     <script type="text/javascript">
-        function init_equipment_types()
+        function sort_recipe(a,b)
         {
-            do_ajax("https://foodgame.github.io/data/data.min.json", function (text) {
-                    var e = document.getElementById("content");
-                    var model = JSON.parse(text);
-
-                    // 菜谱
-                    var recipes = model.recipes;
-                    var s = "<table border='1'>";
-                    s += "<tr>";
-                    s += "<td>";
-                    s += "ID";
-                    s += "</td>";
-                    s += "<td>";
-                    s += "名称";
-                    s += "</td>";
-                    s += "<td>";
-                    s += "稀有度";
-                    s += "</td>";
-                    s += "<td>";
-                    s += "炒";
-                    s += "</td>";
-                    s += "<td>";
-                    s += "煮";
-                    s += "</td>";
-                    s += "<td>";
-                    s += "切";
-                    s += "</td>";
-                    s += "<td>";
-                    s += "炸";
-                    s += "</td>";
-                    s += "<td>";
-                    s += "烤";
-                    s += "</td>";
-                    s += "<td>";
-                    s += "蒸";
-                    s += "</td>";
-                    s += "</tr>";
-                    for (var i = 0; i < recipes.length; i++) {
+            return a.recipeId - b.recipeId;
+        }
+        function material_by_id(id)
+        {
+            var materials_dict = g_bcjh_data.materials;
+            for (let i = 0; i < materials_dict.length; i++) {
+                if (id == materials_dict[i].materialId)
+                {
+                    return materials_dict[i];
+                }
+            }
+            return null;
+        }
+        function get_materials_name(materials)
+        {
+            var list = new Array();
+            for (let i = 0; i < materials.length; i++) {
+                const id = materials[i].material;
+                const count = materials[i].quantity;
+                var obj = material_by_id(id);
+                list.push(obj.name + "*" + count);
+            }
+            return list.join(",");
+        }
+        function get_materials_max_time(materials, materials_map)
+        {
+            var list = new Array();
+            var max_time = 0;
+            for (let i = 0; i < materials.length; i++) {
+                const id = materials[i].material;
+                const count = materials[i].quantity;
+                var obj = material_by_id(id);
+                var time = materials_map.get(obj.name) * count;
+                max_time = Math.max(max_time, time);
+            }
+            return max_time;
+        }
+        function display_time(time)
+        {
+            var hour = parseInt(time / 3600);
+            time = time - hour*3600;
+            var minute = parseInt(time / 60);
+            var second = time - minute*60;
+            var result = "";
+            if(hour != 0)
+                result += hour + "小时";
+            if(minute != 0)
+                result += minute + "分";
+            if(second != 0)
+                result += second + "秒";
+            return result;
+        }
+        function calc_material_time()
+        {
+            var maps = g_bcjh_data.maps;
+            var m = new Map();
+            for (let i = 0; i < maps.length; i++) {
+                var map = maps[i];
+                var times = map.time;
+                for (let j = 0; j < map.materials.length; j++) {
+                    const material = map.materials[j];
+                    var name = material.name;
+                    var quantity = material.quantity;
+                    var total_time = 0;
+                    var n = 0;
+                    for (let k = 0; k < quantity.length; k++) {
+                        const pair = quantity[k];
+                        if(pair[0] == 0)
+                            continue;
+                        var count = (pair[0] + pair[1])/2;
+                        var time = times[k] / count;
+                        total_time += time;
+                        ++n;
+                    }
+                    m.set(name, total_time / n);
+                }
+            }
+            return m;
+        }
+        function display_recipes()
+        {
+            do_ajax("get_db_data.php?name=bcjh_recipes&order_field=id", function(text){
+                var e = document.getElementById("recipes");
+                var my_recipes = JSON.parse(text);
+                // 菜谱
+                var recipes = g_bcjh_data.recipes;
+                var materials = g_bcjh_data.materials;
+                var material_time_map = calc_material_time();
+                recipes.sort(sort_recipe);
+                var s = "<table border='1'>";
+                s += "<tr>";
+                s += "<td>";
+                s += "ID";
+                s += "</td>";
+                s += "<td>";
+                s += "名称";
+                s += "</td>";
+                s += "<td>";
+                s += "稀有度";
+                s += "</td>";
+                s += "<td>";
+                s += "材料";
+                s += "</td>";
+                s += "<td>";
+                s += "单价";
+                s += "</td>";
+                s += "<td>";
+                s += "总价";
+                s += "</td>";
+                s += "<td>";
+                s += "总时间(秒)";
+                s += "</td>";
+                s += "<td>";
+                s += "总时间";
+                s += "</td>";
+                s += "<td>";
+                s += "解锁";
+                s += "</td>";
+                s += "<td>";
+                s += "采集时间";
+                s += "</td>";
+                s += "</tr>";
+                var i = 0;
+                var j = 0;
+                while (i < recipes.length && j < my_recipes.length) {
+                    var my_id = parseInt(my_recipes[j].id);
+                    if (recipes[i].recipeId > my_id)
+                        ++j;
+                    else if (recipes[i].recipeId < my_id)
+                        ++i;
+                    else {
+                        var calc_price = parseInt(my_recipes[j].is_mastery) != 0 ? recipes[i].price + recipes[i].exPrice : recipes[i].price;
+                        var total_time = recipes[i].limit * recipes[i].time;
                         s += "<tr>";
                         s += "<td>";
                         s += recipes[i].galleryId;
@@ -79,35 +177,41 @@
                         s += recipes[i].rarity;
                         s += "</td>";
                         s += "<td>";
-                        s += recipes[i].stirfry;
+                        s += get_materials_name(recipes[i].materials);
                         s += "</td>";
                         s += "<td>";
-                        s += recipes[i].boil;
+                        s += calc_price;
                         s += "</td>";
                         s += "<td>";
-                        s += recipes[i].knife;
+                        s += recipes[i].limit * calc_price;
                         s += "</td>";
                         s += "<td>";
-                        s += recipes[i].fry;
+                        s += total_time;
                         s += "</td>";
                         s += "<td>";
-                        s += recipes[i].bake;
+                        s += display_time(total_time);
                         s += "</td>";
                         s += "<td>";
-                        s += recipes[i].steam;
+                        s += recipes[i].unlock;
+                        s += "</td>";
+                        s += "<td>";
+                        s += Math.round(get_materials_max_time(recipes[i].materials, material_time_map));
                         s += "</td>";
                         s += "</tr>";
+                        ++i;
+                        ++j;
                     }
-                    s += "</table>";
-                    e.innerHTML = s;
-            })
+                }
+                s += "</table>";
+                e.innerHTML = s;
+            });
         }
     </script>
 </head>
 <body>
-    <div id="content"></div>
+    <div id="recipes"></div>
     <script type="text/javascript">
-        init_equipment_types();
+        display_recipes();
     </script>
 
 </body>

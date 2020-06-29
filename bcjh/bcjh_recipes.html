@@ -30,6 +30,8 @@
     </script>
     <script type="text/javascript" src="bcjh_data.js">
     </script>
+    <script type="text/javascript" src="TableSorterV3.js">
+    </script>
     <script type="text/javascript">
         function sort_recipe(a,b)
         {
@@ -122,7 +124,7 @@
                 var materials = g_bcjh_data.materials;
                 var material_time_map = calc_material_time();
                 recipes.sort(sort_recipe);
-                var s = "<table border='1'>";
+                var s = "<table id=\"tb2\" border='1'>";
                 s += "<tr>";
                 s += "<td>";
                 s += "ID";
@@ -152,7 +154,7 @@
                 s += "解锁";
                 s += "</td>";
                 s += "<td>";
-                s += "采集时间";
+                s += "效率";
                 s += "</td>";
                 s += "</tr>";
                 var i = 0;
@@ -195,7 +197,7 @@
                         s += recipes[i].unlock;
                         s += "</td>";
                         s += "<td>";
-                        s += Math.round(get_materials_max_time(recipes[i].materials, material_time_map));
+                        s += (calc_price / (recipes[i].time + get_materials_max_time(recipes[i].materials, material_time_map)) / 0.02).toFixed(2);
                         s += "</td>";
                         s += "</tr>";
                         ++i;
@@ -204,6 +206,7 @@
                 }
                 s += "</table>";
                 e.innerHTML = s;
+                var x = new TableSorter("tb2");
             });
         }
     </script>

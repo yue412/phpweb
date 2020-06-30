@@ -166,7 +166,7 @@
 
     function create_update_form(&$db, $table_name, $primary_key, $key_val, $titles = NULL, $fixed_list = NULL, $source = NULL)
     {
-        echo '<form action="sg_update_record.php">';
+        echo '<form action="update_record.php">';
         echo '<input type="hidden" name="primary_key" value="'.$primary_key.'"> ';
         echo '<input type="hidden" name="key_val" value="'.$key_val.'"> ';
         create_form($db, $table_name, $titles, $fixed_list, get_record_by_id($db, $table_name, $primary_key, $key_val), $source);
@@ -182,7 +182,7 @@
         for($i = 0; $i < $num; ++$i)
         {
             $row = $result->fetch_assoc();
-            if ($row['Key'] == 'PRI')
+            if ($row['Key'] == 'PRI' && $row['Extra'] == 'auto_increment')
             {
                 //主键，自增长暂不处理
             }

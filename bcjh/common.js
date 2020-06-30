@@ -31,3 +31,7 @@ function checkbox_check(id)
         document.getElementById(id + "_val").value = 0;
 }
 
+function goBack(){
+    window.history.back()
+}
+

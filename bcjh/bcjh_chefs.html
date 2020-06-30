@@ -1,0 +1,171 @@
+<html>
+
+<head>
+    <meta http-equiv="content-type" content="text/html;charset=utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>
+        爆炒江湖
+    </title>
+    <style type="text/css">
+        div.no {
+            font-size: 120%;
+            display: inline
+        }
+
+        div.yes {
+            font-size: 80%;
+            display: inline
+        }
+
+        div.content {
+            color: #FF0000;
+            display: inline
+        }
+
+        div.level {
+            display: inline
+        }
+    </style>
+    <script type="text/javascript" src="common.js">
+    </script>
+    <script type="text/javascript" src="bcjh_data.js">
+    </script>
+    <script type="text/javascript" src="bcjh_common.js">
+    </script>
+    <script type="text/javascript" src="TableSorterV3.js">
+    </script>
+    <script type="text/javascript">
+        function display_chefs()
+        {
+            do_ajax("get_db_data.php?name=bcjh_chefs&order_field=id", function(text){
+                var e = document.getElementById("chefs");
+                var e2 = document.getElementById("title");
+                var my_chefs = JSON.parse(text);
+                e2.innerHTML = "数量：" + my_chefs.length;
+                // 菜谱
+                //var chefs = g_bcjh_data.chefs;
+                var arrRate = ["", "可", "优", "特", "神"]; 
+                //chefs.sort(sort_chefs);
+                var s = "<table id=\"tb2\" border='1'>";
+                s += "<tr>";
+                s += "<td>";
+                s += "ID";
+                s += "</td>";
+                s += "<td>";
+                s += "名称";
+                s += "</td>";
+                s += "<td>";
+                s += "级别";
+                s += "</td>";
+                s += "<td>";
+                s += "稀有度";
+                s += "</td>";
+                s += "<td>";
+                s += "炒";
+                s += "</td>";
+                s += "<td>";
+                s += "蒸";
+                s += "</td>";
+                s += "<td>";
+                s += "切";
+                s += "</td>";
+                s += "<td>";
+                s += "炸";
+                s += "</td>";
+                s += "<td>";
+                s += "煮";
+                s += "</td>";
+                s += "<td>";
+                s += "烤";
+                s += "</td>";
+                s += "<td>";
+                s += "鱼";
+                s += "</td>";
+                s += "<td>";
+                s += "面";
+                s += "</td>";
+                s += "<td>";
+                s += "菜";
+                s += "</td>";
+                s += "<td>";
+                s += "肉";
+                s += "</td>";
+                s += "<td>";
+                s += "编辑";
+                s += "</td>";
+                s += "</tr>";
+                for (var i = 0; i < my_chefs.length; ++i) 
+                {
+                    //var my_id = parseInt(my_chefs[j].id);
+                    s += "<tr>";
+                    s += "<td>";
+                    s += my_chefs[i].id;
+                    s += "</td>";
+                    s += "<td>";
+                    s += my_chefs[i].name;
+                    s += "</td>";
+                    s += "<td>";
+                    s += my_chefs[i].level;
+                    s += "</td>";
+                    s += "<td>";
+                    s += my_chefs[i].rarity;
+                    s += "</td>";
+                    s += "<td>";
+                    s += my_chefs[i].stirfry;
+                    s += "</td>";
+                    s += "<td>";
+                    s += my_chefs[i].steam;
+                    s += "</td>";
+                    s += "<td>";
+                    s += my_chefs[i].knife;
+                    s += "</td>";
+                    s += "<td>";
+                    s += my_chefs[i].fry;
+                    s += "</td>";
+                    s += "<td>";
+                    s += my_chefs[i].boil;
+                    s += "</td>";
+                    s += "<td>";
+                    s += my_chefs[i].bake;
+                    s += "</td>";
+                    s += "<td>";
+                    s += my_chefs[i].fish;
+                    s += "</td>";
+                    s += "<td>";
+                    s += my_chefs[i].creation;
+                    s += "</td>";
+                    s += "<td>";
+                    s += my_chefs[i].veg;
+                    s += "</td>";
+                    s += "<td>";
+                    s += my_chefs[i].meat;
+                    s += "</td>";
+                    s += "<td>";
+                    s += "<a href=\"bcjh_modify_chef.php?id="+my_chefs[i].id+"\">修改</a>";
+                    if(my_chefs[i].level < 3)
+                    {
+                        var sparams = build_chef_params(my_chefs[i].name);
+                        s += "<a href=\"update_record.php?table_name=bcjh_chefs&source=bcjh_chefs.html&primary_key=id&"+sparams+"&key_val="+my_chefs[i].id+"\">满级</a>";
+                    }
+                    s += "</td>";
+                    s += "</tr>";
+                }
+                s += "</table>";
+                e.innerHTML = s;
+                var x = new TableSorter("tb2");
+            });
+        }
+    </script>
+</head>
+<body>
+    <a href="bcjh_new_chef.html">添加厨师</a>
+    <a href="bcjh_recipes.html">返回</a>
+    <div id="title"></div>
+    <div id="chefs"></div>
+    <script type="text/javascript">
+        display_chefs();
+    </script>
+    <div id="test"></div>
+</body>
+
+</html>

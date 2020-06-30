@@ -114,6 +114,54 @@
             }
             return m;
         }
+        function recipe_by_id(id)
+        {
+            var recipes = g_bcjh_data.recipes;
+            for (let i = 0; i < recipes.length; i++) {
+                const recipe = recipes[i];
+                if(recipe.recipeId == id)
+                {
+                    return recipe;
+                }
+            }
+            return null;
+        }
+        function clickCheckbox(id)
+        {
+            var recipe = recipe_by_id(id);
+            var e1 = document.getElementById("price"+id);
+            var e2 = document.getElementById("total_price"+id);
+            var checked = document.getElementById("ck"+id).checked ? 1 : 0;
+            var price = recipe.price;
+            if (checked)
+                price += recipe.exPrice;
+            e1.innerHTML = price;
+            e2.innerHTML = price*recipe.limit;
+
+            var url = "update_record.php?table_name=bcjh_recipes&primary_key=id&key_val=" + id +"&is_mastery="+checked;
+            do_ajax(url, function (text) {
+                // do nothing
+                //var e = document.getElementById("test");
+                //e.innerHTML = text;
+            });            
+        }
+        function changeRate(id)
+        {
+            var recipe = recipe_by_id(id);
+            var e1 = document.getElementById("unlock"+id);
+            var val = document.getElementById("cb_rate"+id).value;
+            var unlock = recipe.unlock;
+            if (val == 4)
+                unlock = "-";
+            e1.innerHTML = unlock;
+
+            var url = "update_record.php?table_name=bcjh_recipes&primary_key=id&key_val=" + id +"&rate="+val;
+            do_ajax(url, function (text) {
+                // do nothing
+                //var e = document.getElementById("test");
+                //e.innerHTML = text;
+            });             
+        }
         function display_recipes()
         {
             do_ajax("get_db_data.php?name=bcjh_recipes&order_field=id", function(text){
@@ -123,6 +171,7 @@
                 var recipes = g_bcjh_data.recipes;
                 var materials = g_bcjh_data.materials;
                 var material_time_map = calc_material_time();
+                var arrRate = ["", "可", "优", "特", "神"]; 
                 recipes.sort(sort_recipe);
                 var s = "<table id=\"tb2\" border='1'>";
                 s += "<tr>";
@@ -139,6 +188,9 @@
                 s += "材料";
                 s += "</td>";
                 s += "<td>";
+                s += "熟练";
+                s += "</td>";
+                s += "<td>";
                 s += "单价";
                 s += "</td>";
                 s += "<td>";
@@ -149,6 +201,9 @@
                 s += "</td>";
                 s += "<td>";
                 s += "总时间";
+                s += "</td>";
+                s += "<td>";
+                s += "评级";
                 s += "</td>";
                 s += "<td>";
                 s += "解锁";
@@ -166,8 +221,12 @@
                     else if (recipes[i].recipeId < my_id)
                         ++i;
                     else {
-                        var calc_price = parseInt(my_recipes[j].is_mastery) != 0 ? recipes[i].price + recipes[i].exPrice : recipes[i].price;
+                        var is_mastery = parseInt(my_recipes[j].is_mastery) != 0
+                        var calc_price = is_mastery ? recipes[i].price + recipes[i].exPrice : recipes[i].price;
                         var total_time = recipes[i].limit * recipes[i].time;
+                        var check_val = is_mastery ? "checked=\"checked\"" : "";
+                        var rate = parseInt(my_recipes[j].rate);
+                        //var checkbox_id = "ck_" + recipes[i].galleryId;
                         s += "<tr>";
                         s += "<td>";
                         s += recipes[i].galleryId;
@@ -182,10 +241,17 @@
                         s += get_materials_name(recipes[i].materials);
                         s += "</td>";
                         s += "<td>";
-                        s += calc_price;
+                        s += "<input type=\"checkbox\" id=\"ck"+recipes[i].recipeId+"\" onclick=\"clickCheckbox("+recipes[i].recipeId+")\" "+check_val+">";
                         s += "</td>";
                         s += "<td>";
+                        s += "<div id=\"price" + recipes[i].recipeId + "\">";
+                        s += calc_price;
+                        s += "</div>";
+                        s += "</td>";
+                        s += "<td>";
+                        s += "<div id=\"total_price" + recipes[i].recipeId + "\">";
                         s += recipes[i].limit * calc_price;
+                        s += "</div>";
                         s += "</td>";
                         s += "<td>";
                         s += total_time;
@@ -194,7 +260,18 @@
                         s += display_time(total_time);
                         s += "</td>";
                         s += "<td>";
-                        s += recipes[i].unlock;
+                        s += "<select id=\"cb_rate"+recipes[i].recipeId+"\" onchange=\"changeRate("+recipes[i].recipeId+")\">";
+                        for (let i = 0; i < arrRate.length; i++) {
+                            const name = arrRate[i];
+                            var flag = i == rate ? "selected = \"selected\"" : "";
+                            s += "<option value=\""+i+"\" "+flag+">"+name+"</option>";
+                        }
+                        s += "</select>";
+                        s += "</td>";
+                        s += "<td>";
+                        s += "<div id=\"unlock" + recipes[i].recipeId + "\">";
+                        s += rate == 4 ? "-" : recipes[i].unlock;
+                        s += "</div>";
                         s += "</td>";
                         s += "<td>";
                         s += (calc_price / (recipes[i].time + get_materials_max_time(recipes[i].materials, material_time_map)) / 0.02).toFixed(2);
@@ -212,11 +289,12 @@
     </script>
 </head>
 <body>
+    <a href="bcjh_chefs.html">厨师</a>
     <div id="recipes"></div>
     <script type="text/javascript">
         display_recipes();
     </script>
-
+    <div id="test"></div>
 </body>
 
 </html>

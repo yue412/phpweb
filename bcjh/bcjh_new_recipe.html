@@ -1,0 +1,57 @@
+<html>
+
+<head>
+    <meta http-equiv="content-type" content="text/html;charset=utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>
+        爆炒江湖
+    </title>
+    <style type="text/css">
+        div.no {
+            font-size: 120%;
+            display: inline
+        }
+
+        div.yes {
+            font-size: 80%;
+            display: inline
+        }
+
+        div.content {
+            color: #FF0000;
+            display: inline
+        }
+
+        div.level {
+            display: inline
+        }
+    </style>
+    <script type="text/javascript" src="bcjh_data.js">
+    </script>
+    <script type="text/javascript" src="bcjh_common.js">
+    </script>
+    <script type="text/javascript">
+        function submitName()
+        {
+            var e = document.getElementById("recipe_name");
+            var name = e.value;
+            var recipes = g_bcjh_data.recipes;
+            for (let i = 0; i < recipes.length; i++) {
+                if(name === recipes[i].name)
+                {
+                    window.location.href= "insert_record.php?table_name=bcjh_recipes&source=bcjh_recipes.html&id="+recipes[i].recipeId; 
+                    return;
+                }
+            }
+            alert("未找到厨师");
+        }
+    </script>
+
+</head>
+<body>
+    名称：<input type="text" name="name" id="recipe_name" >
+    <br>
+    <input type="submit" value="提交" onclick="submitName()">
+</body>
+
+</html>

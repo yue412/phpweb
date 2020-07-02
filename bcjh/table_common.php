@@ -1,4 +1,4 @@
-<script type="text/javascript" src="sg_common.js">
+<script type="text/javascript" src="common.js">
 </script>
 <?php
     //include_once "sg_common.h"
@@ -127,6 +127,7 @@
 
     function gen_combox($field_name, $arr, $default, $allow_null = FALSE)
     {
+        echo '<param id="'.$field_name.'_p" name="'.$field_name.'" value="'.$default.'">';
         echo '<select name="'.$field_name.'" id="'.$field_name.'_">';
         if($allow_null)
         {

@@ -32,6 +32,8 @@
     </script>
     <script type="text/javascript" src="bcjh_common.js">
     </script>
+    <script type="text/javascript" src="bcjh_skill.js">
+    </script>
     <script type="text/javascript" src="TableSorterV3.js">
     </script>
     <script type="text/javascript">
@@ -41,6 +43,8 @@
                 var e = document.getElementById("chefs");
                 var e2 = document.getElementById("title");
                 var my_chefs = JSON.parse(text);
+                init_skills(g_bcjh_data.skills);
+                init_chefs(my_chefs);
                 e2.innerHTML = "数量：" + my_chefs.length;
                 // 菜谱
                 //var chefs = g_bcjh_data.chefs;
@@ -91,6 +95,12 @@
                 s += "肉";
                 s += "</td>";
                 s += "<td>";
+                s += "技能";
+                s += "</td>";
+                s += "<td>";
+                s += "装备";
+                s += "</td>";
+                s += "<td>";
                 s += "编辑";
                 s += "</td>";
                 s += "</tr>";
@@ -139,6 +149,12 @@
                     s += "</td>";
                     s += "<td>";
                     s += my_chefs[i].meat;
+                    s += "</td>";
+                    s += "<td>";
+                    s += my_chefs[i].skill_name();
+                    s += "</td>";
+                    s += "<td>";
+                    s += my_chefs[i].equip_name();
                     s += "</td>";
                     s += "<td>";
                     s += "<a href=\"bcjh_modify_chef.php?id="+my_chefs[i].id+"\">修改</a>";

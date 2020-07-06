@@ -37,28 +37,8 @@
     <script type="text/javascript" src="TableSorterV3.js">
     </script>
     <script type="text/javascript">
-        function material_by_id(id)
-        {
-            var materials_dict = g_bcjh_data.materials;
-            for (let i = 0; i < materials_dict.length; i++) {
-                if (id == materials_dict[i].materialId)
-                {
-                    return materials_dict[i];
-                }
-            }
-            return null;
-        }
-        function get_materials_name(materials)
-        {
-            var list = new Array();
-            for (let i = 0; i < materials.length; i++) {
-                const id = materials[i].material;
-                const count = materials[i].quantity;
-                var obj = material_by_id(id);
-                list.push(obj.name + "*" + count);
-            }
-            return list.join(",");
-        }
+
+
         function get_materials_max_time(materials, materials_map)
         {
             var list = new Array();
@@ -72,21 +52,7 @@
             }
             return max_time;
         }
-        function display_time(time)
-        {
-            var hour = parseInt(time / 3600);
-            time = time - hour*3600;
-            var minute = parseInt(time / 60);
-            var second = time - minute*60;
-            var result = "";
-            if(hour != 0)
-                result += hour + "小时";
-            if(minute != 0)
-                result += minute + "分";
-            if(second != 0)
-                result += second + "秒";
-            return result;
-        }
+
         function calc_material_time()
         {
             var maps = g_bcjh_data.maps;
@@ -114,18 +80,7 @@
             }
             return m;
         }
-        function recipe_by_id(id)
-        {
-            var recipes = g_bcjh_data.recipes;
-            for (let i = 0; i < recipes.length; i++) {
-                const recipe = recipes[i];
-                if(recipe.recipeId == id)
-                {
-                    return recipe;
-                }
-            }
-            return null;
-        }
+
         function clickCheckbox(id)
         {
             var recipe = recipe_by_id(id);
@@ -153,13 +108,16 @@
             var recipe = recipe_by_id(id);
             var e1 = document.getElementById("unlock"+id);
             var e2 = document.getElementById("chefs"+id);
+            var e3 = document.getElementById("guest"+id);
             var val = document.getElementById("cb_rate"+id).value;
+            recipe.rate = val;
             var unlock = recipe.unlock;
             var recipe_chefs = get_recipe_chefs(recipe, my_chefs);
             if (val == 4)
                 unlock = "-";
             e1.innerHTML = unlock;
             e2.innerHTML = display_recipe_chefs(recipe_chefs, val);
+            e3.innerHTML = display_first_guests(recipe_chefs, recipe);
 
             var url = "update_record.php?table_name=bcjh_recipes&primary_key=id&key_val=" + id +"&rate="+val;
             do_ajax(url, function (text) {
@@ -168,22 +126,26 @@
                 //e.innerHTML = text;
             });             
         }
+
         function display_recipes()
         {
             do_ajax("get_db_data.php?name=bcjh_recipes&order_field=id", function(text){
                 var e = document.getElementById("recipes");
-                var e2 = document.getElementById("recipes_count");
                 var my_recipes = JSON.parse(text);
-                init_skills(g_bcjh_data.skills);
-                e2.innerHTML = "数量：" + my_recipes.length;
                 do_ajax("get_db_data.php?name=bcjh_chefs&order_field=id", function(text){
                     // 菜谱
+                    var e2 = document.getElementById("recipes_count");
+                    init_skills(g_bcjh_data.skills);
                     my_chefs = JSON.parse(text);
                     init_chefs(my_chefs);
                     var recipes = g_bcjh_data.recipes;
                     var materials = g_bcjh_data.materials;
                     var material_time_map = calc_material_time();
                     var new_recipes = build_recipes(recipes, my_recipes);
+                    new_recipes = filter_recipes_by_material(new_recipes);
+                    new_recipes = filter_recipes_by_name(new_recipes);
+                    new_recipes = filter_recipes_by_first_guest_name(new_recipes, my_chefs);
+                    e2.innerHTML = "数量：" + new_recipes.length;
                     var s = "<table id=\"tb2\" border='1'>";
                     s += "<tr>";
                     s += "<td>";
@@ -208,6 +170,9 @@
                     s += "总价";
                     s += "</td>";
                     s += "<td>";
+                    s += "时间";
+                    s += "</td>";
+                    s += "<td>";
                     s += "总时间(秒)";
                     s += "</td>";
                     s += "<td>";
@@ -227,6 +192,9 @@
                     s += "</td>";
                     s += "<td>";
                     s += "推荐厨师";
+                    s += "</td>";
+                    s += "<td>";
+                    s += "首次贵客";
                     s += "</td>";
                     s += "</tr>";
                     for (let j = 0; j < new_recipes.length; j++) {
@@ -266,6 +234,9 @@
                         s += "</div>";
                         s += "</td>";
                         s += "<td>";
+                        s += recipe.time;
+                        s += "</td>";
+                        s += "<td>";
                         s += total_time;
                         s += "</td>";
                         s += "<td>";
@@ -298,6 +269,11 @@
                         s += display_recipe_chefs(recipe_chefs, recipe.rate);
                         s += "</div>";
                         s += "</td>";
+                        s += "<td>";
+                        s += "<div id=\"guest" + recipe.recipeId + "\">";
+                        s += display_first_guests(recipe_chefs, recipe);
+                        s += "</div>";
+                        s += "</td>";
                         s += "</tr>";
                     }
                     s += "</table>";
@@ -306,12 +282,34 @@
                 });
             });
         }
+        function filter_recipe()
+        {
+            {
+                var e = document.getElementById("f_material");
+                g_filter_material = e.value;
+            }
+            {
+                var e = document.getElementById("recipe_name");
+                g_filter_recipe = e.value;
+            }
+            {
+                var e = document.getElementById("first_guest_name");
+                g_first_guest_name = e.value;
+            }
+            display_recipes();
+        }
     </script>
 </head>
 <body>
     <a href="bcjh_chefs.html">厨师</a>
-    <a href="bcjh_price.html">菜价</a><br>
-    <a href="bcjh_new_recipe.html">添加菜谱</a>
+    <a href="bcjh_price.html">菜价</a>
+    <a href="bcjh_best_chef.html">最牛厨师</a>
+    <a href="bcjh_calc.html">计算器</a>
+    <br>
+    <a href="bcjh_new_recipe.html">添加菜谱</a> 
+    材料:<input type="text" id="f_material"/>
+    菜谱:<input type="text" id="recipe_name"/>
+    首次贵客:<input type="text" id="first_guest_name"/><input type="button" value="过滤" onclick="filter_recipe()"/>
     <div id="recipes_count"></div>
     <div id="recipes"></div>
     <script type="text/javascript">

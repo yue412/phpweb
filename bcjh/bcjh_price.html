@@ -44,6 +44,7 @@
                 do_ajax("get_db_data.php?name=bcjh_chefs&order_field=id", function(text){
                     var e = document.getElementById("price");
                     var recipes = build_recipes(g_bcjh_data.recipes, my_recipes);
+                    var recipes = filter_recipes_by_material(recipes);
                     init_skills(g_bcjh_data.skills);
                     var my_chefs = JSON.parse(text);
                     init_chefs(my_chefs);
@@ -68,7 +69,7 @@
                         for (let i = 0; i < my_chefs.length; i++) {
                             const chef = my_chefs[i];
                             s += "<td>";
-                            s += calc_price(recipe, chef) * recipe.limit;
+                            s += calc_price(recipe, chef, 0) * recipe.limit;
                             s += "</td>";
                         }
                         s += "</tr>";
@@ -79,10 +80,17 @@
                 });
             });
         }
+        function filter_material()
+        {
+            var e = document.getElementById("f_material");
+            g_filter_material = e.value;
+            display_price();
+        }        
     </script>
 </head>
 <body>
-    <a href="bcjh_recipes.html">返回</a>
+    <a href="bcjh_recipes.html">返回</a><br>
+    <a href="bcjh_new_recipe.html">添加菜谱</a>菜：<input type="text" id="f_material"/><input type="button" value="过滤" onclick="filter_material()"/>
     <div id="price"></div>
     <script type="text/javascript">
         display_price();

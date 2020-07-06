@@ -1,0 +1,287 @@
+<html>
+
+<head>
+    <meta http-equiv="content-type" content="text/html;charset=utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>
+        爆炒江湖
+    </title>
+    <style type="text/css">
+        div.no {
+            font-size: 120%;
+            display: inline
+        }
+
+        div.yes {
+            font-size: 80%;
+            display: inline
+        }
+
+        div.content {
+            color: #FF0000;
+            display: inline
+        }
+
+        div.level {
+            display: inline
+        }
+    </style>
+    <script type="text/javascript" src="common.js">
+    </script>
+    <script type="text/javascript" src="bcjh_data.js">
+    </script>
+    <script type="text/javascript" src="bcjh_common.js">
+    </script>
+    <script type="text/javascript" src="bcjh_skill.js">
+    </script>
+    <script type="text/javascript" src="TableSorterV3.js">
+    </script>
+    <script type="text/javascript">
+        function sort_chef(a,b)
+        {
+            return b.rarity - a.rarity;
+        }
+        function display_chefs(chefs)
+        {
+            chefs.sort(sort_chef);
+            if (chefs.length == 0)
+                return;
+            var e2 = document.getElementById("chefs");
+            var s = "";
+            var rarity = chefs[0].rarity;
+            for (let i = 0; i < chefs.length; i++) {
+                const chef = chefs[i];
+                if(chef.rarity != rarity)
+                {
+                    s += "<br>";
+                    rarity = chef.rarity;
+                }
+                s += "<input type=\"checkbox\" id=\"ck_chef_"+chef.id+"\" onclick=\"select_chef("+chef.id+")\">" + chef.name;
+            }
+            e2.innerHTML = s;
+        }
+        g_select_chefs = [];
+        g_select_recipes =[];
+        recipes = [];
+        my_chefs = [];
+        function get_chef_by_id(id)
+        {
+            for (let i = 0; i < my_chefs.length; i++) {
+                const chef = my_chefs[i];
+                if (chef.id == id)
+                    return chef;
+            }
+            return null;
+        }
+        function show_chef(new_chef, recipes, i)
+        {
+            for (let j = 0; j < recipes.length; j++) {
+                const recipe = recipes[j];
+                var e1 = document.getElementById("price_"+i+"_"+recipe.recipeId);
+                var e2 = document.getElementById("price_time_"+i+"_"+recipe.recipeId);
+                var e3 = document.getElementById("ck_"+i+"_"+recipe.recipeId);
+                var price = calc_price(recipe, new_chef, 0) ;
+                e1.innerHTML = price * recipe.limit;
+                e2.innerHTML = Math.round(price/recipe.time*3600);
+                e3.checked = false;
+            }
+        }
+        function select_chef(chef_id)
+        {
+            var e = document.getElementById("ck_chef_"+chef_id);
+            if (e.checked)
+            {
+                var new_chef = get_chef_by_id(chef_id);
+                for (let i = 0; i < g_select_chefs.length; i++) {
+                    const chef = g_select_chefs[i];
+                    if(chef == null)
+                    {
+                        g_select_chefs[i] = new_chef;
+                        show_chef(new_chef, recipes, i);
+                        show_select_chef();
+                        return;
+                    }
+                }
+                g_select_chefs[2] = new_chef;
+                show_chef(new_chef, recipes, 2);
+            }
+            else 
+            {
+                for (let i = 0; i < g_select_chefs.length; i++) {
+                    const chef = g_select_chefs[i];
+                    if(chef != null && chef.id == chef_id)
+                    {
+                        g_select_chefs[i] = null;
+                        g_select_recipes[i].length = 0;
+                        for (let j = 0; j < recipes.length; j++) {
+                            const recipe = recipes[j];
+                            var e1 = document.getElementById("price_"+i+"_"+recipe.recipeId);
+                            var e2 = document.getElementById("price_time_"+i+"_"+recipe.recipeId);
+                            var e3 = document.getElementById("ck_"+i+"_"+recipe.recipeId);
+                            e1.innerHTML = "";
+                            e2.innerHTML = "";
+                            e3.checked = false;
+                        }
+                    }
+                }
+            }
+            show_select_chef();
+        }
+        function show_select_chef()
+        {
+            var arr = [];
+            for (let i = 0; i < g_select_chefs.length; i++) {
+                const chef = g_select_chefs[i];
+                if(chef != null)
+                {
+                    var arr1 = [];
+                    for (let j = 0; j < g_select_recipes[i].length; j++) {
+                        const recipeId = g_select_recipes[i][j];
+                        var recipe = recipe_by_id(recipeId);
+                        arr1.push(recipe.name);
+                    } 
+                    arr.push(arr1.length > 0 ? chef.name + ":" + arr1.join(",") : chef.name);
+                }
+                else
+                    arr.push("<空>");
+            }
+            var e = document.getElementById("select_chefs");
+            e.innerHTML = arr.join(";");
+        }
+        function clickCheckbox(i, recipeId)
+        {
+            var e = document.getElementById("ck_"+i+"_"+recipeId);
+            if (e.checked)
+                g_select_recipes[i].push(recipeId)
+            else
+            {
+                var index = g_select_recipes[i].indexOf(recipeId);
+                if (index > -1) {
+                    g_select_recipes[i].splice(index, 1);
+                }
+            }
+            calc_total_price();
+            show_select_chef();
+        }
+        function calc_total_price()
+        {
+            var e = document.getElementById("price_add");
+            var total = 0;
+            var time = 0;
+            for (let i = 0; i < g_select_chefs.length; i++) {
+                const chef = g_select_chefs[i];
+                if (chef != null)
+                {
+                    for (let j = 0; j < g_select_recipes[i].length; j++) {
+                        const recipeId = g_select_recipes[i][j];
+                        var recipe = recipe_by_id(recipeId);
+                        var price = calc_price(recipe, chef, e.value) ;
+                        total += price * recipe.limit;
+                        time += recipe.time * recipe.limit;
+                    }
+                }
+            }
+            var e2 = document.getElementById("total_price");
+            e2.innerHTML = "总价格："+total +"，总时间："+display_time(time);
+        }
+        function display_price()
+        {
+            do_ajax("get_db_data.php?name=bcjh_recipes&order_field=id", function(text){
+                g_select_chefs.push(null);
+                g_select_chefs.push(null);
+                g_select_chefs.push(null);
+                g_select_recipes.push(new Array());
+                g_select_recipes.push(new Array());
+                g_select_recipes.push(new Array());
+                var my_recipes = JSON.parse(text);
+                do_ajax("get_db_data.php?name=bcjh_chefs&order_field=id", function(text){
+                    var e = document.getElementById("price");
+                    recipes = build_recipes(g_bcjh_data.recipes, my_recipes);
+                    recipes = filter_recipes_by_material(recipes);
+                    init_skills(g_bcjh_data.skills);
+                    my_chefs = JSON.parse(text);
+                    init_chefs(my_chefs);
+                    display_chefs(my_chefs);
+                    var s = "<table id=\"tb2\" border='1'>";
+                    s += "<tr>";
+                    s += "<td>";
+                    s += "ID";
+                    s += "</td>";
+                    s += "<td>";
+                    s += "名称";
+                    s += "</td>";
+                    s += "<td>";
+                    s += "总时间(秒)";
+                    s += "</td>";
+                    s += "<td>";
+                    s += "总时间";
+                    s += "</td>";
+                    for (let i = 0; i < 3; i++) {
+                        s += "<td>";
+                        s += "总价";
+                        s += "</td>";
+                        s += "<td>";
+                        s += "金币/小时";
+                        s += "</td>";
+                        s += "<td>";
+                        s += "选择";
+                        s += "</td>";
+                    }
+                    s += "</tr>";
+                    for (let j = 0; j < recipes.length; j++) {
+                        var recipe = recipes[j];
+                        var total_time = recipe.limit * recipe.time;
+                        s += "<tr>";
+                        s += "<td>";
+                        s += recipe.galleryId;
+                        s += "</td>";
+                        s += "<td>";
+                        s += recipe.name;
+                        s += "</td>";
+                        s += "<td>";
+                        s += total_time;
+                        s += "</td>";
+                        s += "<td>";
+                        s += display_time(total_time);
+                        s += "</td>";                        
+                        for (let i = 0; i < 3; i++) {
+                            s += "<td id=\"price_"+i+"_"+recipe.recipeId+"\">";
+                            //s += "<div id=\"price_"+i+"_"+recipe.recipeId+"\"></div>";
+                            s += "</td>";
+                            s += "<td id=\"price_time_"+i+"_"+recipe.recipeId+"\">";
+                            //s += "<div id=\"price_time_"+i+"_"+recipe.recipeId+"\"></div>";
+                            s += "</td>";
+                            s += "<td>";
+                            s += "<input type=\"checkbox\" id=\"ck_"+i+"_"+recipe.recipeId+"\" onclick=\"clickCheckbox("+i+","+recipe.recipeId+")\">";
+                            s += "</td>";
+                        }
+                        s += "</tr>";
+                    }
+                    s += "</table>";
+                    e.innerHTML = s;
+                    var x = new TableSorter("tb2");
+                });
+            });
+        }
+        function filter_material()
+        {
+            var e = document.getElementById("f_material");
+            g_filter_material = e.value;
+            display_price();
+        }        
+    </script>
+</head>
+<body>
+    <a href="bcjh_recipes.html">返回</a><br>
+    餐桌加成：<input type="number" id="price_add"/>% 菜：<input type="text" id="f_material"/><input type="button" value="过滤" onclick="filter_material()"/>
+    <div id="chefs"></div>
+    <div id="select_chefs"></div>
+    <div id="total_price"></div>
+    <div id="price"></div>
+    <script type="text/javascript">
+        display_price();
+    </script>
+    
+</body>
+
+</html>

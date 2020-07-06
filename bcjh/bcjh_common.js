@@ -4,6 +4,9 @@ var g_material_types2 = ["meat", "fish", "vegetable", "creation"];
 var g_material_shop = [["鸡舍","meat"],["猪圈","meat"],["牧场","meat"],["池塘","fish"],["菜棚","veg"],["菜地","veg"],["森林","veg"],["作坊","creation"]];
 var g_Rate_names = ["", "可", "优", "特", "神"];
 var g_rate_factor = [0, 1, 1.1, 1.3, 1.5];
+g_filter_material = "";
+g_filter_recipe = "";
+g_first_guest_name = "";
 
 function material_by_id(id)
 {
@@ -117,7 +120,7 @@ function get_chef_names(chefs)
     }
     if(list.length > 0)
         arr.push(list.join(","));
-    return arr.join("<br>");
+    return arr.join("<br>&emsp;&nbsp;");
 }
 
 function display_recipe_chefs(recipe_chefs, rate)
@@ -129,11 +132,27 @@ function display_recipe_chefs(recipe_chefs, rate)
         const chefs = recipe_chefs[i];
         if(chefs.length == 0)
             continue;
-        var s = g_Rate_names[i] + "<br>" + get_chef_names(chefs);
+        var s = g_Rate_names[i] + ":" + get_chef_names(chefs);
         arr.push(s);
     }
     return arr.join("<br>");
 }
+
+function display_first_guests(recipe_chefs, recipe)
+{
+    var rate = Math.max(recipe.rate, 1);
+    var arr = [];
+    for (let i = rate - 1; i < recipe.guests.length; i++) {
+        const guest = recipe.guests[i];
+        if(recipe_chefs[i+2].length > 0)
+        {
+            var s = g_Rate_names[i+2] + ":" + guest.guest;
+            arr.push(s);
+        }
+    }
+    return arr.join("<br>");
+}
+
 
 function load_combox()
 {
@@ -315,7 +334,7 @@ function build_recipes(recipes, my_recipes)
     return new_recipes; 
 }
 
-function calc_price(recipe, chef)
+function calc_price(recipe, chef, price_add)
 {
     var rate = calc_rate(recipe, chef);
     if (rate == 0)
@@ -336,6 +355,89 @@ function calc_price(recipe, chef)
                 delta += e.calc_price(recipe);
             });
         }); 
-    }    
+    } 
+    delta += price * price_add /100;
     return Math.ceil(price + delta);
+}
+
+function get_materials_name(materials)
+{
+    var list = new Array();
+    for (let i = 0; i < materials.length; i++) {
+        const id = materials[i].material;
+        const count = materials[i].quantity;
+        var obj = material_by_id(id);
+        list.push(obj.name + "*" + count);
+    }
+    return list.join(",");
+}
+
+function filter_recipes_by_material(recipes)
+{
+    if(g_filter_material == "")
+        return recipes;
+    var new_recipes = [];
+    for (let i = 0; i < recipes.length; i++) {
+        const recipe = recipes[i];
+        if(get_materials_name(recipe.materials).indexOf(g_filter_material) >= 0)
+            new_recipes.push(recipe);
+    }
+    return new_recipes;
+}
+
+function filter_recipes_by_name(recipes)
+{
+    if(g_filter_recipe == "")
+        return recipes;
+    var new_recipes = [];
+    for (let i = 0; i < recipes.length; i++) {
+        const recipe = recipes[i];
+        if(recipe.name.indexOf(g_filter_recipe) >= 0)
+            new_recipes.push(recipe);
+    }
+    return new_recipes;    
+}
+
+function filter_recipes_by_first_guest_name(recipes, chefs)
+{
+    if(g_first_guest_name == "")
+        return recipes;
+    var new_recipes = [];
+    for (let i = 0; i < recipes.length; i++) {
+        const recipe = recipes[i];
+        var recipe_chefs = get_recipe_chefs(recipe, chefs);
+        var str = display_first_guests(recipe_chefs, recipe);
+        if(str.indexOf(g_first_guest_name) >= 0)
+            new_recipes.push(recipe);
+    }
+    return new_recipes;    
+}
+
+function display_time(time)
+{
+    var hour = parseInt(time / 3600);
+    time = time - hour*3600;
+    var minute = parseInt(time / 60);
+    var second = time - minute*60;
+    var result = "";
+    if(hour != 0)
+        result += hour + "小时";
+    if(minute != 0)
+        result += minute + "分";
+    if(second != 0)
+        result += second + "秒";
+    return result;
+}
+
+function recipe_by_id(id)
+{
+    var recipes = g_bcjh_data.recipes;
+    for (let i = 0; i < recipes.length; i++) {
+        const recipe = recipes[i];
+        if(recipe.recipeId == id)
+        {
+            return recipe;
+        }
+    }
+    return null;
 }

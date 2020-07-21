@@ -193,6 +193,7 @@
                 if (price > result[0])
                 {
                     result[0] = price;
+                    result[1].length = 0;
                     result[1].push(chef.name);
                 }
                 else if(price == result[0] && price > 0)
@@ -205,20 +206,14 @@
         function display_price()
         {
             do_ajax("get_db_data.php?name=bcjh_recipes&order_field=id", function(text){
-                g_select_chefs.push(null);
-                g_select_chefs.push(null);
-                g_select_chefs.push(null);
-                g_select_recipes.push(new Array());
-                g_select_recipes.push(new Array());
-                g_select_recipes.push(new Array());
                 var my_recipes = JSON.parse(text);
                 do_ajax("get_db_data.php?name=bcjh_chefs&order_field=id", function(text){
                     var e = document.getElementById("price");
-                    recipes = build_recipes(g_bcjh_data.recipes, my_recipes);
-                    recipes = filter_recipes_by_material(recipes);
                     init_skills(g_bcjh_data.skills);
                     my_chefs = JSON.parse(text);
                     init_chefs(my_chefs);
+                    recipes = build_recipes(g_bcjh_data.recipes, my_recipes, my_chefs);
+                    recipes = filter_recipes_by_material(recipes);
                     //display_chefs(my_chefs);
                     var s = "<table id=\"tb2\" border='1'>";
                     s += "<tr>";

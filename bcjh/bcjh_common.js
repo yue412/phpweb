@@ -1,4 +1,5 @@
 var g_cook_types = ["stirfry", "boil", "knife", "fry", "bake", "steam"];
+var g_cook_type_names = ["炒", "煮", "切", "炸", "烤", "蒸"];
 var g_material_types = ["meat", "fish", "veg", "creation"];
 var g_material_types2 = ["meat", "fish", "vegetable", "creation"];
 var g_material_shop = [["鸡舍","meat"],["猪圈","meat"],["牧场","meat"],["池塘","fish"],["菜棚","veg"],["菜地","veg"],["森林","veg"],["作坊","creation"]];
@@ -296,7 +297,44 @@ function get_shop_type(shop)
     return "";
 }
 
-function build_recipes(recipes, my_recipes)
+function get_materials_count(materials)
+{
+    var count = 0;
+    for (let i = 0; i < materials.length; i++) {
+        const material = materials[i];
+        count += material.quantity;
+    }
+    return count;
+}
+
+function get_cook_name(recipe)
+{
+    var arr = [];
+    for (let i = 0; i < g_cook_types.length; i++) {
+        const type = g_cook_types[i];
+        if (recipe[type] > 0)
+            arr.push(g_cook_type_names[i] + ":"+recipe[type]);
+    }
+    return arr.join(",");
+}
+
+function display_guests_like(guests, recipe)
+{
+    var arr = [];
+    for (let i = 0; i < guests.length; i++) {
+        const guest = guests[i];
+        for (let j = 0; j < guest.gifts.length; j++) {
+            const gift = guest.gifts[j];
+            if(gift.recipe == recipe.name)
+            {
+                arr.push(guest.name+":"+gift.antique);
+            }
+        }
+    }
+    return arr.join("<br>");
+}
+
+function build_recipes(recipes, my_recipes, my_chefs)
 {
     var new_recipes = [];
     recipes.sort(sort_recipe);
@@ -315,6 +353,29 @@ function build_recipes(recipes, my_recipes)
             recipes[i].calc_price = function(){
                 return this.is_mastery ? this.price + this.exPrice : this.price;
             };
+            recipes[i].calc_total_price = function(){
+                return this.limit * this.calc_price();
+            };
+            recipes[i].materials_name = get_materials_name(recipes[i].materials);
+            recipes[i].material_cnt = get_materials_count(recipes[i].materials);
+            recipes[i].material_cnt_time = function(){
+                return Math.round(this.material_cnt/this.time*3600);
+            }
+            recipes[i].total_time = function(){
+                return this.limit * this.time;
+            }
+            recipes[i].time_name = function() {
+                return display_time(this.total_time());
+            }
+            recipes[i].cook_name = get_cook_name(recipes[i]);
+            recipes[i].calc_price_time = function() {
+                return Math.round(this.calc_price()/this.time*3600);
+            } 
+            recipes[i].unclock_name = recipes[i].rate == 4 ? "-" : recipes[i].unlock; 
+            var recipe_chefs = get_recipe_chefs(recipes[i], my_chefs);
+            recipes[i].recipe_chefs = display_recipe_chefs(recipe_chefs, recipes[i].rate);
+            recipes[i].first_guests = display_first_guests(recipe_chefs, recipes[i]);
+            recipes[i].guests_like = display_guests_like(g_bcjh_data.guests, recipes[i]);            
             for (let i = 0; i < g_material_types.length; i++) {
                 const type = g_material_types[i];
                 recipes[i].type = 0;
@@ -381,6 +442,27 @@ function filter_recipes_by_material(recipes)
         const recipe = recipes[i];
         if(get_materials_name(recipe.materials).indexOf(g_filter_material) >= 0)
             new_recipes.push(recipe);
+    }
+    return new_recipes;
+}
+
+function filter_recipes(recipes, filter)
+{
+    if(filter[2] == "")
+        return recipes;
+    var new_recipes = [];
+    for (let i = 0; i < recipes.length; i++) {
+        const recipe = recipes[i];
+        if(Number.isInteger(recipe[filter[1]]))
+        {
+            if(recipe[filter[1]] == filter[2])
+                new_recipes.push(recipe);
+        }
+        else
+        {
+            if(recipe[filter[1]].indexOf(filter[2]) >= 0)
+                new_recipes.push(recipe);
+        }
     }
     return new_recipes;
 }

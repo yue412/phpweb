@@ -43,11 +43,11 @@
                 var my_recipes = JSON.parse(text);
                 do_ajax("get_db_data.php?name=bcjh_chefs&order_field=id", function(text){
                     var e = document.getElementById("price");
-                    var recipes = build_recipes(g_bcjh_data.recipes, my_recipes);
-                    var recipes = filter_recipes_by_material(recipes);
                     init_skills(g_bcjh_data.skills);
                     var my_chefs = JSON.parse(text);
                     init_chefs(my_chefs);
+                    var recipes = build_recipes(g_bcjh_data.recipes, my_recipes, my_chefs);
+                    var recipes = filter_recipes_by_material(recipes);
                     var s = "<table id=\"tb2\" border='1'>";
                     s += "<tr>";
                     s += "<td>";

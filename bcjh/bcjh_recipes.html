@@ -37,7 +37,8 @@
     <script type="text/javascript" src="TableSorterV3.js">
     </script>
     <script type="text/javascript">
-
+        var filter_list = [["名称", "name", ""], ["稀有度", "rarity", ""],["材料","materials_name", ""],["技法","cook_name", ""],["评级","rate", ""],
+            ["推荐厨师","recipe_chefs", ""],["首次贵客","first_guests", ""],["贵客喜欢","guests_like", ""]];
 
         function get_materials_max_time(materials, materials_map)
         {
@@ -141,10 +142,11 @@
                     var recipes = g_bcjh_data.recipes;
                     var materials = g_bcjh_data.materials;
                     var material_time_map = calc_material_time();
-                    var new_recipes = build_recipes(recipes, my_recipes);
-                    new_recipes = filter_recipes_by_material(new_recipes);
-                    new_recipes = filter_recipes_by_name(new_recipes);
-                    new_recipes = filter_recipes_by_first_guest_name(new_recipes, my_chefs);
+                    var new_recipes = build_recipes(recipes, my_recipes, my_chefs);
+                    for (let i = 0; i < filter_list.length; i++) {
+                        const filter = filter_list[i];
+                        new_recipes = filter_recipes(new_recipes, filter);
+                    }
                     e2.innerHTML = "数量：" + new_recipes.length;
                     var s = "<table id=\"tb2\" border='1'>";
                     s += "<tr>";
@@ -159,6 +161,15 @@
                     s += "</td>";
                     s += "<td>";
                     s += "材料";
+                    s += "</td>";
+                    s += "<td>";
+                    s += "材料数";
+                    s += "</td>";
+                    s += "<td>";
+                    s += "材料/小时";
+                    s += "</td>";
+                    s += "<td>";
+                    s += "技法";
                     s += "</td>";
                     s += "<td>";
                     s += "熟练";
@@ -196,17 +207,21 @@
                     s += "<td>";
                     s += "首次贵客";
                     s += "</td>";
+                    s += "<td>";
+                    s += "贵客喜欢";
+                    s += "</td>";
                     s += "</tr>";
                     for (let j = 0; j < new_recipes.length; j++) {
                         const recipe = new_recipes[j];
                         //var is_mastery = parseInt(my_recipes[j].is_mastery) != 0
                         //var calc_price = is_mastery ? recipe.price + recipe.exPrice : recipe.price;
-                        var total_time = recipe.limit * recipe.time;
+                        
                         var check_val = recipe.is_mastery ? "checked=\"checked\"" : "";
                         //var rate = parseInt(my_recipes[j].rate);
                         var material_time = get_materials_max_time(recipe.materials, material_time_map)
-                        var recipe_chefs = get_recipe_chefs(recipe, my_chefs);
+                        //var recipe_chefs = get_recipe_chefs(recipe, my_chefs);
                         //var checkbox_id = "ck_" + recipe.galleryId;
+                        
                         s += "<tr>";
                         s += "<td>";
                         s += recipe.galleryId;
@@ -218,7 +233,16 @@
                         s += recipe.rarity;
                         s += "</td>";
                         s += "<td>";
-                        s += get_materials_name(recipe.materials);
+                        s += recipe.materials_name;
+                        s += "</td>";
+                        s += "<td>";
+                        s += recipe.material_cnt;
+                        s += "</td>";
+                        s += "<td>";
+                        s += recipe.material_cnt_time();
+                        s += "</td>";
+                        s += "<td>";
+                        s += recipe.cook_name;
                         s += "</td>";
                         s += "<td>";
                         s += "<input type=\"checkbox\" id=\"ck"+recipe.recipeId+"\" onclick=\"clickCheckbox("+recipe.recipeId+")\" "+check_val+">";
@@ -228,23 +252,21 @@
                         s += recipe.calc_price();
                         s += "</div>";
                         s += "</td>";
-                        s += "<td>";
-                        s += "<div id=\"total_price" + recipe.recipeId + "\">";
-                        s += recipe.limit * recipe.calc_price();
-                        s += "</div>";
+                        s += "<td id=\"total_price" + recipe.recipeId + "\">";
+                        s += recipe.calc_total_price();
                         s += "</td>";
                         s += "<td>";
                         s += recipe.time;
                         s += "</td>";
                         s += "<td>";
-                        s += total_time;
+                        s += recipe.total_time();
                         s += "</td>";
                         s += "<td>";
-                        s += display_time(total_time);
+                        s += recipe.time_name();
                         s += "</td>";
                         s += "<td>";
                         s += "<div id=\"price_" + recipe.recipeId + "\">";
-                        s += Math.round(recipe.calc_price()/recipe.time*3600);
+                        s += recipe.calc_price_time();
                         s += "</div>";
                         s += "</td>";
                         s += "<td>";
@@ -256,23 +278,24 @@
                         }
                         s += "</select>";
                         s += "</td>";
-                        s += "<td>";
-                        s += "<div id=\"unlock" + recipe.recipeId + "\">";
-                        s += recipe.rate == 4 ? "-" : recipe.unlock;
-                        s += "</div>";
+                        s += "<td id=\"unlock" + recipe.recipeId + "\">";
+                        s += recipe.unclock_name;
                         s += "</td>";
                         s += "<td>";
                         s += (recipe.calc_price() / (recipe.time + material_time) / 0.02).toFixed(2);
                         s += "</td>";
                         s += "<td>";
                         s += "<div id=\"chefs" + recipe.recipeId + "\">";
-                        s += display_recipe_chefs(recipe_chefs, recipe.rate);
+                        s += recipe.recipe_chefs;//display_recipe_chefs(recipe_chefs, recipe.rate);
                         s += "</div>";
                         s += "</td>";
                         s += "<td>";
                         s += "<div id=\"guest" + recipe.recipeId + "\">";
-                        s += display_first_guests(recipe_chefs, recipe);
+                        s += recipe.first_guests;//display_first_guests(recipe_chefs, recipe);
                         s += "</div>";
+                        s += "</td>";
+                        s += "<td>";
+                        s += recipe.guests_like;// = display_guests_like(g_bcjh_data.guests, recipe);
                         s += "</td>";
                         s += "</tr>";
                     }
@@ -284,19 +307,24 @@
         }
         function filter_recipe()
         {
-            {
-                var e = document.getElementById("f_material");
-                g_filter_material = e.value;
-            }
-            {
-                var e = document.getElementById("recipe_name");
-                g_filter_recipe = e.value;
-            }
-            {
-                var e = document.getElementById("first_guest_name");
-                g_first_guest_name = e.value;
+            for (let i = 0; i < filter_list.length; i++) {
+                const filter = filter_list[i];
+                var e = document.getElementById("ed_"+filter[1]);
+                var s = e.value;
+                filter[2] = s;
             }
             display_recipes();
+        }
+        function create_filter()
+        {
+            var s = "";
+            for (let i = 0; i < filter_list.length; i++) {
+                const filter = filter_list[i];
+                s += filter[0]+":<input type=\"text\" id=\"ed_"+filter[1]+"\"/>";
+            }
+            s += "<input type=\"button\" value=\"过滤\" onclick=\"filter_recipe()\"/>";
+            var e = document.getElementById("filters");
+            e.innerHTML = s;
         }
     </script>
 </head>
@@ -307,12 +335,11 @@
     <a href="bcjh_calc.html">计算器</a>
     <br>
     <a href="bcjh_new_recipe.html">添加菜谱</a> 
-    材料:<input type="text" id="f_material"/>
-    菜谱:<input type="text" id="recipe_name"/>
-    首次贵客:<input type="text" id="first_guest_name"/><input type="button" value="过滤" onclick="filter_recipe()"/>
+    <div id="filters"></div>
     <div id="recipes_count"></div>
     <div id="recipes"></div>
     <script type="text/javascript">
+        create_filter();
         display_recipes();
     </script>
     <div id="test"></div>

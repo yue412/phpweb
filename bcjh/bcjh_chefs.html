@@ -98,6 +98,9 @@
                 s += "技能";
                 s += "</td>";
                 s += "<td>";
+                s += "终极技能";
+                s += "</td>";
+                s += "<td>";
                 s += "装备";
                 s += "</td>";
                 s += "<td>";
@@ -154,6 +157,9 @@
                     s += my_chefs[i].skill_name();
                     s += "</td>";
                     s += "<td>";
+                    s += my_chefs[i].ultimate_skill_name();
+                    s += "</td>";
+                    s += "<td>";
                     s += my_chefs[i].equip_name();
                     s += "</td>";
                     s += "<td>";
@@ -162,6 +168,11 @@
                     {
                         var sparams = build_chef_params(my_chefs[i].name);
                         s += "<a href=\"update_record.php?table_name=bcjh_chefs&source=bcjh_chefs.html&primary_key=id&"+sparams+"&key_val="+my_chefs[i].id+"\">满级</a>";
+                    }
+                    if(my_chefs[i].ultimate_skill == null)
+                    {
+                        var sparams = build_chef_ultimate_params(my_chefs[i].name);
+                        s += "<a href=\"update_record.php?table_name=bcjh_chefs&source=bcjh_chefs.html&primary_key=id&"+sparams+"&key_val="+my_chefs[i].id+"\">终极技能</a>";
                     }
                     s += "</td>";
                     s += "</tr>";

@@ -77,10 +77,13 @@
         {
             for (let j = 0; j < recipes.length; j++) {
                 const recipe = recipes[j];
+                var e0 = document.getElementById("rate_"+i+"_"+recipe.recipeId);
                 var e1 = document.getElementById("price_"+i+"_"+recipe.recipeId);
                 var e2 = document.getElementById("price_time_"+i+"_"+recipe.recipeId);
                 var e3 = document.getElementById("ck_"+i+"_"+recipe.recipeId);
-                var price = calc_price(recipe, new_chef, 0) ;
+                var price = calc_price(recipe, new_chef, my_chefs, 0) ;
+                var rate_n = calc_rate(recipe, new_chef);
+                e0.innerHTML = g_Rate_names[rate_n];
                 e1.innerHTML = price * recipe.limit;
                 e2.innerHTML = Math.round(price/recipe.time*3600);
                 e3.checked = false;
@@ -115,9 +118,11 @@
                         g_select_recipes[i].length = 0;
                         for (let j = 0; j < recipes.length; j++) {
                             const recipe = recipes[j];
+                            var e0 = document.getElementById("rate_"+i+"_"+recipe.recipeId);
                             var e1 = document.getElementById("price_"+i+"_"+recipe.recipeId);
                             var e2 = document.getElementById("price_time_"+i+"_"+recipe.recipeId);
                             var e3 = document.getElementById("ck_"+i+"_"+recipe.recipeId);
+                            e0.innerHTML = "";
                             e1.innerHTML = "";
                             e2.innerHTML = "";
                             e3.checked = false;
@@ -175,7 +180,7 @@
                     for (let j = 0; j < g_select_recipes[i].length; j++) {
                         const recipeId = g_select_recipes[i][j];
                         var recipe = recipe_by_id(recipeId);
-                        var price = calc_price(recipe, chef, e.value) ;
+                        var price = calc_price(recipe, chef, my_chefs, e.value) ;
                         total += price * recipe.limit;
                         time += recipe.time * recipe.limit;
                     }
@@ -216,7 +221,13 @@
                     s += "<td>";
                     s += "总时间";
                     s += "</td>";
+                    s += "<td>";
+                    s += "贵客喜欢";
+                    s += "</td>";
                     for (let i = 0; i < 3; i++) {
+                        s += "<td>";
+                        s += "评级";
+                        s += "</td>";
                         s += "<td>";
                         s += "总价";
                         s += "</td>";
@@ -243,8 +254,13 @@
                         s += "</td>";
                         s += "<td>";
                         s += display_time(total_time);
-                        s += "</td>";                        
+                        s += "</td>"; 
+                        s += "<td>";
+                        s += recipe.guests_like;// = display_guests_like(g_bcjh_data.guests, recipe);
+                        s += "</td>";                                               
                         for (let i = 0; i < 3; i++) {
+                            s += "<td id=\"rate_"+i+"_"+recipe.recipeId+"\">";
+                            s += "</td>";
                             s += "<td id=\"price_"+i+"_"+recipe.recipeId+"\">";
                             //s += "<div id=\"price_"+i+"_"+recipe.recipeId+"\"></div>";
                             s += "</td>";

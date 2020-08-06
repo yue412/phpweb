@@ -45,9 +45,10 @@
             'meat'=>'肉',
             'rarity'=>'稀有度',
             'skill_id'=>'技能',
-            'equip_id'=>'装备'
+            'equip_id'=>'装备',
+            'ultimate_skill_id'=>'终极技能'
         ), 
-        array('skill_id'=>array(), 'equip_id'=>array()), 
+        array('skill_id'=>array(), 'equip_id'=>array(), 'ultimate_skill_id'=>array()), 
         'bcjh_chefs.html');
 ?>
 <?php

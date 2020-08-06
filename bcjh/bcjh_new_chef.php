@@ -44,9 +44,10 @@
             'meat'=>'肉',
             'rarity'=>'稀有度',
             'skill_id'=>'技能',
-            'equip_id'=>'装备'            
+            'equip_id'=>'装备',
+            'ultimate_skill_id'=>'终极技能'
         ), 
-        array('skill_id'=>array(), 'equip_id'=>array()), 
+        array('skill_id'=>array(), 'equip_id'=>array(), 'ultimate_skill_id'=>array()), 
         array(
             'id'=>get_browser_param("id", 0),
             'name'=>get_browser_param("name", ""),
@@ -62,7 +63,8 @@
             'veg'=>get_browser_param("veg", ""),
             'meat'=>get_browser_param("meat", ""),
             'rarity'=>get_browser_param("rarity", ""),
-            'skill_id'=>get_browser_param("skill_id", "")
+            'skill_id'=>get_browser_param("skill_id", ""),
+            'ultimate_skill_id'=>get_browser_param("ultimate_skill_id", "")
         ), 
         'bcjh_chefs.html');
 ?>

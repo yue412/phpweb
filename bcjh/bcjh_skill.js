@@ -8,6 +8,10 @@ function calc_price_default(recipe)
     return 0;
 }
 
+function effect_limit_default(recipe)
+{
+}
+
 function adjust_type(type)
 {
     return type == "vegetable" ? "veg" : type;
@@ -33,6 +37,25 @@ function calc_price_percent(recipe)
         return 0;
 }
 
+function calc_price_gold_gain(recipe)
+{
+    return this.value / 100 * recipe.calc_price();
+}
+
+function calc_price_use_all(recipe)
+{
+    if(recipe.rarity == this.rarity)
+        return this.value / 100 * recipe.calc_price();
+    else
+        return 0;
+}
+
+function effect_limit_max(recipe)
+{
+    if(recipe.rarity == this.rarity)
+        recipe.limit += this.value;
+}
+
 function init_skills(skills)
 {
     for (let i = 0; i < skills.length; i++) {
@@ -42,7 +65,8 @@ function init_skills(skills)
             effect.type = effect.type.toLowerCase();
             effect.effect_chef = effect_chef_default;
             effect.calc_price = calc_price_default;
-            if (effect.condition == "Self")
+            effect.effect_limit = effect_limit_default;
+            //if (effect.condition == "Self")
             {
                 if (is_cook_type(effect.type) || is_material_type(effect.type))
                 {
@@ -62,7 +86,20 @@ function init_skills(skills)
                         effect.calc_price = calc_price_percent;
                     }
                 }
+                else if(effect.type == "gold_gain")
+                {
+                    effect.calc_price = calc_price_gold_gain;
+                }
+                else if(effect.type == "useall")
+                {
+                    effect.calc_price = calc_price_use_all;
+                }
+                else if(effect.type == "maxequiplimit")
+                {
+                    effect.effect_limit = effect_limit_max;
+                }                
             }
+
         }
     }
 }

@@ -77,12 +77,26 @@ function build_chef_params(name){
             s += "&creation="+chefs[i].creation;
             s += "&rarity="+chefs[i].rarity;
             s += "&skill_id="+chefs[i].skill;
+            //s += "&ultimate_skill_id="+chefs[i].ultimateSkill;
             s += "&level=3";
             return s;
         }
     }
     return "";
 }
+
+function build_chef_ultimate_params(name){
+    var chefs = g_bcjh_data.chefs;
+    for (let i = 0; i < chefs.length; i++) {
+        if(name === chefs[i].name)
+        {
+            var s = "&ultimate_skill_id="+chefs[i].ultimateSkill;
+            return s;
+        }
+    }
+    return "";
+}
+
 
 function calc_rate(recipe, chef)
 {
@@ -174,6 +188,23 @@ function load_combox()
                 e.selectedIndex = i+1;
         }
     }
+    e = document.getElementById("ultimate_skill_id_");
+    e2 = document.getElementById("ultimate_skill_id_p");
+    if(e!=null)
+    {
+        var n = e2.value;
+        var skills = g_bcjh_data.skills;
+        e.options.length = skills.length + 1;
+        for (let i = 0; i < skills.length; i++) {
+            const skill = skills[i];
+            var option = new Option();
+            option.text = skill.desc;
+            option.value = skill.skillId;
+            e.options[i+1] = option;
+            if(skill.skillId == n)
+                e.selectedIndex = i+1;
+        }
+    }    
     e = document.getElementById("equip_id_");
     e2 = document.getElementById("equip_id_p");
     if(e!=null)
@@ -252,10 +283,14 @@ function init_chefs(chefs)
             chef[type+"_raw"] = chef[type];
         }
         chef.skill = get_skill(chef.skill_id);
+        chef.ultimate_skill = get_skill(chef.ultimate_skill_id);
         chef.equip = get_equip(chef.equip_id);
         chef.equip_skills = [];
         chef.skill_name = function(){
             return this.skill == null ? "" : this.skill.desc;
+        }
+        chef.ultimate_skill_name = function(){
+            return this.ultimate_skill == null ? "" : this.ultimate_skill.desc;
         }
         chef.equip_name = function(){
             return this.equip == null ? "" : this.equip.name;
@@ -280,6 +315,22 @@ function init_chefs(chefs)
             }); 
         }        
     }
+    //global
+    for (let i = 0; i < chefs.length; i++) {
+        var chef = chefs[i];
+
+        if (chef.ultimate_skill)      
+        {
+            chef.ultimate_skill.effect.forEach(e => {
+                for (let j = 0; j < chefs.length; j++) {
+                    const c = chefs[j];
+                    e.effect_chef(c);
+                }
+                
+            }); 
+        }
+    
+    }    
 }
 
 function sort_recipe(a,b)
@@ -334,6 +385,24 @@ function display_guests_like(guests, recipe)
     return arr.join("<br>");
 }
 
+function calc_limit(recipe)
+{
+    switch (recipe.rarity) {
+        case 1:
+            return 40;
+        case 2:
+            return 30;
+        case 3:
+            return 25;
+        case 4:
+            return 20;
+        case 5:
+            return 15;
+        default:
+            return 0;
+    } 
+}
+
 function build_recipes(recipes, my_recipes, my_chefs)
 {
     var new_recipes = [];
@@ -350,6 +419,7 @@ function build_recipes(recipes, my_recipes, my_chefs)
             new_recipes.push(recipes[i]);
             recipes[i].is_mastery = parseInt(my_recipes[j].is_mastery) != 0;
             recipes[i].rate = parseInt(my_recipes[j].rate);
+            recipes[i].limit = calc_limit(recipes[i]);
             recipes[i].calc_price = function(){
                 return this.is_mastery ? this.price + this.exPrice : this.price;
             };
@@ -392,10 +462,21 @@ function build_recipes(recipes, my_recipes, my_chefs)
             ++j;
         }
     }   
+    //global
+    new_recipes.forEach(recipe => {
+        my_chefs.forEach(chef => {
+            if(chef.ultimate_skill)
+            {
+                chef.ultimate_skill.effect.forEach(effect => {
+                    effect.effect_limit(recipe);
+                });
+            }
+        });
+    });
     return new_recipes; 
 }
 
-function calc_price(recipe, chef, price_add)
+function calc_price(recipe, chef, chefs, price_add)
 {
     var rate = calc_rate(recipe, chef);
     if (rate == 0)
@@ -418,6 +499,16 @@ function calc_price(recipe, chef, price_add)
         }); 
     } 
     delta += price * price_add /100;
+    // global
+    for (let i = 0; i < chefs.length; i++) {
+        const c = chefs[i];
+        if (c.ultimate_skill)      
+        {
+            c.ultimate_skill.effect.forEach(e => {
+                delta += e.calc_price(recipe);
+            }); 
+        }
+    }
     return Math.ceil(price + delta);
 }
 

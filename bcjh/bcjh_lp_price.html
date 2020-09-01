@@ -1,0 +1,253 @@
+<html>
+
+<head>
+    <meta http-equiv="content-type" content="text/html;charset=utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>
+        爆炒江湖
+    </title>
+    <style type="text/css">
+        div.no {
+            font-size: 120%;
+            display: inline
+        }
+
+        div.yes {
+            font-size: 80%;
+            display: inline
+        }
+
+        div.content {
+            color: #FF0000;
+            display: inline
+        }
+
+        div.level {
+            display: inline
+        }
+    </style>
+    <script type="text/javascript" src="common.js">
+    </script>
+    <script type="text/javascript" src="bcjh_data.js">
+    </script>
+    <script type="text/javascript" src="bcjh_common.js">
+    </script>
+    <script type="text/javascript" src="bcjh_skill.js">
+    </script>
+    <script type="text/javascript" src="LP.js">
+    </script>
+    <script type="text/javascript" src="TableSorterV3.js">
+    </script>    
+    <script type="text/javascript">
+        function get_recipe_by_id(recipes, id)
+        {
+            for (let i = 0; i < recipes.length; i++) {
+                const recipe = recipes[i];
+                if(recipe.recipeId == id)
+                    return recipe;
+            }
+            return null;
+        }
+        function display_price()
+        {
+            do_ajax("get_db_data.php?name=bcjh_recipes&order_field=id", function(text){
+                var my_recipes = JSON.parse(text);
+                do_ajax("get_db_data.php?name=bcjh_chefs&order_field=id", function(text){
+                    init_skills(g_bcjh_data.skills);
+                    my_chefs = JSON.parse(text);
+                    init_chefs(my_chefs);
+
+                    var new_recipes = build_recipes(g_bcjh_data.recipes, my_recipes, my_chefs);
+
+                    var e2 = document.getElementById("time_limit");
+                    var time_limit = e2.value*3600;
+
+                    var final_result = [];
+                    var final_objective_value = new Object();
+                    g_debug_simplex_cnt = 0;
+
+                    var comb_list = combination(my_chefs.length, 3);
+                    var dateBegin = new Date();
+                    for (let i = 0; i < comb_list.length; i++) {
+
+                        const comb = comb_list[i];
+
+                        var objective_function = new Object();
+                        var constraint_list = []; 
+                        objective_function.is_max = true;
+                        objective_function.items = [];                        
+                        //var my_recipes_price = [];
+
+                        var constraint_time = new Object(); // 时间限制
+                        constraint_time.opr_type = -1;
+                        constraint_time.value = time_limit;
+                        constraint_time.items = [];
+
+
+                        var constraint_arr = new Array(comb.length);
+                        for (let j = 0; j < constraint_arr.length; j++) {
+                            constraint_arr[j] = new Object(); // 一个人只能做3个菜
+                            constraint_arr[j].opr_type = -1;
+                            constraint_arr[j].value = 3;
+                            constraint_arr[j].items = [];
+                        }
+                        for (let k = 0; k < new_recipes.length; k++) {
+                            const recipe = new_recipes[k];
+                            var constraint = new Object(); // 同一个菜只能一个人做
+                            constraint.opr_type = -1;
+                            constraint.value = 1;
+                            constraint.items = [];
+                            for (let j = 0; j < comb.length; j++) {
+                                const index = comb[j];
+                                var chef = my_chefs[index];
+                                var price = calc_price(recipe, chef, my_chefs, 0);
+                                if(price > 0)
+                                {
+                                    var var_name = "X_"+recipe.recipeId+"_"+index;
+                                    objective_function.items.push([price*recipe.limit, var_name]);
+                                    constraint_time.items.push([recipe.total_time(), var_name]);
+                                    constraint.items.push([1, var_name]);
+                                    constraint_arr[j].items.push([1, var_name]);
+                                }
+                            }
+                            if(constraint.items.length > 0)
+                                constraint_list.push(constraint);
+                        }
+                        for (let j = 0; j < constraint_arr.length; j++) {
+                            if (constraint_arr[j].items.length > 0)
+                                constraint_list.push(constraint_arr[j]);
+                        }
+                        if(time_limit> g_epsilon)
+                        {
+                            constraint_list.push(constraint_time);
+                        }
+
+                        var result = [];
+                        var objective_value = new Object();
+                        var r = solve_int_fast(objective_function, constraint_list, result, objective_value);
+                        if(r==1)
+                        {
+                            if(!("value" in final_objective_value) || (objective_value.value > final_objective_value.value))
+                            {
+                                final_objective_value.value = objective_value.value;
+                                final_result = result;
+                            }
+                        }
+                        if (i == 0) {
+                            break;
+                        }
+                    }
+                    var dateEnd = new Date();
+                    var dateDiff = dateEnd.getTime() - dateBegin.getTime();
+                    var e = document.getElementById("time");
+                    e.innerHTML = "time(ms):" + dateDiff;
+                    //var r = solve(objective_function, constraint_list, result, objective_value);
+                    var e = document.getElementById("price");
+                    if (r == 1) {
+                        //var s = "复杂度:"+ g_debug_simplex_cnt + "<br>" + final_objective_value.value + "<br>";// + JSON.stringify(result) + "<br>";
+                        var s = "<table id=\"tb2\" border=\"1\">";
+                            s += "<tr>";
+                            s += "<td>";
+                            s += "名称";
+                            s += "</td>";
+                            s += "<td>";
+                            s += "菜谱";
+                            s += "</td>";
+                            s += "<td>";
+                            s += "解";
+                            s += "</td>";
+                            s += "<td>";
+                            s += "单价";
+                            s += "</td>";
+                            s += "<td>";
+                            s += "数量";
+                            s += "</td>";
+                            s += "<td>";
+                            s += "总价";
+                            s += "</td>";
+                            s += "<td>";
+                            s += "时间(秒)";
+                            s += "</td>";
+                            s += "<td>";
+                            s += "时间";
+                            s += "</td>";
+                            s += "</tr>";
+                        var total_time = 0;
+                        for (let i = 0; i < final_result.length; i++) {
+                            const pair = final_result[i];
+                            if(pair[1] < g_epsilon)
+                                continue;
+                            if(pair[0].charAt(0) != "X")
+                                continue;
+                            var arr = pair[0].split("_");
+                            var id = parseInt(arr[1]);
+                            var recipe = get_recipe_by_id(new_recipes, id);
+                            var index = parseInt(arr[2]);
+                            var chef = my_chefs[index];
+                            var price = calc_price(recipe, chef, my_chefs, 0);
+                            total_time += recipe.total_time();
+                            s += "<tr>";
+                            s += "<td>";
+                            s += chef.name;
+                            s += "</td>";
+                            s += "<td>";
+                            s += recipe.name;
+                            s += "</td>";
+                            s += "<td>";
+                            s += pair[1].toFixed(2);
+                            s += "</td>";
+                            s += "<td>";
+                            s += price;
+                            s += "</td>";
+                            s += "<td>";
+                            s += recipe.limit;
+                            s += "</td>";
+                            s += "<td>";
+                            s += price * recipe.limit;
+                            s += "</td>";
+                            s += "<td>";
+                            s += recipe.total_time();
+                            s += "</td>";
+                            s += "<td>";
+                            s += recipe.time_name();
+                            s += "</td>";
+                            s += "</tr>";
+                        }
+                        s += "</table>";
+                        s += "复杂度:"+ g_debug_simplex_cnt + " - " + final_objective_value.value + " - " + display_time(total_time);// + JSON.stringify(result) + "<br>";
+                        e.innerHTML =  s;
+                        var x = new TableSorter("tb2");
+                    }
+                    else if( r == 0)
+                    {
+                        e.innerHTML = "无解";
+                    }
+                    else{
+                        e.innerHTML = "无穷解";
+                    }                    
+                });
+            });
+        }
+        function calc() {
+            for (let i = 0; i < my_maps.length; i++) {
+                const map = my_maps[i];
+                var e = document.getElementById("map"+i);
+                var option = e.options[e.selectedIndex];
+                map.value = parseInt(option.value);
+            }
+            display_price();
+        }
+    </script>
+</head>
+<body>
+    <a href="bcjh_recipes.html">返回</a><br>
+    时间限制(h)：<input type="number" id="time_limit"/><input type="button" value="计算" onclick="display_price()"/>
+    <div id="price"></div>
+    <div id="time"></div>
+    <script type="text/javascript">
+        //display_price();
+    </script>
+    
+</body>
+
+</html>

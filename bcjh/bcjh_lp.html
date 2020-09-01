@@ -1,0 +1,217 @@
+<html>
+
+<head>
+    <meta http-equiv="content-type" content="text/html;charset=utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>
+        爆炒江湖
+    </title>
+    <style type="text/css">
+        div.no {
+            font-size: 120%;
+            display: inline
+        }
+
+        div.yes {
+            font-size: 80%;
+            display: inline
+        }
+
+        div.content {
+            color: #FF0000;
+            display: inline
+        }
+
+        div.level {
+            display: inline
+        }
+    </style>
+    <script type="text/javascript" src="common.js">
+    </script>
+    <script type="text/javascript" src="bcjh_data.js">
+    </script>
+    <script type="text/javascript" src="bcjh_common.js">
+    </script>
+    <script type="text/javascript" src="bcjh_skill.js">
+    </script>
+    <script type="text/javascript" src="LP.js">
+    </script>
+    <script type="text/javascript">
+        var my_maps = [
+            {"name":"牧场","type":"meat","value":25}, //25 19 13 6 1
+            {"name":"鸡舍","type":"meat","value":18}, //24 18 14 8 4 1
+            {"name":"猪圈","type":"meat","value":18}, //18 12 7 5 1
+            {"name":"菜棚","type":"veg","value":20}, // 25 20 15 8 4 1
+            {"name":"菜地","type":"veg","value":22}, // 30 22 16 8 5 1
+            {"name":"森林","type":"veg","value":17}, // 32 27 17 12 6 2
+            {"name":"作坊","type":"creation","value":26}, // 26 21 16 11 5 1
+            {"name":"池塘","type":"fish","value":24} // 29 24 19 14 9 5
+        ];
+        function get_chef_by_id(chefs, id)
+        {
+            for (let i = 0; i < chefs.length; i++) {
+                const chef = chefs[i];
+                if(chef.id == id)
+                    return chef;
+            }
+            return null;
+        }
+        function display_price()
+        {
+            do_ajax("get_db_data.php?name=bcjh_recipes&order_field=id", function(text){
+                var my_recipes = JSON.parse(text);
+                do_ajax("get_db_data.php?name=bcjh_chefs&order_field=id", function(text){
+                    init_skills(g_bcjh_data.skills);
+                    my_chefs = JSON.parse(text);
+                    init_chefs(my_chefs);
+                    //display_chefs(my_chefs);
+                    //recipes = build_recipes(g_bcjh_data.recipes, my_recipes, my_chefs);
+                    //recipes = filter_recipes_by_material(recipes);
+                    var objective_function = new Object();
+                    var constraint_list = []; 
+                    var result = [];
+                    var objective_value = new Object();
+                    objective_function.is_max = false;
+                    objective_function.items = [];
+                    for (let j = 0; j < my_maps.length; j++) {
+                        const map = my_maps[j];
+                        if(map.value == 0)
+                            continue;
+                        objective_function.items.push([1, "t"+j]);
+                        {
+                            // 作坊
+                            var constraint = new Object();
+                            constraint.opr_type = 0;
+                            constraint.value = map.value;
+                            constraint.items = [[-1, "t"+j]];
+                            for (let i = 0; i < my_chefs.length; i++) {
+                                const chef = my_chefs[i];
+                                if (chef[map.type] > 0)
+                                    constraint.items.push([chef[map.type], "X_"+chef.id+"_"+j]);
+                            }
+                            constraint_list.push(constraint);
+                        }
+                        {
+                            // 作坊
+                            var constraint = new Object();
+                            constraint.opr_type = -1;
+                            constraint.value = 5;
+                            constraint.items = [];
+                            for (let i = 0; i < my_chefs.length; i++) {
+                                const chef = my_chefs[i];
+                                if (chef[map.type] > 0)
+                                    constraint.items.push([1, "X_"+chef.id+"_"+j]);
+                            }
+                            constraint_list.push(constraint);
+                        }
+                    }
+                    for (let i = 0; i < my_chefs.length; i++) {
+                        const chef = my_chefs[i];
+                        var constraint = new Object();
+                        constraint.opr_type = -1;
+                        constraint.value = 1;
+                        constraint.items = [];
+                        for (let j = 0; j < my_maps.length; j++) {
+                            const map = my_maps[j];
+                            if(map.value == 0)
+                                continue;
+                            if (chef[map.type] > 0)
+                                constraint.items.push([1, "X_"+chef.id+"_"+j]);
+                        }
+                        if (constraint.items.length == 0)
+                            continue;
+                        constraint_list.push(constraint);
+                    }
+                    //var r = solve(objective_function, constraint_list, result, objective_value);
+                    g_debug_simplex_cnt = 0;
+                    var r = solve_int(objective_function, constraint_list, result, objective_value);
+                    var e = document.getElementById("price");
+                    if (r == 1) {
+                        var s = "复杂度:"+ g_debug_simplex_cnt + "<br>" + objective_value.value + "<br>";// + JSON.stringify(result) + "<br>";
+                        for (let i = 0; i < my_maps.length; i++) {
+                            const map = my_maps[i];
+                            if(map.value == 0)
+                                continue;
+                            s += map.name + "(" + map.value + "),";
+                        }
+                        s += "<br><table border=\"1\">";
+                        for (let i = 0; i < result.length; i++) {
+                            const pair = result[i];
+                            if(pair[1] < g_epsilon)
+                                continue;
+                            if(pair[0].charAt(0) != "X")
+                                continue;
+                            var arr = pair[0].split("_");
+                            var id = parseInt(arr[1]);
+                            var chef = get_chef_by_id(my_chefs, id);
+                            var map_index = parseInt(arr[2]);
+                            var map = my_maps[map_index];
+                            s += "<tr>";
+                            s += "<td>";
+                            s += map.name;
+                            s += "</td>";
+                            s += "<td>";
+                            s += chef.name;
+                            s += "</td>";
+                            s += "<td>";
+                            s += chef[map.type]; 
+                            s += "</td>";
+                            s += "<td>";
+                            s += pair[1].toFixed(2);
+                            s += "</td>";
+                            s += "</tr>";
+                        }
+                        s += "</table>";
+                        e.innerHTML =  s;
+                    }
+                    else if( r == 0)
+                    {
+                        e.innerHTML = "无解";
+                    }
+                    else{
+                        e.innerHTML = "无穷解";
+                    }                    
+                });
+            });
+        }
+        function init_maps()
+        {
+            var s = "";
+            for (let i = 0; i < g_bcjh_data.maps.length; i++) {
+                const map = g_bcjh_data.maps[i];
+                s += map.name;
+                s += "<select id=\"map"+i+"\">";
+                s += "<option selected=\"selected\" value=\"0\">忽略</option>";
+                for (let j = 0; j < map.materials.length; j++) {
+                    const material = map.materials[j];
+                    s += "<option value =\""+material.skill+"\">"+material.name+"("+material.skill+")"+"</option>";
+                }
+                s += "</select>"
+            }
+            var e = document.getElementById("maps");
+            e.innerHTML = s;
+        }
+        function calc() {
+            for (let i = 0; i < my_maps.length; i++) {
+                const map = my_maps[i];
+                var e = document.getElementById("map"+i);
+                var option = e.options[e.selectedIndex];
+                map.value = parseInt(option.value);
+            }
+            display_price();
+        }
+    </script>
+</head>
+<body>
+    <a href="bcjh_recipes.html">返回</a><br>
+    <div id="maps"></div>
+    <input type="button" value="计算" onclick="calc()"/>
+    <div id="price"></div>
+    <script type="text/javascript">
+        init_maps();
+        //display_price();
+    </script>
+    
+</body>
+
+</html>

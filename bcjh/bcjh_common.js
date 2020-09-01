@@ -9,6 +9,36 @@ g_filter_material = "";
 g_filter_recipe = "";
 g_first_guest_name = "";
 
+// 从n个数里选m个，范围[0..n-1]
+function combination(n, m)
+{
+    if (n==m)
+    {
+        var result = new Array(m);
+        for (let i = 0; i < m; i++) {
+            result[i] = i;
+        }
+        return [result];
+    }
+    else if (m==1)
+    {
+        var result = new Array(n); 
+        for (let i = 0; i < n; i++) {
+            result[i] = [i];
+        }
+        return result;        
+    }
+    else
+    {
+        var r1 = combination(n-1, m-1);
+        for (let i = 0; i < r1.length; i++) {
+            r1[i].push(n-1);
+        }
+        var r2 = combination(n-1, m);
+        return r1.concat(r2);
+    }
+}
+
 function material_by_id(id)
 {
     var materials_dict = g_bcjh_data.materials;

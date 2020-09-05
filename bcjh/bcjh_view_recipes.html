@@ -65,22 +65,22 @@
                     my_chefs = JSON.parse(text);
                     init_chefs(my_chefs);
                     //display_chefs(my_chefs);
-                    //recipes = build_recipes(g_bcjh_data.recipes, my_recipes, my_chefs);
+                    recipes = build_recipes(g_bcjh_data.recipes, my_recipes, my_chefs);
                     //recipes = filter_recipes_by_material(recipes);
-                    for (let i = 0; i < my_chefs.length; i++) {
-                        var chef = my_chefs[i];
-                        if (chef.equip)
-                            chef.equip.origin = chef.equip.origin.replace(/<br>/g, " ");
-                    }                    
+                    for (let i = 0; i < recipes.length; i++) {
+                        var recipe = recipes[i];
+                        recipe.recipe_chefs = recipe.recipe_chefs.replace(/<br>/g, " ");
+                        recipe.guests_like = recipe.guests_like.replace(/<br>/g, " ");
+                        recipe.first_guests = recipe.first_guests.replace(/<br>/g, " ");
+                    }
                     var e = document.getElementById("price");
-                    e.innerHTML = JSON.stringify(my_chefs);                    
+                    e.innerHTML = JSON.stringify(recipes);                    
                 });
             });
         }
     </script>
 </head>
 <body>
-    <a href="bcjh_recipes.html">返回</a><br>
     <div id="price"></div>
     <script type="text/javascript">
 //        init_maps();

@@ -37,25 +37,6 @@
     <script type="text/javascript" src="LP.js">
     </script>
     <script type="text/javascript">
-        var my_maps = [
-            {"name":"牧场","type":"meat","value":25}, //25 19 13 6 1
-            {"name":"鸡舍","type":"meat","value":18}, //24 18 14 8 4 1
-            {"name":"猪圈","type":"meat","value":18}, //18 12 7 5 1
-            {"name":"菜棚","type":"veg","value":20}, // 25 20 15 8 4 1
-            {"name":"菜地","type":"veg","value":22}, // 30 22 16 8 5 1
-            {"name":"森林","type":"veg","value":17}, // 32 27 17 12 6 2
-            {"name":"作坊","type":"creation","value":26}, // 26 21 16 11 5 1
-            {"name":"池塘","type":"fish","value":24} // 29 24 19 14 9 5
-        ];
-        function get_chef_by_id(chefs, id)
-        {
-            for (let i = 0; i < chefs.length; i++) {
-                const chef = chefs[i];
-                if(chef.id == id)
-                    return chef;
-            }
-            return null;
-        }
         function display_price()
         {
             do_ajax("get_db_data.php?name=bcjh_recipes&order_field=id", function(text){
@@ -65,22 +46,27 @@
                     my_chefs = JSON.parse(text);
                     init_chefs(my_chefs);
                     //display_chefs(my_chefs);
-                    //recipes = build_recipes(g_bcjh_data.recipes, my_recipes, my_chefs);
+                    recipes = build_recipes(g_bcjh_data.recipes, my_recipes, my_chefs);
                     //recipes = filter_recipes_by_material(recipes);
-                    for (let i = 0; i < my_chefs.length; i++) {
-                        var chef = my_chefs[i];
-                        if (chef.equip)
-                            chef.equip.origin = chef.equip.origin.replace(/<br>/g, " ");
-                    }                    
+                    var result=[];
+                    for (let i = 0; i < recipes.length; i++) {
+                        var recipe = recipes[i];
+                        var arr=[];
+                        for (let j = 0; j < my_chefs.length; j++) {
+                            const chef = my_chefs[j];
+                            var price = calc_price(recipe, chef, my_chefs, 0);
+                            arr.push(price);
+                        }
+                        result.push(arr);
+                    }
                     var e = document.getElementById("price");
-                    e.innerHTML = JSON.stringify(my_chefs);                    
+                    e.innerHTML = JSON.stringify(result);                    
                 });
             });
         }
     </script>
 </head>
 <body>
-    <a href="bcjh_recipes.html">返回</a><br>
     <div id="price"></div>
     <script type="text/javascript">
 //        init_maps();

@@ -472,6 +472,7 @@ function build_recipes(recipes, my_recipes, my_chefs)
                 return Math.round(this.calc_price()/this.time*3600);
             } 
             recipes[i].unclock_name = recipes[i].rate == 4 ? "-" : recipes[i].unlock; 
+            recipes[i].gift_name = recipes[i].rate == 4 ? "-" : recipes[i].gift; 
             var recipe_chefs = get_recipe_chefs(recipes[i], my_chefs);
             recipes[i].recipe_chefs = display_recipe_chefs(recipe_chefs, recipes[i].rate);
             recipes[i].first_guests = display_first_guests(recipe_chefs, recipes[i]);

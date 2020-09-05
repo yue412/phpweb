@@ -135,18 +135,25 @@
             var n1 = getColIndex("解锁");
             //var n2 = getColIndex("推荐厨师");
             var n3 = getColIndex("首次贵客");
+            var n4 = getColIndex("神级符文");
             var e1 = document.getElementById("td_"+n1+"_"+id);
             //var e2 = document.getElementById("td_"+n2+"_"+id);
             var e3 = document.getElementById("td_"+n3+"_"+id);
+            var e4 = document.getElementById("td_"+n4+"_"+id);
             var val = document.getElementById("cb_rate"+id).value;
             recipe.rate = val;
             var unlock = recipe.unlock;
+            var gift = recipe.gift;
             var recipe_chefs = get_recipe_chefs(recipe, my_chefs);
             if (val == 4)
+            {
                 unlock = "-";
+                gift = "-";
+            }
             e1.innerHTML = unlock;
             //e2.innerHTML = display_recipe_chefs(recipe_chefs, val);
             e3.innerHTML = display_first_guests(recipe_chefs, recipe);
+            e4.innerHTML = gift;
 
             var url = "update_record.php?table_name=bcjh_recipes&primary_key=id&key_val=" + id +"&rate="+val;
             do_ajax(url, function (text) {
@@ -264,6 +271,7 @@
                                     get_chef_names(recipe_chefs[4]),
                                     recipe.first_guests,
                                     recipe.guests_like,
+                                    recipe.gift_name,
                                     "",
                                     "",
                                     "",
@@ -596,6 +604,7 @@
             <td>神级厨师</td>
             <td>首次贵客</td>
             <td>贵客喜欢</td>
+            <td>神级符文</td>
             <td>评级1</td>
             <td>总价1</td>
             <td>金币/小时1</td>

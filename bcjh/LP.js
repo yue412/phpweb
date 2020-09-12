@@ -576,5 +576,85 @@ function solve_int_fast(objective_function, constraint_list, result, objective_v
             objective_value.value = -objective_value.value;
     }
     return r;
-    
+}
+
+function solve_fast(objective_function, constraint_list, result, objective_value)
+{
+    var lp = new Object();
+    lp.base = new Array(constraint_list.length);
+    var var_list = [];
+    var Ct = [];
+    var factor = objective_function.is_max ? 1 : -1;
+    for (let i = 0; i < objective_function.items.length; i++) {
+        const pair = objective_function.items[i];
+        var_list.push(pair[1]); // 变量名
+        Ct.push(pair[0]*factor); // 系数
+    }
+    var b = [];
+    var A = [];
+    var new_var_no = 0;
+    var arr = [];
+    for (let i = 0; i < constraint_list.length; i++) {
+        const constraint = constraint_list[i];
+        var factor = constraint.value < - g_epsilon ? -1 : 1;
+        var row = new Array(var_list.length);
+        init_number_array(row);
+        for (let j = 0; j < constraint.items.length; j++) {
+            const pair = constraint.items[j];
+            var k = var_list.indexOf(pair[1]);
+            //var k = index_of_val_list(var_list, pair[1]);
+            var val = pair[0]*factor;
+            if (k == -1)
+            {
+                //var_list.push("_t"+(new_var_no++));
+                var_list.push(pair[1]);
+                row.push(val);
+            }
+            else
+            {
+                row[k] = val;
+            }
+        }
+        if (constraint.opr_type != 0)
+        {
+            var_list.push("_t"+(new_var_no++));
+            row.push(-constraint.opr_type*factor);
+            lp.base[i] = var_list.length - 1;
+        }
+        else
+        {
+            var var_name = constraint.items[0][1];
+            var index = var_list.indexOf(var_name);
+            lp.base[i] = index;
+            arr.push(i);
+        }
+        A.push(row);
+        b.push(Math.abs(constraint.value));
+    }
+    grow_number_array(Ct, var_list.length);
+    for (let i = 0; i < A.length; i++) {
+        grow_number_array(A[i], var_list.length);
+    }
+    var X = new Array(var_list.length);
+    lp.matrix = init_matrix(Ct, A, b);
+    for (let i = 0; i < arr.length; i++) {
+        const row = arr[i];
+        gaussian(lp.matrix, row, lp.base[row]);
+    }
+    for (let i = 0; i < b.length; i++) {
+        if(lp.matrix[i][Ct.length] < -g_epsilon)
+            return 0;
+    }
+    //var r = simplex(Ct, A, b, X, objective_value);
+    var r = simplex(lp.matrix, lp.base, X, objective_value);
+    if (r == 1) {
+        for (let i = 0; i < var_list.length; i++) {
+            if (var_list[i].charAt(0) == "_")
+                continue;
+            result.push([var_list[i], X[i]]);
+        }
+        if(!objective_function.is_max)
+            objective_value.value = -objective_value.value;
+    }
+    return r;
 }

@@ -97,7 +97,7 @@
                     for (let j = 0; j < recipes.length; j++) {
                         var recipe = recipes[j];
                         var total_time = recipe.limit * recipe.time;
-                        var best = get_best_chefs(recipe, my_chefs);
+                        var best = get_best_chefs(recipe, my_chefs, 0);
                         s += "<tr>";
                         s += "<td>";
                         s += recipe.galleryId;

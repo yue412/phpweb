@@ -107,7 +107,7 @@
             //var price = recipe.price;
             //if (checked)
             //    price += recipe.exPrice;
-            var best = get_best_chefs(recipe, my_chefs);       
+            var best = get_best_chefs(recipe, my_chefs, 0);       
             e1.innerHTML = recipe.calc_price();
             e2.innerHTML = recipe.calc_total_price();
             e3.innerHTML = recipe.calc_price_time();
@@ -174,25 +174,7 @@
             g_select_recipes.push(new Array());
             g_select_recipes.push(new Array());            
         }
-        function get_best_chefs(recipe, chefs)
-        {
-            var result = [0, []];
-            for (let i = 0; i < chefs.length; i++) {
-                const chef = chefs[i];
-                var price = calc_price(recipe, chef, my_chefs, 0);
-                if (price > result[0])
-                {
-                    result[0] = price;
-                    result[1].length = 0;
-                    result[1].push(chef.name);
-                }
-                else if(price == result[0] && price > 0)
-                {
-                    result[1].push(chef.name);
-                }
-            }
-            return result;
-        }
+
         function display_recipes()
         {
             do_ajax("get_db_data.php?name=bcjh_recipes&order_field=id", function(text){
@@ -241,7 +223,7 @@
                             s += "<option value=\""+i+"\" "+flag+">"+name+"</option>";
                         }
                         s += "</select>";
-                        var best = get_best_chefs(recipe, my_chefs);
+                        var best = get_best_chefs(recipe, my_chefs, 0);
                         var recipe_chefs = get_recipe_chefs(recipe, my_chefs);
                         var row = tb2.insertRow(tb2.rows.length);
                         var data = [recipe.galleryId, 
@@ -354,27 +336,7 @@
                 table.deleteRow(i);
             }
         }
-        function setCookie(cname, cvalue, exdays) {
-            var d = new Date();
-            d.setTime(d.getTime() + (exdays*24*60*60*1000));
-            var expires = "expires="+ d.toUTCString();
-            document.cookie = cname + "=" + cvalue + ";" + expires + ";path=/";
-        }   
-        function getCookie(cname) {
-            var name = cname + "=";
-            var decodedCookie = decodeURIComponent(document.cookie);
-            var ca = decodedCookie.split(';');
-            for(var i = 0; i <ca.length; i++) {
-                var c = ca[i];
-                while (c.charAt(0) == ' ') {
-                    c = c.substring(1);
-                }
-                if (c.indexOf(name) == 0) {
-                    return c.substring(name.length, c.length);
-                }
-            }
-            return "";
-        }               
+           
         function initCols()
         {
             var et = document.getElementById("tb2");
@@ -567,7 +529,7 @@
     </script>
 </head>
 <body>
-    <a href="bcjh_chefs.html">厨师</a>
+    <a href="bcjh_chefs.html">厨师</a> <a href="bcjh_lp_price.html">计算器</a>
     <a href="bcjh_new_recipe.html">添加菜谱</a> 餐桌加成：<input type="number" id="price_add"/>%
     <div id="cols"></div>
     <div id="filters"></div>

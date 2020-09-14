@@ -375,13 +375,13 @@
                 //e5.innerHTML = Math.ceil(best[0]/recipe.time*3600);
                 var price = best[0];
                 var var_name = "X_"+recipe.recipeId; // 份数
-                objective_function.items.push([price, var_name]);
-                constraint_time.items.push([recipe.time, var_name]);
+                objective_function.items.push([price*recipe.limit, var_name]);
+                constraint_time.items.push([recipe.time*recipe.limit, var_name]);
                 for (let n = 0; n < recipe.materials.length; n++) {
                     const m = recipe.materials[n];
                     if(material_constraint_map.has(m.material))
                     {
-                        material_constraint_map.get(m.material).items.push([m.quantity, var_name]);
+                        material_constraint_map.get(m.material).items.push([m.quantity*recipe.limit, var_name]);
                     }
                 }
             }
@@ -427,13 +427,13 @@
             s += recipe.limit;
             s += "</td>";
             s += "<td>";
-            s += price * cnt;
+            s += price * cnt * recipe.limit;
             s += "</td>";
             s += "<td>";
-            s += recipe.time * cnt;
+            s += recipe.time * cnt * recipe.limit;
             s += "</td>";
             s += "<td>";
-            s += display_time(recipe.time * cnt);
+            s += display_time(recipe.time * cnt * recipe.limit);
             s += "</td>";
             s += "</tr>";
             return s;
@@ -483,7 +483,7 @@
                 var map = new Map();
                 for (let i = 0; i < final_result.length; i++) {
                     const pair = final_result[i];
-                    var cnt = Math.floor(pair[1]);
+                    var cnt = Math.round(pair[1]);
                     if(cnt == 0)
                         continue;
                     if(pair[0].charAt(0) != "X")
@@ -493,8 +493,8 @@
                     var recipe = get_recipe_by_id(recipes, id);
                     var best = best_recipe_map.get(id);
                     var price = best[0];
-                    total_time += recipe.time * cnt;
-                    total_price += price * cnt;
+                    total_time += recipe.time * cnt *recipe.limit;
+                    total_price += price * cnt *recipe.limit;
                     for (let n = 0; n < recipe.materials.length; n++) {
                         const m = recipe.materials[n];
                         var t = 0;
@@ -502,15 +502,9 @@
                         {
                             t = map.get(m.material);
                         }
-                        map.set(m.material, t + m.quantity*cnt);
+                        map.set(m.material, t + m.quantity*cnt*recipe.limit);
                     }
-                    while(cnt > recipe.limit)
-                    {
-                        s += display_item(recipe, best[1].join(","), price, recipe.limit);
-                        cnt -= recipe.limit;
-                    }
-                    if(cnt>0)
-                        s += display_item(recipe, best[1].join(","), price, cnt);
+                    s += display_item(recipe, best[1].join(","), price, cnt);
                 }
                 s += "</table>";
                 s += "总价:"+ total_price + " - " + display_time(total_time);// + JSON.stringify(result) + "<br>";
@@ -605,8 +599,8 @@
 
             var result = [];
             var objective_value = new Object();
-            var r = solve_fast(objective_function, constraint_list, result, objective_value);
-            //var r = solve_int_fast(objective_function, constraint_list, result, objective_value);
+            //var r = solve_fast(objective_function, constraint_list, result, objective_value);
+            var r = solve_int_fast(objective_function, constraint_list, result, objective_value);
             if(r==1)
             {
                 if(!("value" in final_objective_value) || (objective_value.value > final_objective_value.value))

@@ -136,6 +136,7 @@
             //var n2 = getColIndex("推荐厨师");
             var n3 = getColIndex("首次贵客");
             var n4 = getColIndex("神级符文");
+
             var e1 = document.getElementById("td_"+n1+"_"+id);
             //var e2 = document.getElementById("td_"+n2+"_"+id);
             var e3 = document.getElementById("td_"+n3+"_"+id);
@@ -154,6 +155,16 @@
             //e2.innerHTML = display_recipe_chefs(recipe_chefs, val);
             e3.innerHTML = display_first_guests(recipe_chefs, recipe);
             e4.innerHTML = gift;
+
+            for (let i = 1; i < g_Rate_names.length; i++) {
+                var n = getColIndex(g_Rate_names[i] + "级厨师");
+                var e = document.getElementById("td_"+n+"_"+id);
+                if(val < i)
+                    e.style.backgroundColor = "#CCFFCC";
+                else
+                    e.style.backgroundColor = "#FFFFFF";
+            }
+
 
             var url = "update_record.php?table_name=bcjh_recipes&primary_key=id&key_val=" + id +"&rate="+val;
             do_ajax(url, function (text) {
@@ -271,6 +282,14 @@
                             var cell = row.insertCell(k);
                             cell.innerHTML = data[k];
                             cell.id = "td_"+k+"_"+recipe.recipeId;
+                        }
+                        var index = getColIndex("可级厨师");
+                        for (let k = 0; k < 4; k++) {
+                            var cell = row.cells[index+k];
+                            if(recipe.rate < (k+1))
+                                cell.style.backgroundColor = "#CCFFCC";
+                            else
+                                cell.style.backgroundColor = "#FFFFFF";
                         }
                     }
                     initColVisible(tb2);

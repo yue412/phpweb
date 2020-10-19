@@ -1,4 +1,4 @@
-function effect_chef_default(chef)
+function effect_chef_default(chef, owner)
 {
 
 }
@@ -17,15 +17,23 @@ function adjust_type(type)
     return type == "vegetable" ? "veg" : type;
 }
 
-function effect_chef_abs(chef)
+function effect_chef_abs(chef, owner)
 {
+    if(this.condition == "Self" && chef != owner)
+        return;
+    if("tag" in this && chef.tags.indexOf(this.tag) == -1 )
+        return;
     chef[adjust_type(this.type)] += this.value;
 }
 
-function effect_chef_percent(chef)
+function effect_chef_percent(chef, owner)
 {
+    if(this.condition == "Self" && chef != owner)
+        return;
+    if("tag" in this && chef.tags.indexOf(this.tag) == -1 )
+        return;
     var type = adjust_type(this.type);
-    chef[type] += this.value / 100 * chef[type+"_raw"] ;
+    chef[type] += Math.floor(this.value / 100 * chef[type+"_raw"]) ;
 }
 
 function calc_price_percent(recipe)

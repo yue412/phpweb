@@ -1,11 +1,27 @@
 var g_epsilon = 1e-6;
 var g_debug_simplex_cnt = 0;
+var g_objective_value = 0;
+var g_log_objective_value = false;
 
 function solve_int(objective_function, constraint_list, result, objective_value)
 {
     var r = solve(objective_function, constraint_list, result, objective_value);
     if(r != 1)
         return r;
+    // 剪枝
+    if(g_log_objective_value)
+    {
+        if(objective_function.is_max)
+        {   
+            if(objective_value.value < g_objective_value)
+                return 0;
+        }
+        else 
+        {
+            if(objective_value.value > g_objective_value)
+                return 0;
+        }
+    }
     for (let i = 0; i < result.length; i++) {
         const pair = result[i];
         var int_val = Math.round(pair[1])
@@ -18,7 +34,7 @@ function solve_int(objective_function, constraint_list, result, objective_value)
         {
             // 作坊
             var constraint = new Object();
-            constraint.opr_type = 0;
+            constraint.opr_type = 1;
             constraint.value = int_val;
             constraint.items = [[1, pair[0]]];
             new_constraint_list1.push(constraint);
@@ -31,7 +47,7 @@ function solve_int(objective_function, constraint_list, result, objective_value)
         {
             // 作坊
             var constraint = new Object();
-            constraint.opr_type = 0;
+            constraint.opr_type = -1;
             constraint.value = int_val-1;
             constraint.items = [[1, pair[0]]];
             new_constraint_list2.push(constraint);
@@ -75,9 +91,13 @@ function solve_int(objective_function, constraint_list, result, objective_value)
             return 0;
         }
     }
+    // 全部都是整数，记录极值
+    g_objective_value = objective_value.value;
+    g_log_objective_value = true;
     return r;
 }
 
+//先不考虑整数
 function solve(objective_function, constraint_list, result, objective_value)
 {
     var var_list = [];
@@ -91,6 +111,8 @@ function solve(objective_function, constraint_list, result, objective_value)
     var b = [];
     var A = [];
     var new_var_no = 0;
+    var base = [];
+    var rows = [];
     for (let i = 0; i < constraint_list.length; i++) {
         const constraint = constraint_list[i];
         var factor = constraint.value < - g_epsilon ? -1 : 1;
@@ -115,16 +137,29 @@ function solve(objective_function, constraint_list, result, objective_value)
         {
             var_list.push("_t"+(new_var_no++));
             row.push(-constraint.opr_type*factor);
+            if(row[row.length-1] < 0)
+                rows.push(A.length);
+            base.push(row.length-1);
         }
         A.push(row);
         b.push(Math.abs(constraint.value));
     }
+
+    for (let i = 0; i < rows.length; i++) {
+        const index = rows[i];
+        var row = A[index];
+        for (let j = 0; j < row.length; j++) {
+            row[j] = -row[j];
+        }
+        b[index] = -b[index];
+    }
+
     grow_number_array(Ct, var_list.length);
     for (let i = 0; i < A.length; i++) {
         grow_number_array(A[i], var_list.length);
     }
     var X = new Array(var_list.length);
-    var r = simplex2(Ct, A, b, X, objective_value);
+    var r = simplex2(Ct, A, b, base, X, objective_value);
     if (r == 1) {
         for (let i = 0; i < var_list.length; i++) {
             if (var_list[i].charAt(0) == "_")
@@ -141,7 +176,7 @@ function solve(objective_function, constraint_list, result, objective_value)
 // max(Ct*X)
 // AX=b
 // b>=0 X>=0
-function simplex2(Ct, A, b, result, objective_value)
+function simplex2(Ct, A, b, base, result, objective_value)
 {
     
     // 构造Matrix
@@ -150,8 +185,9 @@ function simplex2(Ct, A, b, result, objective_value)
     var width = Ct.length;
     var height = b.length;
     var matrix = init_matrix(Ct, A, b);
-    var base = new Array(height);
+    //var base = new Array(height);
     // 找到最初的基变量
+    /*
     for (let i = 0; i < height; i++) {
         base[i] = -1;
         var bZero = Math.abs(matrix[i][width]) < g_epsilon;
@@ -171,6 +207,7 @@ function simplex2(Ct, A, b, result, objective_value)
         if (!bSucc && !bZero)
             return 0; // 无解
     }
+    */
     //b有可能是负的了，要处理
     while (true) {
         var isValid = true;
@@ -415,11 +452,31 @@ function _solve_int_fast(lp, result, objective_value)
     var r = simplex(_lp.matrix, _lp.base, result, objective_value);
     if(r != 1)
         return r;
+
+    var index = -1;
+    var factor = 0;
     for (let i = 0; i < result.length; i++) {
         if (Number.isInteger(result[i])) 
             continue;
         if (in_base(lp.base, i))
             continue;
+        var d = lp.matrix[lp.matrix.length-1][i];
+        if(index == -1 || d > factor)
+        {
+            factor = d;
+            index = i;
+        }
+    }
+
+            
+    //for (let i = 0; i < result.length; i++) 
+    if (index >= 0)
+    {
+        var i = index;
+//        if (Number.isInteger(result[i])) 
+//            continue;
+//        if (in_base(lp.base, i))
+//            continue;
         var int_val = Math.ceil(result[i]);
         // 非整数
         var new_lp1 = calc_new_lp(lp, i, int_val);

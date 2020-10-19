@@ -340,6 +340,16 @@ function get_equip_name(id)
         return "";
 }
 
+function get_tags(id)
+{
+    for (let i = 0; i < g_bcjh_data.chefs.length; i++) {
+        const chef = g_bcjh_data.chefs[i];
+        if(chef.chefId == id)
+            return chef.tags;
+    }
+    return [];
+}
+
 function init_chefs(chefs)
 {
     for (let i = 0; i < chefs.length; i++) {
@@ -358,6 +368,7 @@ function init_chefs(chefs)
         chef.ultimate_skill = get_skill(chef.ultimate_skill_id);
         chef.equip = get_equip(chef.equip_id);
         chef.equip_skills = [];
+        chef.tags = get_tags(chef.id);
         chef.skill_name = function(){
             return this.skill == null ? "" : this.skill.desc;
         }
@@ -370,7 +381,7 @@ function init_chefs(chefs)
         if (chef.skill)      
         {
             chef.skill.effect.forEach(e => {
-                e.effect_chef(chef);
+                e.effect_chef(chef, chef);
             }); 
         }
         if (chef.equip)      
@@ -380,7 +391,7 @@ function init_chefs(chefs)
                 if(e_skill)
                 {
                     e_skill.effect.forEach(e => {
-                        e.effect_chef(chef);
+                        e.effect_chef(chef, chef);
                     });
                     chef.equip_skills.push(e_skill);
                 }
@@ -396,7 +407,7 @@ function init_chefs(chefs)
             chef.ultimate_skill.effect.forEach(e => {
                 for (let j = 0; j < chefs.length; j++) {
                     const c = chefs[j];
-                    e.effect_chef(c);
+                    e.effect_chef(c, chef);
                 }
                 
             }); 

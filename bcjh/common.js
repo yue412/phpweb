@@ -20,6 +20,8 @@ function do_ajax(url, cfunc)
         url += '&';
     url += "t=" + Math.random();
     xmlhttp.open("GET", url, true);
+    //xmlhttp.setRequestHeader( 'Access-Control-Allow-Origin', '*');
+    //xmlhttp.setRequestHeader( 'Content-Type', 'application/json' ); 
     xmlhttp.send();
 }
 

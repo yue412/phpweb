@@ -2,6 +2,7 @@ var g_epsilon = 1e-6;
 var g_debug_simplex_cnt = 0;
 var g_objective_value = 0;
 var g_log_objective_value = false;
+var g_solve_only_once = false;
 
 function solve_int(objective_function, constraint_list, result, objective_value)
 {
@@ -42,6 +43,14 @@ function solve_int(objective_function, constraint_list, result, objective_value)
         var new_result1 = [];
         var new_value1 = new Object();
         var r1 = solve_int(objective_function, new_constraint_list1, new_result1, new_value1);
+        // 只计算一次
+        if(g_solve_only_once && r1 == 1)
+        {
+            copy_array(new_result1, result);
+            //result = JSON.parse(JSON.stringify(new_result1));
+            objective_value.value = new_value1.value;
+            return r1;            
+        }
         // 非整数
         var new_constraint_list2 = JSON.parse(s);
         {

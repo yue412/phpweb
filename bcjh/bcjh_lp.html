@@ -526,7 +526,7 @@
                     var k = arr[2];
                     var chef = final_comb[k];
                     var recipe = get_recipe_by_id(recipes, id);
-                    var rule_effect = rule.RepriceEffect[recipe.recipeId];
+                    var rule_effect = rule.RecipeEffect[recipe.recipeId];
                     if (rule_effect == null)
                         rule_effect = 0;
                     var price = calc_price(recipe, chef, my_chefs, rule_effect*100);
@@ -608,7 +608,7 @@
             var best_recipe_map = new Map();
             for (let k = 0; k < new_recipes.length; k++) {
                 const recipe = new_recipes[k];
-                var rule_effect = rule.RepriceEffect[recipe.recipeId];
+                var rule_effect = rule.RecipeEffect[recipe.recipeId];
                 if (rule_effect == null)
                     rule_effect = 0;
                 var best = get_best_chefs(recipe, filter_chefs, rule_effect*100);
@@ -693,6 +693,7 @@
             var sl = document.getElementById("score_limit");
             var limit = sl.value;
             var recipe_limit = document.getElementById("recipe_limit").value;
+            var calc_limit = document.getElementById("calc_limit").value;
 
             final_result = [];
             final_objective_value = new Object();
@@ -709,7 +710,7 @@
                 var best_recipe_map = new Map();
                 for (let k = 0; k < new_recipes.length; k++) {
                     const recipe = new_recipes[k];
-                    var rule_effect = rule.RepriceEffect[recipe.recipeId];
+                    var rule_effect = rule.RecipeEffect[recipe.recipeId];
                     if (rule_effect == null)
                         rule_effect = 0;
                     var best = get_best_chefs(recipe, select_chefs, rule_effect*100);
@@ -791,7 +792,7 @@
                 for (let i = 0; i <= index; i++) {
                     const r = list[i];
                     var recipe = r[0];
-                    var rule_effect = rule.RepriceEffect[recipe.recipeId];
+                    var rule_effect = rule.RecipeEffect[recipe.recipeId];
                     if (rule_effect == null)
                         rule_effect = 0;                        
                     for (let j = 0; j < select_chefs.length; j++) {
@@ -802,7 +803,7 @@
                         recipe_price_list[j].push([recipe, price]);
                     }
                 }
-                var clist1 = combination(recipe_price_list[0].length, 3);      
+                var clist1 = combination(Math.min(recipe_price_list[0].length, calc_limit), 3);      
                 for (let i = 0; i < clist1.length; i++) {
                     const arr_index1 = clist1[i];
                     var arr_id=[recipe_price_list[0][arr_index1[0]][0].recipeId, recipe_price_list[0][arr_index1[1]][0].recipeId, recipe_price_list[0][arr_index1[2]][0].recipeId];
@@ -814,7 +815,7 @@
                     }
                     if(left_list.length<3)
                         continue;
-                    var clist2 = combination(left_list.length, 3);
+                    var clist2 = combination(Math.min(left_list.length, calc_limit), 3);
                     for (let k = 0; k < clist2.length; k++) {
                         const arr_index2 = clist2[k];
                         var arr_id2 = [left_list[arr_index2[0]][0].recipeId, left_list[arr_index2[1]][0].recipeId, left_list[arr_index2[2]][0].recipeId];
@@ -827,7 +828,7 @@
                         }
                         if(left_list2.length<3)
                             continue;
-                        var clist3 = combination(left_list2.length, 3);
+                        var clist3 = combination(Math.min(left_list2.length, calc_limit), 3);
                         for (let m = 0; m < clist3.length; m++) {
                             const arr_index3 = clist3[m];
                             var arr3 = [left_list2[arr_index3[0]], left_list2[arr_index3[1]], left_list2[arr_index3[2]]];
@@ -967,7 +968,9 @@
 <body>
     <a href="bcjh_recipes.html">返回</a><br>
     规则地址：<input type="text" id="rule_address" onchange="setCookie('rule_address', this.value, 14)"/><input type="button" value="加载" onclick="load_rule()"/>
-    <input type="button" value="直接加载" onclick="load_rule2()"/>
+    <!--input type="button" value="直接加载" onclick="load_rule2()"/-->
+    <input type="button" value="直接加载" onclick='do_ajax("cors.php?url="+encodeURIComponent("https://bcjh.xyz/api/get_rule"), _load_rule)'/><br>
+    阈值：<input type="number" id="calc_limit" value="6"/>
     <div id="rules"></div>
     <div id="passline"></div>
     <!--input type="button" value="整数计算" onclick="display_price(0)"/>

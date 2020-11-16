@@ -601,14 +601,14 @@
                     my_chefs = JSON.parse(text);
                     init_chefs(my_chefs);
                     new_recipes = build_recipes(g_bcjh_data.recipes, my_recipes, my_chefs);
-                    //display_chefs(my_chefs);
+                    display_chefs(my_chefs);
                 });
             });
         }
 
         function display_price()
         {
-            //filter_chefs = filter_chef(my_chefs);
+            filter_chefs = filter_chef(my_chefs);
 
             var e2 = document.getElementById("time_limit");
             var time_limit = e2.value*3600;
@@ -622,7 +622,7 @@
             var best_recipe_map = new Map();
             for (let k = 0; k < new_recipes.length; k++) {
                 const recipe = new_recipes[k];
-                var best = get_best_chefs(recipe, my_chefs, e.value);
+                var best = get_best_chefs(recipe, filter_chefs, e.value);
                 if(best[1].length == 0)
                     continue;
                 best_recipe_map.set(recipe.recipeId, best);
@@ -632,7 +632,7 @@
 
             var objective_function = new Object();
             var constraint_list = []; 
-            build_constraint(objective_function, constraint_list, new_recipes, my_chefs, time_limit, best_recipe_map, materail_map);
+            build_constraint(objective_function, constraint_list, new_recipes, filter_chefs, time_limit, best_recipe_map, materail_map);
 
             var result = [];
             var objective_value = new Object();
@@ -653,7 +653,7 @@
             var e = document.getElementById("time");
             e.innerHTML = "time(ms):" + dateDiff;
 
-            display_result(new_recipes, my_chefs, best_recipe_map, materail_map);
+            display_result(new_recipes, filter_chefs, best_recipe_map, materail_map);
         }
 
         function select_material_cnt(id, checked) {
@@ -708,6 +708,42 @@
                 arr[val].checked = true;
             }
         }
+        function sort_chef(a,b)
+        {
+            return b.rarity - a.rarity;
+        }  
+        function select_chef(rarity)
+        {
+            var e = document.getElementById("ck_all_chef_"+rarity);
+            for (let i = 0; i < my_chefs.length; i++) {
+                const chef = my_chefs[i];
+                if (chef.rarity == rarity)
+                {
+                    var e2 = document.getElementById("ck_chef_" + chef.id);
+                    e2.checked = e.checked;
+                }
+            }
+        }         
+        function display_chefs(chefs)
+        {
+            chefs.sort(sort_chef);
+            if (chefs.length == 0)
+                return;
+            var e2 = document.getElementById("chefs");
+            var rarity = chefs[0].rarity;
+            var sChecked = "checked=\"checked\"";
+            var s = "<input type=\"checkbox\" id=\"ck_all_chef_"+rarity+"\" onclick=\"select_chef("+rarity+")\" "+((rarity>1)?sChecked:"")+">全选 ";
+            for (let i = 0; i < chefs.length; i++) {
+                const chef = chefs[i];
+                if(chef.rarity != rarity)
+                {
+                    s += "<br>" + "<input type=\"checkbox\" id=\"ck_all_chef_"+chef.rarity+"\" onclick=\"select_chef("+chef.rarity+")\" "+((chef.rarity>1)?sChecked:"")+">全选 ";
+                    rarity = chef.rarity;
+                }
+                s += "<input type=\"checkbox\" id=\"ck_chef_"+chef.id+"\" "+((chef.rarity>1)?sChecked:"")+">" + chef.name;
+            }
+            e2.innerHTML = s;
+        }          
     </script>
 </head>
 <body>
@@ -719,6 +755,7 @@
     <input type="radio" name="map_quantity" id="rb_max"  onclick="setCookie(this.name, 2, 14)"/>最大值
     <input type="checkbox" id="ck_milk" checked="checked" />禁用牛乳
     <div id="materials"></div>
+    <div id="chefs"></div>
     <div id="price"></div>
     <div id="time"></div>
     <script type="text/javascript">

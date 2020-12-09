@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta http-equiv="content-type" content="text/html;charset=utf-8">
+    <title>
+        GFC标准
+    </title>
+    <style type="text/css">
+
+    </style>
+    <link rel="stylesheet" type="text/css" href="gfc.css" />
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script src="layer/layer.js"></script>    
+    <script type="text/javascript" src="common.js">
+    </script>
+    <script type="text/javascript" src="table_common.js">
+    </script>
+    <script type="text/javascript" src="property_dict.js">
+    </script>
+    <script type="text/javascript" src="../mustache.js">
+    </script>    
+    <script type="text/javascript">
+        var g_element_types_schema = [
+                    {"caption":"编码", "name":"<div {{#child_cnt}}class=\"out-box\"{{/child_cnt}} {{^child_cnt}}class=\"out-box-hide\"{{/child_cnt}} onclick=\"expand_child({{element_type_id}})\" style=\"margin-left:{{margin_left}}px;\">{{#child_cnt}}<div id=\"collapse_{{element_type_id}}\" class=\"cross\"></div>{{/child_cnt}}</div><span id=\"code_{{element_type_id}}\">{{whole_code}}</span>", "class":"code-col"},
+                    {"caption":"名称", "name":"{{name}}", "class":"name-col"},
+                    {"caption":"备注", "name":"{{remark}}", "class":"remark-col"},
+                    {"caption":"方案设计阶段", "name":"{{#for_plan_design}}●{{/for_plan_design}}{{^for_plan_design}}○{{/for_plan_design}}", "class":"design-col"},
+                    {"caption":"初步设计阶段", "name":"{{#for_design}}●{{/for_design}}{{^for_design}}○{{/for_design}}", "class":"design-col"},
+                    {"caption":"施工图设计阶段", "name":"{{#for_construction_design}}●{{/for_construction_design}}{{^for_construction_design}}○{{/for_construction_design}}", "class":"design-col"},
+                    {"caption":"深化设计阶段", "name":"{{#for_detailed_design}}●{{/for_detailed_design}}{{^for_detailed_design}}○{{/for_detailed_design}}", "class":"design-col"},
+                    {"caption":"竣工移交", "name":"{{#for_completed_transfer}}●{{/for_completed_transfer}}{{^for_completed_transfer}}○{{/for_completed_transfer}}", "class":"design-col"},
+                    {"caption":"操作", "name":"<span class=\"can-link\" onclick=\"add_element_type({{element_type_pid}})\">添加</span> | <span class=\"can-link\" onclick=\"add_element_type({{element_type_id}})\">添加下一级</span> | <span class=\"can-link\" onclick=\"edit_element_type({{element_type_id}})\">编辑</span> | 删除"}
+                ];
+
+        function edit_element_type(element_type_id)
+        {
+            do_ajax("get_element_type.php?element_type_id="+element_type_id, function(text){
+                var data = JSON.parse(text);
+                initData(data);
+                if(data.length == 0)
+                    return;
+                var type_obj = data[0];
+                var arr = [];
+                arr.push("code=" + type_obj.code);
+                arr.push("name=" + type_obj.name);
+                arr.push("remark=" + type_obj.remark);
+                arr.push("for_plan_design=" + type_obj.for_plan_design);
+                arr.push("for_design=" + type_obj.for_design);
+                arr.push("for_construction_design=" + type_obj.for_construction_design);
+                arr.push("for_detailed_design=" + type_obj.for_detailed_design);
+                arr.push("for_completed_transfer=" + type_obj.for_completed_transfer);  
+                var url = encodeURI("edit_element_type.html?"+arr.join("&"));
+                layer.open({
+                    type: 2,
+                    btn: ['确定','取消'],
+                    yes: function(index, layero){
+                        //按钮【按钮一】的回调
+                        var body = layer.getChildFrame('body', index);
+                        var doc = body[0].ownerDocument;
+                        var e = doc.getElementById("name");
+                        var sName = e.value.trim();
+                        if(sName == "")
+                        {
+                            layer.alert('名称不能为空');
+                            return;
+                        }
+                        var arr = [];
+                        arr.push(build_param(doc, "code"));
+                        arr.push(build_param(doc, "name"));
+                        arr.push(build_param(doc, "remark"));
+                        arr.push(build_checkbox_param(doc, "for_plan_design"));
+                        arr.push(build_checkbox_param(doc, "for_design"));
+                        arr.push(build_checkbox_param(doc, "for_construction_design"));
+                        arr.push(build_checkbox_param(doc, "for_detailed_design"));
+                        arr.push(build_checkbox_param(doc, "for_completed_transfer"));
+                        arr.push("table_name=gfc_element_type");
+                        arr.push("primary_key=element_type_id");
+                        arr.push("key_val="+element_type_id);
+                        // db添加
+                        do_ajax(encodeURI("update_record.php?"+arr.join("&")), function(text){
+                            if(text != "")
+                            {
+                                layer.alert(text);
+                                return;
+                            }
+                            // ui添加
+                            do_ajax("get_element_type.php?element_type_id="+element_type_id, function(text){
+                                var data = JSON.parse(text);
+                                initData(data);
+                                if(data.length > 0)
+                                {
+                                    var curr_row = document.getElementById("tr_" + element_type_id);
+                                    update_row_data(curr_row, data[0], g_element_types_schema);
+                                }
+                            });
+                        });
+                        layer.close(index);
+                    },
+                    title: '编辑构件类型',
+                    maxmin: false,
+                    area: ['480px', '320px'],
+                    content: url
+                });
+            });
+        }
+
+        function add_element_type(parent_id)
+        {
+            layer.open({
+                type: 2,
+                btn: ['确定','取消'],
+                yes: function(index, layero){
+                    //按钮【按钮一】的回调
+                    var body = layer.getChildFrame('body', index);
+                    var doc = body[0].ownerDocument;
+                    var e = doc.getElementById("name");
+                    var sName = e.value.trim();
+                    if(sName == "")
+                    {
+                        layer.alert('名称不能为空');
+                        return;
+                    }
+                    var arr = [];
+                    arr.push(build_param(doc, "code"));
+                    arr.push(build_param(doc, "name"));
+                    arr.push(build_param(doc, "remark"));
+                    arr.push(build_checkbox_param(doc, "for_plan_design"));
+                    arr.push(build_checkbox_param(doc, "for_design"));
+                    arr.push(build_checkbox_param(doc, "for_construction_design"));
+                    arr.push(build_checkbox_param(doc, "for_detailed_design"));
+                    arr.push(build_checkbox_param(doc, "for_completed_transfer"));
+                    arr.push("speciality_id=2");//todo?????????????????????????
+                    if(parent_id != null)
+                        arr.push("element_type_pid="+parent_id);
+                    // db添加
+                    do_ajax("insert_element_type.php?"+arr.join("&"), function(text){
+                        if(text != "")
+                        {
+                            layer.alert(text);
+                            return;
+                        }
+                        var row_index = 0;
+                        if(parent_id != null)
+                        {
+                            var curr_row = document.getElementById("tr_" + parent_id);
+                            row_index = curr_row.rowIndex;
+                            // 修改状态
+                            var cell = curr_row.cells[0]; //todo????
+                            var out_box = cell.firstChild;
+                            if(out_box.className == "out-box")
+                            {
+                                //原先已经有子
+                                if (out_box.firstChild.className == "cross") //如果是折叠的，后面也不用处理了
+                                    return;
+                            }
+                            else
+                            {
+                                out_box.className = "out-box";
+                                out_box.innerHTML = "<div id=\"collapse_"+parent_id+"\" class=\"cross\"></div>";
+                                return; //后面不用了
+                            }
+                        }
+                        // ui添加
+                        do_ajax("get_element_type.php?name="+sName, function(text){
+                            var table = document.getElementById("tb_element_type");
+                            var data = JSON.parse(text);
+                            initData(data);
+                            if(data.length > 0)
+                            {
+                                var level = data[0].whole_code.split(".").length;
+                                row_index++;
+                                while (row_index < table.rows.length) {
+                                    const row = table.rows[row_index];
+                                    // todo ?????????????????
+                                    var str = row.cells[0].innerText;
+                                    var level2 = str.split(".").length;
+                                    if(level2 < level)
+                                        break;
+                                    row_index++;
+                                }
+                                insert_table_data(table, row_index, data, g_element_types_schema);
+                            }
+                        });
+                    });
+                    layer.close(index);
+                },
+                title: '新增构件类型',
+                maxmin: false,
+                area: ['480px', '320px'],
+                content: 'edit_element_type.html'
+            });
+        }
+
+
+        function update_row_data(row, type_obj, schema)
+        {
+            for (let i = 0; i < schema.length; i++) {
+                const item = schema[i];
+                var cell = row.cells[i];
+                cell.innerHTML = Mustache.render(item.name, type_obj);
+            }
+        }
+
+        function display_speciality()
+        {
+            do_ajax("get_speciality.php", function(text){
+                var speciality_data = JSON.parse(text);
+                var table = create_table(speciality_data, [{"caption":"编码", "name":"code"},{"caption":"名称", "name":"name"}]);
+                var e =document.getElementById("main");
+                e.innerHTML = "";
+                e.appendChild(table);
+            });
+        }
+
+        function display_unit()
+        {
+            do_ajax("get_unit.php", function(text){
+                var unit_data = JSON.parse(text);
+                var table = create_table(unit_data, [{"caption":"ID", "name":"unit_id"},{"caption":"名称", "name":"name"}]);
+                var e =document.getElementById("main");
+                e.innerHTML = "";
+                e.appendChild(table);
+            });
+        }
+
+        function get_code(element_type_id)
+        {
+            var e = document.getElementById("code_" + element_type_id);
+            return e.innerText;
+        }
+
+        function expand_child(element_type_id)
+        {
+            var e = document.getElementById("collapse_" + element_type_id);
+            if(e == null)
+                return;
+            var expand = e.className == "cross";
+            if(expand)
+            {
+                do_ajax("get_element_type.php?element_type_pid="+element_type_id, function(text){
+                    var table = document.getElementById("tb_element_type");
+                    var curr_row = document.getElementById("tr_" + element_type_id);
+                    var row_index = curr_row.rowIndex;
+                    var data = JSON.parse(text);
+                    initData(data);
+                    insert_table_data(table, row_index+1, data, g_element_types_schema);
+                });
+                e.className = "line";
+            }
+            else
+            {
+                var code = get_code(element_type_id);
+                var level = code.split(".").length;
+                var table = document.getElementById("tb_element_type");
+                var curr_row = document.getElementById("tr_" + element_type_id);
+                var row_index = curr_row.rowIndex;
+                var i = row_index+1;
+                while (i < table.rows.length) {
+                    const row = table.rows[i];
+                    // todo ?????????????????
+                    var str = row.cells[0].innerText;
+                    var level2 = str.split(".").length;
+                    if (level2 > level)
+                        table.deleteRow(i);
+                    else
+                        break;
+                }
+                e.className = "cross";
+            }
+        }
+
+        function initData(data)
+        {
+            for (let i = 0; i < data.length; i++) {
+                const item = data[i];
+                item.margin_left = (item.level-1)*17;
+            }
+        }
+
+        function display_element_type()
+        {
+            do_ajax("get_element_type.php?speciality_id=2&element_type_pid=-1", function(text){
+                var data = JSON.parse(text);
+                initData(data);
+                var table = create_table(data, g_element_types_schema, "element_type_id");
+                table.id = "tb_element_type";
+                table.className = "display-table";
+                var e =document.getElementById("main");
+                e.innerHTML = "";
+                e.appendChild(table);
+            });
+        }
+
+        function compile_schema(schema)
+        {
+            for (let i = 0; i < schema.length; i++) {
+                var item = schema[i];
+                Mustache.parse(item.name);
+            }
+        }
+
+        function clear_tab_state()
+        {
+            var e = document.getElementById("tabs");
+            var child = e.firstElementChild;
+            while (child) {
+                child.className = "header-tab-item";
+                child = child.nextElementSibling;
+            }
+        }
+
+        function set_tab_state(index)
+        {
+            var e = document.getElementById("tabs");
+            var i = 0;
+            var child = e.firstElementChild;
+            while (child) {
+                if (i == index)
+                {
+                    child.className = "selected-header-tab-item";
+                    break;
+                }
+                child = child.nextElementSibling;
+                ++i;
+            }
+        }
+
+        function change_tab(index)
+        {
+            clear_tab_state();
+            /*
+            var e =document.getElementById("main");
+            e.innerHTML = "<form class='layui-form' action=''><div class='layui-inline'><select><option value='2'>建筑</option><option value='1' selected=''>结构</option></select></div></form>";
+            */
+            switch (index) {
+                case 0:
+                    display_speciality();
+                    break;
+                case 1:
+                    display_element_type();
+                    break;
+                case 2:
+                    display_property_dict();
+                    break;
+                case 3:
+                    display_unit();
+                    break;
+                default:
+                    break;
+            }
+            set_tab_state(index);
+        }
+    </script>
+</head>
+<body>
+    <div id="header">
+    <div id="titles">GFC数据标准</div>
+    <div id= "tabs" class="header-tab">
+        <span class="header-tab-item" onclick="change_tab(0)">专业</span>
+        <span class="selected-header-tab-item" onclick="change_tab(1)">构件分类</span>
+        <span class="header-tab-item" onclick="change_tab(2)">属性管理</span>
+        <span class="header-tab-item" onclick="change_tab(3)">单位字典</span>
+    </div>
+    </div>
+    <div id="main"></div>
+    <script type="text/javascript">
+        compile_schema(g_element_types_schema);
+        display_element_type();
+    </script>
+    <script>
+
+    </script>
+    
+</body>
+
+</html>

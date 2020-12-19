@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta http-equiv="content-type" content="text/html;charset=utf-8">
+    <title>
+        GFC标准
+    </title>
+    <style type="text/css">
+    </style>
+    <link rel="stylesheet" type="text/css" href="gfc.css" />
+    <script type="text/javascript" src="common.js"></script>
+    <script type="text/javascript" src="../mustache.js"></script>
+    <script type="text/html" id="inputs">
+        {{#inputs}}<tr>{{{input}}}</tr>{{/inputs}}
+    </script>    
+    <script type="text/html" id="normal_input">
+        <td>{{caption}}：</td>
+        <td><input id="{{field_name}}" type="{{input_type}}"/></td>
+    </script>    
+    <script type="text/html" id="select_input">
+        <td>{{caption}}：</td>
+        <td><select id="{{field_name}}">
+            {{#picklist}}<option value="{{id}}">{{caption}}</option>{{/picklist}}
+        </select>
+        </td>
+    </script>    
+    <script type="text/html" id="textarea_input">
+        <td>{{caption}}：</td>
+        <td><textarea id="{{field_name}}"></textarea></td>
+    </script>    
+    <script type="text/javascript">
+        function init_item(name)
+        {
+            var val = GetQueryString(name);
+            if(val == null)
+                return;
+            var e = document.getElementById(name);
+            if(e == null)
+                return;
+            if(e.tagName.toLowerCase() == "select")
+            {
+                for (let i = 0; i < e.options.length; i++) {
+                    const option = e.options[i];
+                    if(option.value == parseInt(val))
+                    {
+                        e.selectedIndex = i;
+                        break;
+                    }
+                }
+            }
+            else if(e.type == "checkbox")
+                e.checked = parseInt(val);
+            else {
+                if(val == "null")
+                    val = "";
+                e.value = val;
+            }
+        }
+
+        function init()
+        {
+            var sSchema = GetQueryString("schema");
+            if(sSchema)
+            {
+                var normal_input = document.getElementById("normal_input").innerHTML;
+                Mustache.parse(normal_input);
+                var select_input = document.getElementById("select_input").innerHTML;
+                Mustache.parse(select_input);
+                var textarea_input = document.getElementById("textarea_input").innerHTML;
+                Mustache.parse(textarea_input);
+                var schema = JSON.parse(decodeURIComponent(sSchema));
+                var input_arr = new Array();
+                for (let i = 0; i < schema.length; i++) {
+                    const item = schema[i];
+                    if(item.input_type)
+                    {
+                        if (item.input_type == "combox") {
+                            //todo
+                            var s = Mustache.render(select_input, item);
+                            input_arr.push({"input": s});
+                        }
+                        else if (item.input_type == "textarea") {
+                            var s = Mustache.render(textarea_input, item);
+                            input_arr.push({"input": s});                            
+                        }
+                        else {
+                            var s = Mustache.render(normal_input, item);
+                            input_arr.push({"input": s});
+                        }
+                    }
+                }
+                var inputs = document.getElementById("inputs").innerHTML;
+                Mustache.parse(inputs);
+                var sHtml = Mustache.render(inputs, {"inputs":input_arr});
+                document.getElementById("edit_table").innerHTML = sHtml;
+
+                //
+                for (let i = 0; i < schema.length; i++) {
+                    const item = schema[i];
+                    if(item.input_type)
+                    {
+                        init_item(item.field_name);
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body>
+    <table id="edit_table" class="edit-table">
+    </table>
+    <script type="text/javascript">
+        init();
+    </script>
+</body>
+
+</html>

@@ -3,8 +3,8 @@ var g_cook_type_names = ["炒", "煮", "切", "炸", "烤", "蒸"];
 var g_material_types = ["meat", "fish", "veg", "creation"];
 var g_material_types2 = ["meat", "fish", "vegetable", "creation"];
 var g_material_shop = [["鸡舍","meat"],["猪圈","meat"],["牧场","meat"],["池塘","fish"],["菜棚","veg"],["菜地","veg"],["森林","veg"],["作坊","creation"]];
-var g_Rate_names = ["", "可", "优", "特", "神"];
-var g_rate_factor = [0, 1, 1.1, 1.3, 1.5];
+var g_Rate_names = ["", "可", "优", "特", "神", "传"];
+var g_rate_factor = [0, 1, 1.1, 1.3, 1.5, 2];
 g_filter_material = "";
 g_filter_recipe = "";
 g_first_guest_name = "";
@@ -172,7 +172,7 @@ function build_chef_ultimate_params(name){
 
 function calc_rate(recipe, chef)
 {
-    var n = 4;
+    var n = 5;
     for (let i = 0; i < g_cook_types.length; i++) {
         const type = g_cook_types[i];
         if (recipe[type] > 0)
@@ -183,7 +183,7 @@ function calc_rate(recipe, chef)
 
 function get_recipe_chefs(recipe, chefs)
 {
-    var arr = [new Array(), new Array(), new Array(), new Array(), new Array()];
+    var arr = [new Array(), new Array(), new Array(), new Array(), new Array(), new Array()];
     for (let i = 0; i < chefs.length; i++) {
         const chef = chefs[i];
         var rate = calc_rate(recipe, chef);
@@ -524,8 +524,8 @@ function build_recipes(recipes, my_recipes, my_chefs)
             recipes[i].calc_price_time = function() {
                 return Math.round(this.calc_price()/this.time*3600);
             } 
-            recipes[i].unclock_name = recipes[i].rate == 4 ? "-" : recipes[i].unlock; 
-            recipes[i].gift_name = recipes[i].rate == 4 ? "-" : recipes[i].gift; 
+            recipes[i].unclock_name = recipes[i].rate >= 4 ? "-" : recipes[i].unlock; 
+            recipes[i].gift_name = recipes[i].rate >= 4 ? "-" : recipes[i].gift; 
             var recipe_chefs = get_recipe_chefs(recipes[i], my_chefs);
             recipes[i].recipe_chefs = display_recipe_chefs(recipe_chefs, recipes[i].rate);
             recipes[i].first_guests = display_first_guests(recipe_chefs, recipes[i]);

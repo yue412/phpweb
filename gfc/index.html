@@ -11,15 +11,15 @@
     </style>
     <link rel="stylesheet" type="text/css" href="gfc.css" />
     <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
-    <script src="layer/layer.js"></script>    
-    <script type="text/javascript" src="common.js">
-    </script>
-    <script type="text/javascript" src="table_common.js">
-    </script>
-    <script type="text/javascript" src="property_dict.js">
-    </script>
-    <script type="text/javascript" src="../mustache.js">
-    </script>    
+    <script src="layer/layer.js"></script>
+    <script type="text/javascript" src="common.js"></script>
+    <script type="text/javascript" src="table_common.js"></script>
+    <script type="text/javascript" src="../mustache.js"></script>
+    <script type="text/javascript" src="GFCTable.js"></script>
+    <script type="text/javascript" src="GFCTableModel.js"></script>
+    <script type="text/javascript" src="GFCEditor.js"></script>
+    <script type="text/javascript" src="GFCSchema.js"></script>
+    <script type="text/javascript" src="property_dict.js"></script>
     <script type="text/javascript">
         var g_element_types_schema = [
                     {"caption":"编码", "name":"<div {{#child_cnt}}class=\"out-box\"{{/child_cnt}} {{^child_cnt}}class=\"out-box-hide\"{{/child_cnt}} onclick=\"expand_child({{element_type_id}})\" style=\"margin-left:{{margin_left}}px;\">{{#child_cnt}}<div id=\"collapse_{{element_type_id}}\" class=\"cross\"></div>{{/child_cnt}}</div><span id=\"code_{{element_type_id}}\">{{whole_code}}</span>", "class":"code-col"},
@@ -78,7 +78,7 @@
                         arr.push("primary_key=element_type_id");
                         arr.push("key_val="+element_type_id);
                         // db添加
-                        do_ajax(encodeURI("update_record.php?"+arr.join("&")), function(text){
+                        do_ajax(encodeURI("../db/update_record.php?"+arr.join("&")), function(text){
                             if(text != "")
                             {
                                 layer.alert(text);
@@ -131,10 +131,11 @@
                     arr.push(build_checkbox_param(doc, "for_detailed_design"));
                     arr.push(build_checkbox_param(doc, "for_completed_transfer"));
                     arr.push("speciality_id=2");//todo?????????????????????????
+                    arr.push("table_name=gfc_element_type");
                     if(parent_id != null)
                         arr.push("element_type_pid="+parent_id);
                     // db添加
-                    do_ajax("insert_element_type.php?"+arr.join("&"), function(text){
+                    do_ajax("../db/insert_record.php?"+arr.join("&"), function(text){
                         if(text != "")
                         {
                             layer.alert(text);
@@ -179,7 +180,7 @@
                                         break;
                                     row_index++;
                                 }
-                                insert_table_data(table, row_index, data, g_element_types_schema);
+                                insert_table_data(table, row_index, data, g_element_types_schema, "element_type_id");
                             }
                         });
                     });
@@ -192,36 +193,26 @@
             });
         }
 
-
-        function update_row_data(row, type_obj, schema)
-        {
-            for (let i = 0; i < schema.length; i++) {
-                const item = schema[i];
-                var cell = row.cells[i];
-                cell.innerHTML = Mustache.render(item.name, type_obj);
-            }
-        }
-
         function display_speciality()
         {
-            do_ajax("get_speciality.php", function(text){
-                var speciality_data = JSON.parse(text);
-                var table = create_table(speciality_data, [{"caption":"编码", "name":"code"},{"caption":"名称", "name":"name"}]);
-                var e =document.getElementById("main");
-                e.innerHTML = "";
-                e.appendChild(table);
-            });
+            var schema = [new GFCSchema("编码", "code", "text"), new GFCSchema("名称", "name", "text")];
+            var main = document.getElementById("main");
+            main.innerHTML = "";
+            var model = new GFCTableModel("gfc_speciality", "speciality_id");
+            var editor = new GFCEditor(model, schema, 360, 200);
+            var table = new GFCTable(main, model, schema, editor);
+            model.init();
         }
 
         function display_unit()
         {
-            do_ajax("get_unit.php", function(text){
-                var unit_data = JSON.parse(text);
-                var table = create_table(unit_data, [{"caption":"ID", "name":"unit_id"},{"caption":"名称", "name":"name"}]);
-                var e =document.getElementById("main");
-                e.innerHTML = "";
-                e.appendChild(table);
-            });
+            var schema = [new GFCSchema("ID", "unit_id"), new GFCSchema("名称", "name", "text")];
+            var main = document.getElementById("main");
+            main.innerHTML = "";
+            var model = new GFCTableModel("gfc_unit", "unit_id");
+            var editor = new GFCEditor(model, schema, 360, 200);
+            var table = new GFCTable(main, model, schema, editor);
+            model.init();            
         }
 
         function get_code(element_type_id)
@@ -244,7 +235,7 @@
                     var row_index = curr_row.rowIndex;
                     var data = JSON.parse(text);
                     initData(data);
-                    insert_table_data(table, row_index+1, data, g_element_types_schema);
+                    insert_table_data(table, row_index+1, data, g_element_types_schema, "element_type_id");
                 });
                 e.className = "line";
             }
@@ -285,19 +276,11 @@
                 initData(data);
                 var table = create_table(data, g_element_types_schema, "element_type_id");
                 table.id = "tb_element_type";
-                table.className = "display-table";
+                table.className = "gfc-table";
                 var e =document.getElementById("main");
                 e.innerHTML = "";
                 e.appendChild(table);
             });
-        }
-
-        function compile_schema(schema)
-        {
-            for (let i = 0; i < schema.length; i++) {
-                var item = schema[i];
-                Mustache.parse(item.name);
-            }
         }
 
         function clear_tab_state()

@@ -37,14 +37,6 @@ function goBack(){
     window.history.back()
 }
 
-function build_combox_param(doc, name)
-{
-    var e = doc.getElementById(name);
-    var option = e.options[e.selectedIndex];
-    var val = option.value == -1 ? "" : option.value;
-    return name + "=" + val;
-}
-
 function build_checkbox_param(doc, name)
 {
     var e = doc.getElementById(name);
@@ -69,19 +61,20 @@ function GetQueryString(name)
     return null;
 }
 
-// [[key,val],[key,val]]
-function build_url_params(arr)
+function create_table(data, schema)
 {
-    var list = [];
-    for (let i = 0; i < arr.length; i++) {
-        const pair = arr[i];
-        var str = pair[0] + "=" + pair[1];
-        list.push(str);
-    }
-    return list.join("&");
+    var table = document.createElement("table");
+    //table.border = 1;
+    // title
+    var arr = [];
+    for (let i = 0; i < schema.length; i++) {
+        const item = schema[i];
+        arr.push([item.caption, item.class]);
+    };
+    insert_row(table, 0, arr);
+    // data
+    insert_table_data(table, 1, data, schema);
+
+    return table;
 }
 
-function clone(obj)
-{
-    return JSON.parse(JSON.stringify(obj));
-}

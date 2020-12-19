@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta http-equiv="content-type" content="text/html;charset=utf-8">
+    <title>
+        公式生成器
+    </title>
+    <link type="text/css" rel="stylesheet" href="math.css" media="screen" /> 
+    <link type="text/css" rel="stylesheet" href="print.css" media="print" /> 
+    <script type="text/javascript" src="common.js">
+    </script>
+    <script type="text/javascript" src="../mustache.js">
+    </script>    
+    <script id="formula_tables_schema" type="text/html">
+        <p>日期：</p>
+        <table id="formula_table">
+            {{#rows}}
+            <tr>
+                {{#cols}}<td>{{formula}}=</td>{{/cols}}
+            </tr>
+            {{/rows}}
+        </table>
+    </script>
+    <script type="text/javascript">
+        function output_formulas(col_cnt, result)
+        {
+            var arr = [];
+            var col_arr = [];
+            for (let i = 0; i < result.length; i++) {
+                const item = result[i];
+                if(col_arr.length >= col_cnt)
+                {
+                    arr.push({"cols":col_arr});
+                    col_arr = [];
+                }
+                col_arr.push({"formula":item});
+            }
+            arr.push({"cols":col_arr});
+            var schemas = document.getElementById("formula_tables_schema").innerHTML;
+            Mustache.parse(schemas);
+            return Mustache.render(schemas, {"rows":arr});
+        }
+
+        function select_formula(count, f_cnt, data)
+        {
+            var result = [];
+            for (let i = 0; i < count; i++) {
+                var index = Math.floor(Math.random()*f_cnt);
+                result.push(data[index]);
+            }
+            return result;
+        }
+
+        function generate_formulas()
+        {
+            var params = [];
+            params.push(build_param(document, "range"));
+            params.push(build_checkbox_param(document, "nonnegative"));
+            params.push(build_checkbox_param(document, "carry"));
+            var opr = document.getElementById("add").checked ? 1 : 0;
+            opr += (document.getElementById("sub").checked ? 1 : 0) * 2;
+            opr += (document.getElementById("mul").checked ? 1 : 0) * 4;
+            opr += (document.getElementById("div").checked ? 1 : 0) * 8;
+            params.push("operator="+opr);
+            do_ajax("generate_formula.php?"+params.join("&"), function(text){
+                var data = JSON.parse(text);
+                var f_cnt = data.length;
+                var count = document.getElementById("formula_cnt").value;
+                var page_cnt = document.getElementById("page_cnt").value;
+                var s = "";
+                for (let i = 0; i < page_cnt; i++) {
+                    s += output_formulas(3, select_formula(count, f_cnt, data));
+                    s += "<hr />";
+                    s += output_formulas(3, select_formula(count, f_cnt, data));
+                    s += "<div class='pagebreak'/>";
+                }
+                var e =document.getElementById("main");
+                e.innerHTML = s;
+                window.print();
+            });
+        }
+    </script>
+</head>
+<body>
+    <div class="noprint">
+        <p>范围：<input id="range" type="number" value="20"/></p>
+        <p><input id="nonnegative" type="checkbox" checked/>结果不能为负；</p>
+        <p><input id="carry" type="checkbox"/>能否进退位；</p>
+        <p><input id="add" type="checkbox" checked/>加<input id="sub" type="checkbox"/>减<input id="mul" type="checkbox"/>乘<input id="div" type="checkbox"/>除</p>
+        <p>每页公式数量：<input id="formula_cnt" type="number" value="30"/></p>
+        <p>生成页数：<input id="page_cnt" type="number" value="1"/></p>
+        <div class="button" onclick="generate_formulas()">打印公式</div>
+    </div>
+    <div id="main"></div>
+</body>
+
+</html>

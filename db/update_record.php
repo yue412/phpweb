@@ -1,6 +1,6 @@
 <?php
     include_once("db_connect.php");
-    include_once("common.php")
+    include_once("../common.php")
 ?>
 <?php
     $table_name = $_GET['table_name'];

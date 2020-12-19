@@ -8,24 +8,24 @@ body {
     margin: 8px;
 }
 
-.display-table {
+.gfc-table {
     border-collapse: collapse;
     width: 100%;
 }
 
-.display-table tr {
+.gfc-table tr {
     border-bottom: 1px solid rgb(240, 240, 240);
 }
 
-.display-table tr:first-child {
+.gfc-table tr:first-child {
     background-color: rgb(250, 250, 250);
 }
 
-.display-table tr:hover {
+.gfc-table tr:hover {
     background-color: rgb(250, 250, 250);;
 }
 
-.display-table td {
+.gfc-table td {
     height: 40px;
 }
 
@@ -204,8 +204,8 @@ body {
     border-radius: 4px;
     width: fit-content;
     color: white;
-    padding-top: 9px;
-    padding-bottom: 9px;
+    padding-top: 5px;
+    padding-bottom: 5px;
     padding-left: 15px;
     padding-right: 15px;
     cursor: pointer;

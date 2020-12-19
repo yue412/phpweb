@@ -146,7 +146,7 @@
             var unlock = recipe.unlock;
             var gift = recipe.gift;
             var recipe_chefs = get_recipe_chefs(recipe, my_chefs);
-            if (val == 4)
+            if (val >= 4)
             {
                 unlock = "-";
                 gift = "-";
@@ -156,7 +156,7 @@
             e3.innerHTML = display_first_guests(recipe_chefs, recipe);
             e4.innerHTML = gift;
 
-            for (let i = 1; i < g_Rate_names.length; i++) {
+            for (let i = 1; i < (g_Rate_names.length-1);/*排除掉传说*/ i++) {
                 var n = getColIndex(g_Rate_names[i] + "级厨师");
                 var e = document.getElementById("td_"+n+"_"+id);
                 if(val < i)
@@ -262,6 +262,7 @@
                                     get_chef_names(recipe_chefs[2]),
                                     get_chef_names(recipe_chefs[3]),
                                     get_chef_names(recipe_chefs[4]),
+                                    get_chef_names(recipe_chefs[5]),
                                     recipe.first_guests,
                                     recipe.guests_like,
                                     recipe.gift_name,
@@ -548,7 +549,7 @@
     </script>
 </head>
 <body>
-    <a href="bcjh_chefs.html">厨师</a> <a href="bcjh_lp_price.html">计算器</a> <a href="bcjh_lp_daily_int.html">每日计算器</a> <a href="bcjh_lp.html">御前计算器</a>
+    <a href="bcjh_chefs.html">厨师</a> <a href="bcjh_lp_price.html">计算器</a> <a href="bcjh_lp_daily_int.html">每日计算器</a> <a href="bcjh_lp.html">御前计算器</a> <a href="bcjh_lp_no_limit.html">不考虑素材限制计算器</a>
     <a href="bcjh_new_recipe.html">添加菜谱</a> 餐桌加成：<input type="number" id="price_add"/>%
     <div id="cols"></div>
     <div id="filters"></div>
@@ -583,6 +584,7 @@
             <td>优级厨师</td>
             <td>特级厨师</td>
             <td>神级厨师</td>
+            <td>传级厨师</td>
             <td>首次贵客</td>
             <td>贵客喜欢</td>
             <td>神级符文</td>

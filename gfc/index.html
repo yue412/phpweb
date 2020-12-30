@@ -32,7 +32,8 @@
                     {"caption":"竣工移交", "name":"{{#for_completed_transfer}}●{{/for_completed_transfer}}{{^for_completed_transfer}}○{{/for_completed_transfer}}", "class":"design-col"},
                     {"caption":"操作", "name":"<span class=\"can-link\" onclick=\"add_element_type({{element_type_pid}})\">添加</span> | <span class=\"can-link\" onclick=\"add_element_type({{element_type_id}})\">添加下一级</span> | <span class=\"can-link\" onclick=\"edit_element_type({{element_type_id}})\">编辑</span> | 删除"}
                 ];
-
+        var g_speciality_id = -1;
+        
         function edit_element_type(element_type_id)
         {
             do_ajax("get_element_type.php?element_type_id="+element_type_id, function(text){
@@ -130,13 +131,13 @@
                     arr.push(build_checkbox_param(doc, "for_construction_design"));
                     arr.push(build_checkbox_param(doc, "for_detailed_design"));
                     arr.push(build_checkbox_param(doc, "for_completed_transfer"));
-                    arr.push("speciality_id=2");//todo?????????????????????????
+                    arr.push("speciality_id="+g_speciality_id);//todo?????????????????????????
                     arr.push("table_name=gfc_element_type");
                     if(parent_id != null)
                         arr.push("element_type_pid="+parent_id);
                     // db添加
                     do_ajax("../db/insert_record.php?"+arr.join("&"), function(text){
-                        if(text != "")
+                        if(isNaN(text))
                         {
                             layer.alert(text);
                             return;
@@ -269,17 +270,40 @@
             }
         }
 
-        function display_element_type()
+        function speciality_change()
         {
-            do_ajax("get_element_type.php?speciality_id=2&element_type_pid=-1", function(text){
+            var combox = document.getElementById("cb_speciality");
+            g_speciality_id = combox.options[combox.selectedIndex].value;
+            do_ajax("get_element_type.php?speciality_id="+g_speciality_id+"&element_type_pid=-1", function(text){
                 var data = JSON.parse(text);
                 initData(data);
                 var table = create_table(data, g_element_types_schema, "element_type_id");
                 table.id = "tb_element_type";
                 table.className = "gfc-table";
-                var e =document.getElementById("main");
+                var e =document.getElementById("element_type_panel");
                 e.innerHTML = "";
                 e.appendChild(table);
+            });
+        }
+
+        function display_element_type()
+        {
+            var e = document.getElementById("main");
+            e.innerHTML = "<div id='filter_panel'><select id='cb_speciality' style='display: inline-block' ></select><div class='button' style='margin-left:20px;display: inline-block' onclick='add_element_type()'>添加构件类型</div></div></div><div id='element_type_panel'></div>";
+            do_ajax("../db/get_records.php?table_name=gfc_speciality", function(text){
+                var data = JSON.parse(text);
+                if(data.length == 0)
+                    return;
+                var combox = document.getElementById("cb_speciality");
+                for (let i = 0; i < data.length; i++) {
+                    const item = data[i];
+                    var option = document.createElement("option");
+                    option.text = item.name;
+                    option.value = item.speciality_id;
+                    combox.add(option, null);                    
+                }
+                combox.onchange = speciality_change;
+                speciality_change();
             });
         }
 

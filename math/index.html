@@ -45,9 +45,15 @@
         function select_formula(count, f_cnt, data)
         {
             var result = [];
-            for (let i = 0; i < count; i++) {
+            var set = new Set();
+            while(result.length < count)
+            {
                 var index = Math.floor(Math.random()*f_cnt);
-                result.push(data[index]);
+                if(!set.has(index))
+                {
+                    set.add(index);
+                    result.push(data[index]);
+                }
             }
             return result;
         }

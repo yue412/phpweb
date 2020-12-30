@@ -1,0 +1,79 @@
+em {
+	font-style: normal
+}
+
+.button {
+	-webkit-box-shadow: inset 0 1px 0 rgba(255,255,255,.5),0 0 0 rgba(0,0,0,.2);
+	-moz-box-shadow: inset 0 1px 0 rgba(255,255,255,.5),0 0 0 rgba(0,0,0,.2);
+	box-shadow: inset 0 1px 0 rgba(255,255,255,.5),0 0 0 rgba(0,0,0,.2);
+	background-color: #eee;
+	background: -webkit-gradient(linear,50% 0,50% 100%,color-stop(0,#fbfbfb),color-stop(100%,#ddd));
+	background: -webkit-linear-gradient(top,#fbfbfb,#ddd);
+	background: -moz-linear-gradient(top,#fbfbfb,#ddd);
+	background: -o-linear-gradient(top,#fbfbfb,#ddd);
+	background: linear-gradient(top,#fbfbfb,#ddd);
+	display: -moz-inline-stack;
+	display: inline-block;
+	vertical-align: middle;
+	zoom: 1;
+	border: 1px solid #ccc;
+	font-size: 14px;
+	color: #666;
+	margin: 0;
+	text-decoration: none;
+	cursor: pointer;
+	outline: 0;
+	border-radius: 3px;
+	width: 90px;
+	height: 30px;
+    line-height: 100%;
+    text-align: center;
+}
+
+a.button {
+	width: 88px;
+	height: 28px;
+	line-height: 28px
+}
+
+.button:hover {
+	color: #666;
+	background-color: #eee;
+	text-decoration: none;
+	background: -webkit-gradient(linear,50% 0,50% 100%,color-stop(0,#fff),color-stop(100%,#f3f3f3));
+	background: -webkit-linear-gradient(top,#fff,#f3f3f3);
+	background: -moz-linear-gradient(top,#fff,#f3f3f3);
+	background: -o-linear-gradient(top,#fff,#f3f3f3);
+	background: linear-gradient(top,#fff,#f3f3f3)
+}
+
+.button:active {
+	box-shadow: inset 1px 1px 2px rgba(0,0,0,.2);
+	background: #eee
+}
+
+.button-primary {
+	background: -webkit-gradient(linear,50% 0,50% 100%,color-stop(0,#61a2e2),color-stop(100%,#2279e3));
+	background: -webkit-linear-gradient(top,#61a2e2,#2279e3);
+	background: -moz-linear-gradient(top,#61a2e2,#2279e3);
+	background: -o-linear-gradient(top,#61a2e2,#2279e3);
+	background: linear-gradient(top,#61a2e2,#2279e3);
+	background-color: #428ee2;
+	border-color: #3d83d8;
+	color: #fff;
+	text-shadow: 1px 1px 0 #3068a6
+}
+
+.button-primary:hover {
+	color: #fff;
+	background-color: #51a6ff;
+	background: -webkit-gradient(linear,50% 0,50% 100%,color-stop(0,#6ab6ff),color-stop(100%,#3887e3));
+	background: -webkit-linear-gradient(top,#6ab6ff,#3887e3);
+	background: -moz-linear-gradient(top,#6ab6ff,#3887e3);
+	background: -o-linear-gradient(top,#6ab6ff,#3887e3);
+	background: linear-gradient(top,#6ab6ff,#3887e3)
+}
+
+.button-primary:active {
+	background: #2477dd
+}

@@ -6,6 +6,7 @@
     <title>
         爆炒江湖
     </title>
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
     <style type="text/css">
         div.no {
             font-size: 120%;
@@ -26,7 +27,7 @@
             display: inline
         }
     </style>
-    <script type="text/javascript" src="common.js">
+    <script type="text/javascript" src="../common.js">
     </script>
     <script type="text/javascript" src="bcjh_data.js">
     </script>
@@ -549,59 +550,63 @@
     </script>
 </head>
 <body>
-    <a href="bcjh_chefs.html">厨师</a> <a href="bcjh_lp_price.html">计算器</a> <a href="bcjh_lp_daily_int.html">每日计算器</a> <a href="bcjh_lp.html">御前计算器</a> <a href="bcjh_lp_no_limit.html">不考虑素材限制计算器</a>
-    <a href="bcjh_new_recipe.html">添加菜谱</a> 餐桌加成：<input type="number" id="price_add"/>%
-    <div id="cols"></div>
-    <div id="filters"></div>
-    <div id="chefs"></div>
-    <div class="content" id="recipes_count"></div>
-    <div class="content" id="select_chefs"></div>
-    <div class="content" id="total_price"></div>
-    <table id="tb2" border="1">
-        <tr>
-            <td>ID</td>
-            <td>名称</td>
-            <td>稀有度</td>
-            <td>数量</td>
-            <td>材料</td>
-            <td>材料数</td>
-            <td>材料/小时</td>
-            <td>技法</td>
-            <td>熟练</td>
-            <td>单价</td>
-            <td>总价</td>
-            <td>时间</td>
-            <td>总时间(秒)</td>
-            <td>总时间</td>
-            <td>金币/小时</td>
-            <td>最大总价</td>
-            <td>最大金币/小时</td>
-            <td>最牛厨师</td>
-            <td>评级</td>
-            <td>解锁</td>
-            <td>效率</td>
-            <td>可级厨师</td>
-            <td>优级厨师</td>
-            <td>特级厨师</td>
-            <td>神级厨师</td>
-            <td>传级厨师</td>
-            <td>首次贵客</td>
-            <td>贵客喜欢</td>
-            <td>神级符文</td>
-            <td>评级1</td>
-            <td>总价1</td>
-            <td>金币/小时1</td>
-            <td>选择1</td>            
-            <td>评级2</td>
-            <td>总价2</td>
-            <td>金币/小时2</td>
-            <td>选择2</td>            
-            <td>评级3</td>
-            <td>总价3</td>
-            <td>金币/小时3</td>
-            <td>选择3</td>            
-        </tr>
-    </table>
+    <div id="bcjh">
+        <a href="bcjh_chefs.html">厨师</a> <a href="bcjh_lp_price.html">计算器</a> <a href="bcjh_lp_daily_int.html">每日计算器</a> <a
+            href="bcjh_lp.html">御前计算器</a> <a href="bcjh_lp_no_limit.html">不考虑素材限制计算器</a>
+        <a href="bcjh_new_recipe.html">添加菜谱</a> 餐桌加成：<input type="number" id="price_add" />%
+        <span v-if="logined">已登录 <a href="">退出</a></span><a href="../login.html" v-else>登录</a>
+        <div id="cols"></div>
+        <div id="filters"></div>
+        <div id="chefs"></div>
+        <div class="content" id="recipes_count"></div>
+        <div class="content" id="select_chefs"></div>
+        <div class="content" id="total_price"></div>
+        <table id="tb2" border="1">
+            <tr>
+                <td>ID</td>
+                <td>名称</td>
+                <td>稀有度</td>
+                <td>数量</td>
+                <td>材料</td>
+                <td>材料数</td>
+                <td>材料/小时</td>
+                <td>技法</td>
+                <td>熟练</td>
+                <td>单价</td>
+                <td>总价</td>
+                <td>时间</td>
+                <td>总时间(秒)</td>
+                <td>总时间</td>
+                <td>金币/小时</td>
+                <td>最大总价</td>
+                <td>最大金币/小时</td>
+                <td>最牛厨师</td>
+                <td>评级</td>
+                <td>解锁</td>
+                <td>效率</td>
+                <td>可级厨师</td>
+                <td>优级厨师</td>
+                <td>特级厨师</td>
+                <td>神级厨师</td>
+                <td>传级厨师</td>
+                <td>首次贵客</td>
+                <td>贵客喜欢</td>
+                <td>神级符文</td>
+                <td>评级1</td>
+                <td>总价1</td>
+                <td>金币/小时1</td>
+                <td>选择1</td>
+                <td>评级2</td>
+                <td>总价2</td>
+                <td>金币/小时2</td>
+                <td>选择2</td>
+                <td>评级3</td>
+                <td>总价3</td>
+                <td>金币/小时3</td>
+                <td>选择3</td>
+            </tr>
+        </table>
+    </div>
 
     <script type="text/javascript">
         init();
@@ -610,6 +615,25 @@
         display_recipes();
     </script>
     <div id="test"></div>
+    <script type="text/javascript">
+        var app = new Vue(
+            {
+                el: '#bcjh',
+                data: {
+                    logined: false,
+                    user_id: ""
+                },
+                created: function () {
+                    this.user_id = getCookie("user_id");
+                    this.logined = this.user_id != "";
+                },
+                methods: {
+                    do_login: function(e) {
+                    }
+                }
+            }
+        );
+    </script>    
 </body>
 
 </html>

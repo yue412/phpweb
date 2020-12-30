@@ -1,11 +1,33 @@
 var g_cur_element_type_id = -1;
+var g_editor = null;
+
+function speciality_change2()
+{
+    var combox = document.getElementById("cb_speciality");
+    g_speciality_id = combox.options[combox.selectedIndex].value;
+    build_element_type_tree(document.getElementById("element_type_tree"));
+}
 
 function display_property_dict()
 {
     var e =document.getElementById("main");
-    e.innerHTML = "<div id='property_view'><div id='tree_panel'><div id=\"element_type_tree\"></div></div><div id=\"property_dict\"><div id='property'></div></div></div>";
+    e.innerHTML = "<div id='filter_panel'><select id='cb_speciality' style='display: inline-block' ></select><div class='button' style='margin-left:20px;display: inline-block' onclick='g_editor.add()'>添加属性</div></div></div><div id='property_view'><div id='tree_panel'><div id=\"element_type_tree\"></div></div><div id=\"property_dict\"><div id='property'></div></div></div>";
     g_cur_element_type_id = -1;
-    build_element_type_tree(document.getElementById("element_type_tree"));
+    do_ajax("../db/get_records.php?table_name=gfc_speciality", function(text){
+        var data = JSON.parse(text);
+        if(data.length == 0)
+            return;
+        var combox = document.getElementById("cb_speciality");
+        for (let i = 0; i < data.length; i++) {
+            const item = data[i];
+            var option = document.createElement("option");
+            option.text = item.name;
+            option.value = item.speciality_id;
+            combox.add(option, null);                    
+        }
+        combox.onchange = speciality_change2;
+        speciality_change2();
+    });    
 /*    do_ajax("get_property.php?element_type_id="+element_type_id, function(text){
         var data = JSON.parse(text);
         initData(data);
@@ -82,6 +104,16 @@ function add_property()
 function display_property(element_type_id)
 {
     g_cur_element_type_id = element_type_id;
+    var old = document.getElementsByClassName("linked_tree_node");
+    for (let i = 0; i < old.length; i++) {
+        const item = old[i];
+        item.className = "link_tree_node";
+    }
+    var e = document.getElementById("code_"+element_type_id);
+    if(e)
+    {
+        e.className = "linked_tree_node";
+    }
     do_ajax("../db/get_records.php?table_name=gfc_unit", function(text){
         var data = JSON.parse(text);
         var unit_arr = ["-1=<空>"];
@@ -101,7 +133,7 @@ function display_property(element_type_id)
         ];
         var main = document.getElementById("property");
         main.innerHTML = "";
-        var model = new GFCTableModel("gfc_property", "property_id", "element_type_id", element_type_id);
+        var model = new GFCTableModel("gfc_property", "property_id", "element_type_id", element_type_id, "instr(getTypeIds("+element_type_id+"), concat(',',element_type_id,','))>0");
         var editor = new GFCEditor(model, schema, 480, 360);
         var table = new GFCTable(main, model, schema, editor);
         model.init();   
@@ -110,9 +142,11 @@ function display_property(element_type_id)
 
 function build_element_type_tree(parent_node)
 {
-    do_ajax("get_element_type.php?speciality_id=2&element_type_pid=-1", function(text){
+    do_ajax("get_element_type.php?speciality_id="+g_speciality_id+"&element_type_pid=-1", function(text){
         var data = JSON.parse(text);
         create_tree_node(data, parent_node);
+        if(data.length > 0)
+            display_property(data[0].element_type_id);
     });
 }
 

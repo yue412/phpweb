@@ -9,24 +9,33 @@
     $opr_arr = array(ADD=>"+", SUB=>"-", MUL=>"*", DIV=>"/");
 
     $range = get_browser_param("range", 10);
-    $non_negative = get_browser_param("nonnegative", 1); // 结果非负
-    $is_carry = get_browser_param("carry", 0); // 进退位
+    //$non_negative = get_browser_param("nonnegative", 1); // 结果非负
+    //$is_carry = get_browser_param("carry", 0); // 进退位
     $operator = get_browser_param("operator", 1); // 运算符
 
     $list = array();
     // 生成公式
-    for ($i=0; $i < $range; $i++) { 
-        for ($j=0; $j < $range; $j++) { 
-            foreach($opr_arr as $opr => $opr_name)
-            {
-                if(($operator & $opr) > 0)
-                {
+    foreach($opr_arr as $opr => $opr_name)
+    {
+        if(($operator & $opr) > 0)
+        {
+            //$formula_list = array();
+            for ($i=0; $i < $range; $i++) { 
+                for ($j=0; $j < $range; $j++) { 
                     $formula = "$i$opr_name$j"; 
                     $result = eval("return $formula;");
-                    if($result>=$range)
+                    if($result >= 20 || $result <= 0)
                         continue;
-                    if($non_negative && $result < 0)
+                    if($result<10 && strlen($formula) == 3)
                         continue;
+                    //echo "$result,$formula|";
+                    $list[] = $formula;
+                    //if($result>=$range)
+                        //continue;
+                    //if($non_negative && $result < 0)
+                        //continue;
+
+                    /*
                     if(!$is_carry)
                     {
                         $opr1 = str_split($i);
@@ -56,9 +65,10 @@
                         if($b)
                             continue;
                     }
-                    $list[] = $formula;
+                    */
                 }
             }
+            //$list[] = $formula_list;
         }
     }
     echo json_encode($list);

@@ -1,0 +1,82 @@
+.bd {
+	width: 610px;
+	left: 50%;
+	margin: 30px 0 60px -150px;
+	position: relative
+}
+
+.bd .input-panel-wrap {
+	width: 610px;
+	margin-bottom: 10px
+}
+
+.bd .input-panel {
+	width: 300px;
+	height: 40px;
+	border: 1px solid #dbdbdb;
+	border-radius: 3px;
+	/*float: left;
+	position: relative;*/
+    display:inline-block;
+    vertical-align:middle;
+    cursor: default
+}
+
+.bd .inp {
+	outline: 0;
+	border: 0;
+	float: left;
+	margin: 3px 0 0;
+	width: 190px;
+	height: 24px;
+	padding: 5px;
+	background-color: #fff
+}
+
+.bd .input-title {
+	float: left;
+	font-size: 14px;
+	line-height: 40px;
+	text-indent: 12px
+}
+
+.bd .input-title em {
+	margin: 0 0 0 4px
+}
+
+.bd .input-infoicon {
+	background: url(info16.png) center center no-repeat;
+	width: 22px;
+	height: 20px;
+	position: absolute;
+	right: 4px;
+	top: 11px;
+	display: none
+}
+
+.bd .input-infoicon-y {
+	background: url(warn16.png) center center no-repeat
+}
+
+.bd .regist-form {
+    width: auto;
+    margin-left: 15px;
+    margin-right: 15px;
+    height: auto;
+    position: relative
+}
+
+.bd .submit-btn {
+	width: 300px;
+	height: 40px;
+	line-height: 38px;
+	font-size: 16px
+}
+
+.bd .input-tip {
+    margin-left: 0;
+    max-width: 100%;
+    font-size: 14px;
+    display: inline-block;
+    vertical-align:middle;
+}

@@ -1,9 +1,10 @@
-function GFCTableModel(table_name, primary_field_name, filter_field_name, filter_value)
+function GFCTableModel(table_name, primary_field_name, filter_field_name, filter_value, filter_condition)
 {
     this.table_name = table_name;
     this.primary_field_name = primary_field_name;
     this.filter_field_name = filter_field_name;
     this.filter_value = filter_value;
+    this.filter_condition = filter_condition;
     this.observer_list = [];
     this.data = null;
 }
@@ -11,9 +12,12 @@ function GFCTableModel(table_name, primary_field_name, filter_field_name, filter
 GFCTableModel.prototype.init = function()
 {
     var params = [["table_name", this.table_name]];
-    if (this.filter_field_name && this.filter_value) {
+    if(this.filter_condition)
+        params.push(["_where", this.filter_condition]);
+    else if (this.filter_field_name && this.filter_value) {
         params.push([this.filter_field_name, this.filter_value]);
     }
+
     var model = this;
     do_ajax("../db/get_records.php?"+build_url_params(params), function(text){
         model.data = JSON.parse(text);

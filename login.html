@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta http-equiv="content-type" content="text/html;charset=utf-8">
+    <title>登录</title>
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    <script src="common.js"></script>
+    <link rel="stylesheet" href="login.css" />
+    <link rel="stylesheet" href="yue412.css" />
+</head>
+
+<body>
+    <div id="login" class="bd">
+        <!--form method="" action="" @submit="do_login"-->
+            <div class="input-panel-wrap">
+                <div class="input-panel">
+                    <span class="input-title-user"></span>
+                    <input name="account_name" v-model="account_name" placeholder="请输入账号" class="inp" pattern="[a-zA-z][a-zA-z0-9]*">
+                </div>
+                <div class="input-tip">
+                    <div class="input-tiptxt">{{account_name_msg}}</div>
+                </div>
+            </div>
+            <div class="input-panel-wrap">
+                <div class="input-panel">
+                    <span class="input-title-password"></span>
+                    <input name="password" v-model="password" type="password" placeholder="请输入密码" class="inp" pattern="[a-zA-z0-9]+">
+                </div>
+            </div>
+            <div class="input-panel-wrap">
+                <button class="button button-primary submit-btn" v-on:click="do_login">登录</button>
+            </div>
+            <div class="input-panel-wrap">
+                <a href="register.html" class="button reg-btn">注册</a>
+            </div>
+        <!--/form-->
+    </div>
+    <script type="text/javascript">
+        var app = new Vue(
+            {
+                el: '#login',
+                data: {
+                    account_name: "",
+                    password: "",
+                    account_name_msg: ""
+                },
+                methods: {
+                    do_login: function(e) {
+                        this.account_name_msg = "";
+                        if (this.account_name == "") {
+                            this.account_name_msg = "账号不能为空";
+                            e.preventDefault();
+                            return false;
+                        } 
+                        var that = this;
+                        do_ajax("login.php?"+build_url_params([["account_name", this.account_name],["password", this.password]]), function(text){
+                            if(isNaN(text))
+                                that.account_name_msg = text;
+                            else 
+                            {
+                                setCookie("user_id", text, 7);
+                                goBack();
+                                //var source = GetQueryString("source");
+                                ///window.location.href = source;
+                            }
+                        });
+                        return true;
+                    }
+                }
+            }
+        );
+    </script>
+</body>
+
+</html>

@@ -37,37 +37,28 @@ function goBack(){
     window.history.back()
 }
 
-function build_combox_param(doc, name)
-{
-    var e = doc.getElementById(name);
-    var option = e.options[e.selectedIndex];
-    var val = option.value == -1 ? "" : option.value;
-    return name + "=" + val;
-}
-
-function build_checkbox_param(doc, name)
-{
-    var e = doc.getElementById(name);
-    var val = e.checked ? 1 : 0;
-    return name + "=" + val;
-}
-
-function build_param(doc, name)
-{
-    var e = doc.getElementById(name);
-    var val = e.value;
-    return name + "=" + val;
-}
-
-function GetQueryString(name)
-{
-     var reg = new RegExp("(^|&)"+ name +"=([^&]*)(&|$)");
-     var url = decodeURI(window.location.search);
-     var r = url.substr(1).match(reg);//search,查询？后面的参数，并匹配正则
-     if(r!=null)
-        return unescape(r[2]); 
-    return null;
-}
+function setCookie(cname, cvalue, exdays) {
+    var d = new Date();
+    d.setTime(d.getTime() + (exdays*24*60*60*1000));
+    var expires = "expires="+ d.toUTCString();
+    document.cookie = cname + "=" + cvalue + ";" + expires + ";path=/";
+} 
+  
+function getCookie(cname) {
+    var name = cname + "=";
+    var decodedCookie = decodeURIComponent(document.cookie);
+    var ca = decodedCookie.split(';');
+    for(var i = 0; i <ca.length; i++) {
+        var c = ca[i];
+        while (c.charAt(0) == ' ') {
+            c = c.substring(1);
+        }
+        if (c.indexOf(name) == 0) {
+            return c.substring(name.length, c.length);
+        }
+    }
+    return "";
+} 
 
 // [[key,val],[key,val]]
 function build_url_params(arr)
@@ -81,7 +72,12 @@ function build_url_params(arr)
     return decodeURIComponent(list.join("&"));
 }
 
-function clone(obj)
+function GetQueryString(name)
 {
-    return JSON.parse(JSON.stringify(obj));
+     var reg = new RegExp("(^|&)"+ name +"=([^&]*)(&|$)");
+     var url = decodeURI(window.location.search);
+     var r = url.substr(1).match(reg);//search,查询？后面的参数，并匹配正则
+     if(r!=null)
+        return unescape(r[2]); 
+    return null;
 }

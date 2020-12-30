@@ -1,0 +1,78 @@
+.bd {
+	width: 300px;
+	margin: 45px auto 0;
+	/*padding-bottom: 30px;
+	position: relative*/
+}
+
+.bd .inp {
+	outline: 0;
+	border: 0;
+	float: left;
+	margin: 3px 0 0 -5px;
+	width: 210px;
+	height: 24px;
+	padding: 5px
+}
+
+.bd .input-panel {
+	width: 298px;
+	height: 40px;
+	border: 1px solid #dbdbdb;
+	border-radius: 3px;
+	/*float: left;
+	position: relative;*/
+	display:inline-block;
+    vertical-align:middle;
+	cursor: default
+}
+
+.bd .input-title {
+	float: left;
+	font-size: 14px;
+	line-height: 40px;
+	text-indent: 12px
+}
+
+.bd .input-title-user {
+	float: left;
+	background: url(user.png) 50% 50% no-repeat;
+	width: 42px;
+	height: 40px
+}
+
+.bd .input-title-password {
+	float: left;
+	background: url(password.png) 50% 50% no-repeat;
+	width: 42px;
+	height: 40px
+}
+
+.bd .input-panel-wrap {
+	margin-bottom: 10px
+}
+
+.bd .submit-btn {
+	width: 300px;
+	height: 40px;
+	line-height: 38px;
+	font-size: 16px
+}
+
+.reg-btn:link, .reg-btn:visited {
+	width: 298px;
+	height: 38px;
+	line-height: 38px;
+	/*margin: 10px 0 0;*/
+	text-decoration: none;
+	color: #333;
+	font-size: 16px
+}
+
+.bd .input-tip {
+    margin-left: 0;
+    max-width: 100%;
+    font-size: 14px;
+    display: inline-block;
+    vertical-align:middle;
+}

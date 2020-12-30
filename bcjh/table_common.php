@@ -1,4 +1,4 @@
-<script type="text/javascript" src="common.js">
+<script type="text/javascript" src="../common.js">
 </script>
 <?php
     //include_once "sg_common.h"

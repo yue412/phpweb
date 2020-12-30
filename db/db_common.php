@@ -51,7 +51,9 @@
         $arr = array();
         foreach($params as $key => $value)
         {
-            if($value == -1)
+            if($key == "_where")
+                $arr[] = $value;
+            elseif($value == -1)
                 $arr[] = "isnull($key)";
             else
                 $arr[] = $key."='".$value."'";

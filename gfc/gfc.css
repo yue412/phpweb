@@ -175,6 +175,17 @@ body {
     color: rgb(82, 197, 217);
 }
 
+.linked_tree_node
+{
+    color: rgb(45, 175, 205);
+    cursor: pointer;    
+}
+
+.linked_tree_node:hover
+{
+    color: rgb(82, 197, 217);
+}
+
 #property_view
 {
     display: table;
@@ -184,7 +195,7 @@ body {
 {
     display: table-cell;
     vertical-align: top;
-    width: 20%;
+    width: 400px;
 }
 
 #element_type_tree
@@ -213,4 +224,13 @@ body {
 .button:hover
 {
     background-color: rgb(82, 197, 217);
+}
+
+#filter_panel {
+    padding-bottom: 10px;
+}
+
+#cb_speciality {
+    width: 100px;
+    height: 29px;
 }

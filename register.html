@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta http-equiv="content-type" content="text/html;charset=utf-8">
+    <title>注册</title>
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    <link rel="stylesheet" href="reg.css" />
+    <link rel="stylesheet" href="yue412.css" />
+</head>
+
+<body>
+    <div class="bd" id="reg">
+        <!--
+        <div class="errormsg-box" style="position: relative;top: 0px;" id="errormsg-box"></div>
+            -->
+        <form method="post" action="signup.php" id="register_form" class="regist-form" @submit="do_check">
+            <input type="hidden" name="source" value="login.html" />
+            <!--
+            <input type="hidden" name="service" value="" />
+            <input type="hidden" name="identity" value="" />
+            <input type="hidden" name="claimedId" value="" />
+            <input type="hidden" name="userId" value="" />
+            <input type="hidden" name="enterprise" value="0" />
+            <input id="captchaIdInput" type="hidden" name="captchaId" value="">
+            <div id="captcha"></div>
+            -->
+            <div class="input-panel-wrap">
+                <div class="input-panel">
+                    <span class="input-title">账号<em>:</em></span>
+                    <input class="inp" data-type="account" type="text" name="account_name" v-model.trim="account_name" value="" maxlength="20"
+                        tabindex="1" autocomplete="off" pattern="[a-zA-z][a-zA-z0-9]*" title="账号不应超过20个字符，只能由英文字母和数字组成，且第一个字符必须为英文字母"/>
+                    <div class="input-infoicon"></div>
+                </div>
+                <div class="input-tip">
+                    <div class="input-tiptxt">{{account_name_msg}}</div>
+                </div>
+            </div>
+
+            <div class="input-panel-wrap">
+                <div class="input-panel">
+                    <span class="input-title">设置密码<em>:</em></span>
+                    <input class="inp" type="password" data-type="password" name="password" v-model="password" maxlength="17" tabindex="2"
+                        autocomplete="off" pattern="[a-zA-z0-9]+"/>
+                    <div class="input-infoicon"></div>
+                </div>
+                <div class="input-tip input-noaction">
+                    <div class="input-tiptxt">{{password_msg}}</div>
+                </div>
+            </div>
+            <div class="input-panel-wrap">
+                <div class="input-panel">
+                    <span class="input-title">确认密码<em>:</em></span>
+                    <input class="inp" type="password" data-type="repassword" v-model="password_confirm" maxlength="17"
+                        tabindex="3" autocomplete="off" pattern="[a-zA-z0-9]+" />
+                    <div class="input-infoicon"></div>
+                </div>
+                <div class="input-tip input-noaction">
+                    <div class="input-tiptxt"></div>
+                </div>
+            </div>
+
+            <div class="panel">
+                <button type="submit" class="button button-primary submit-btn" tabindex="6" id="submitBtn">立即注册
+                </button>
+            </div>
+        </form>
+    </div>
+    <script type="text/javascript">
+        var reg = new Vue(
+            {
+                el: '#reg',
+                data: {
+                    account_name: "",
+                    password: "",
+                    password_confirm: "",
+                    password_msg: "",
+                    account_name_msg: ""
+                },
+                methods: {
+                    do_check: function(e) {
+                        this.account_name_msg = "";
+                        this.password_msg = "";
+                        if (this.account_name == "") {
+                            this.account_name_msg = "账号不能为空";
+                            e.preventDefault();
+                            return false;
+                        } 
+                        else if(this.password.length < 6) {
+                            this.password_msg = "密码长度不能小于6";
+                            e.preventDefault();
+                            return false;
+                        }
+                        else if(this.password != this.password_confirm)
+                        {
+                            this.password_msg = "确认密码和设置密码不一致";
+                            e.preventDefault();
+                            return false;
+                        }
+                        else {
+                            return true;
+                        }
+                    }
+                }
+            }
+        );
+    </script>
+</body>
+
+</html>

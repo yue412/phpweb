@@ -60,9 +60,9 @@
                             else 
                             {
                                 setCookie("user_id", text, 7);
-                                goBack();
-                                //var source = GetQueryString("source");
-                                ///window.location.href = source;
+                                //goBack();
+                                var source = GetQueryString("source");
+                                window.location.href = source;
                             }
                         });
                         return true;

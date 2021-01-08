@@ -1,5 +1,5 @@
 <?php
-    include_once "common.php";
+    include_once "../common.php";
     $url = get_browser_param('url', '');
 ?>
 <?php

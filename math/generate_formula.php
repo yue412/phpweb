@@ -20,8 +20,8 @@
         if(($operator & $opr) > 0)
         {
             //$formula_list = array();
-            for ($i=0; $i < $range; $i++) { 
-                for ($j=0; $j < $range; $j++) { 
+            for ($i=1; $i < $range; $i++) { 
+                for ($j=1; $j < $range; $j++) { 
                     $formula = "$i$opr_name$j"; 
                     $result = eval("return $formula;");
                     if($result >= 20 || $result <= 0)

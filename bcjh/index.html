@@ -1,0 +1,359 @@
+<html>
+
+<head>
+    <meta http-equiv="content-type" content="text/html;charset=utf-8">
+    <meta name="viewport"
+        content="width=device-width,initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>爆炒江湖</title>
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    <link rel="stylesheet" href="bcjh.css" />
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script src="../layer/layer.js"></script>
+    <script type="text/javascript" src="../common.js">
+    </script>
+    <script type="text/javascript" src="bcjh_data.js">
+    </script>
+    <script type="text/javascript" src="bcjh_common.js">
+    </script>
+    <script type="text/javascript" src="bcjh_skill.js">
+    </script>
+    <script type="text/javascript" src="TableSorterV3.js">
+    </script>
+    <script type="text/javascript" src="vue_components.js">
+    </script>
+</head>
+
+<body>
+    <div id="bcjh">
+        <a href="bcjh_chefs.html">厨师</a>
+        <a href="#" v-on:click="add_recipe">添加菜谱</a>
+        <a href="bcjh_lp_daily_int.html">每日计算器</a>
+        <a href="bcjh_lp.html">御前计算器</a>
+        <a href="bcjh_lp_no_limit.html">不考虑素材限制计算器</a>
+        <login-panel login-ref="..\login.html" v-on:give-user="load_recipes"></login-panel>
+        <div>
+            <span v-for="(item, index) in recipes_schema">
+                <input type="checkbox" v-bind:id="'ck_'+index+'_col'" v-model="item.show">
+                <label v-bind:for="'ck_'+index+'_col'">{{item.caption}}</label>
+            </span>
+        </div>
+        <div>
+            <input type="text" placeholder="过滤<名称 材料 厨师>" v-model="text_filter" />
+            <input type="text" placeholder="过滤<首次贵客 贵客喜欢 神级符文>" v-model="text_filter2" />
+            <div>
+                <span>稀有度: </span>
+                <span v-for="(item, index) in rarity_list">
+                    <input type="checkbox" v-bind:id="'rarity'+index" v-bind:value="item" v-model="rarity_filter">
+                    <label v-bind:for="'rarity'+index">{{item}}</label>
+                </span>
+                <span>技法: </span>
+                <span v-for="(item, index) in cook_names">
+                    <input type="checkbox" v-bind:id="'cook'+index" v-bind:value="item" v-model="cook_filter">
+                    <label v-bind:for="'cook'+index">{{item}}</label>
+                </span>
+                <span>级别: </span>
+                <span v-for="(item, index) in rate_names">
+                    <input type="checkbox" v-bind:id="'rate'+index" v-bind:value="index" v-model="rate_filter">
+                    <label v-bind:for="'rate'+index">{{item}}</label>
+                </span>
+                <span>熟练: </span>
+                <span v-for="(item, index) in mastery_names">
+                    <input type="checkbox" v-bind:id="'mastery'+index" v-bind:value="index" v-model="mastery_filter">
+                    <label v-bind:for="'mastery'+index">{{item}}</label>
+                </span>
+            </div>
+        </div>
+        <div>菜谱数量:{{recipes.length}}</div>
+        <table id="tb2">
+            <tr>
+                <td v-for="(item, index) in recipes_schema" v-bind:class="{'no-show': !item.show}">{{item.caption}}</td>
+            </tr>
+            <tr v-for="recipe in recipes">
+                <td v-bind:class="{'no-show': !recipes_schema[0].show}">{{recipe.galleryId}}</td>
+                <td v-bind:class="{'no-show': !recipes_schema[1].show}">{{recipe.name}}</td>
+                <td v-bind:class="{'no-show': !recipes_schema[2].show}">{{recipe.rarity}}</td>
+                <td v-bind:class="{'no-show': !recipes_schema[3].show}">{{recipe.limit}}</td>
+                <td v-bind:class="{'no-show': !recipes_schema[4].show}">{{recipe.materials_name}}</td>
+                <td v-bind:class="{'no-show': !recipes_schema[5].show}">{{recipe.material_cnt}}</td>
+                <td v-bind:class="{'no-show': !recipes_schema[6].show}">{{recipe.material_cnt_time()}}</td>
+                <td v-bind:class="{'no-show': !recipes_schema[7].show}">{{recipe.cook_name}}</td>
+                <td v-bind:class="{'no-show': !recipes_schema[8].show}"><input type='checkbox'
+                        v-model="recipe.is_mastery"></td>
+                <td v-bind:class="{'no-show': !recipes_schema[9].show}">{{recipe.calc_price()}}</td>
+                <td v-bind:class="{'no-show': !recipes_schema[10].show}">{{recipe.calc_total_price()}}</td>
+                <td v-bind:class="{'no-show': !recipes_schema[11].show}">{{recipe.time}}</td>
+                <td v-bind:class="{'no-show': !recipes_schema[12].show}">{{recipe.total_time()}}</td>
+                <td v-bind:class="{'no-show': !recipes_schema[13].show}">{{recipe.time_name()}}</td>
+                <td v-bind:class="{'no-show': !recipes_schema[14].show}">{{recipe.calc_price_time()}}</td>
+                <td v-bind:class="{'no-show': !recipes_schema[15].show}">{{recipe.best_price * recipe.limit}}</td>
+                <td v-bind:class="{'no-show': !recipes_schema[16].show}">{{Math.ceil(recipe.best_price / recipe.time *
+                    3600)}}</td>
+                <td v-bind:class="{'no-show': !recipes_schema[17].show}" style="width: 10%;">{{recipe.best_chefs}}</td>
+                <td v-bind:class="{'no-show': !recipes_schema[18].show}"><select v-model="recipe.rate">
+                        <option v-for="(item, index) in rate_names" v-bind:value="index">{{item}}</option>
+                    </select></td>
+                <td v-bind:class="{'no-show': !recipes_schema[19].show}">{{recipe.unclock_name()}}</td>
+                <td v-bind:class="{'no-show': !recipes_schema[20].show, 'chef-emphasize': recipe.rate<1}"
+                    style="width: 10%;">{{recipe.get_recipe_chefs_name(1)}}</td>
+                <td v-bind:class="{'no-show': !recipes_schema[21].show, 'chef-emphasize': recipe.rate<2}"
+                    style="width: 10%;">{{recipe.get_recipe_chefs_name(2)}}</td>
+                <td v-bind:class="{'no-show': !recipes_schema[22].show, 'chef-emphasize': recipe.rate<3}"
+                    style="width: 10%;">{{recipe.get_recipe_chefs_name(3)}}</td>
+                <td v-bind:class="{'no-show': !recipes_schema[23].show, 'chef-emphasize': recipe.rate<4}"
+                    style="width: 10%;">{{recipe.get_recipe_chefs_name(4)}}</td>
+                <td v-bind:class="{'no-show': !recipes_schema[24].show, 'chef-emphasize': recipe.rate<5}"
+                    style="width: 10%;">{{recipe.get_recipe_chefs_name(5)}}</td>
+                <td v-bind:class="{'no-show': !recipes_schema[25].show}">{{recipe.first_guests}}</td>
+                <td v-bind:class="{'no-show': !recipes_schema[26].show}">{{recipe.guests_like}}</td>
+                <td v-bind:class="{'no-show': !recipes_schema[27].show}">{{recipe.gift_name()}}</td>
+            </tr>
+        </table>
+    </div>
+    <script type="text/javascript">
+        var app = new Vue(
+            {
+                el: '#bcjh',
+                data: {
+                    recipes_schema: [
+                        { "caption": "ID", "show": true },
+                        { "caption": "名称", "show": true },
+                        { "caption": "稀有度", "show": false },
+                        { "caption": "数量", "show": false },
+                        { "caption": "材料", "show": true },
+                        { "caption": "材料数", "show": false },
+                        { "caption": "材料/小时", "show": false },
+                        { "caption": "技法", "show": false },
+                        { "caption": "熟练", "show": false },
+                        { "caption": "单价", "show": true },
+                        { "caption": "总价", "show": false },
+                        { "caption": "时间", "show": true },
+                        { "caption": "总时间(秒)", "show": false },
+                        { "caption": "总时间", "show": true },
+                        { "caption": "金币/小时", "show": false },
+                        { "caption": "最大总价", "show": true },
+                        { "caption": "最大金币/小时", "show": true },
+                        { "caption": "最牛厨师", "show": true },
+                        { "caption": "评级", "show": false },
+                        { "caption": "解锁", "show": false },
+                        { "caption": "可级厨师", "show": false },
+                        { "caption": "优级厨师", "show": false },
+                        { "caption": "特级厨师", "show": false },
+                        { "caption": "神级厨师", "show": false },
+                        { "caption": "传级厨师", "show": false },
+                        { "caption": "首次贵客", "show": false },
+                        { "caption": "贵客喜欢", "show": false },
+                        { "caption": "神级符文", "show": false }
+                    ],
+                    recipes: [],
+                    recipes_bak: [],
+                    chefs: [],
+                    rate_names: g_Rate_names,
+                    cook_names: g_cook_type_names,
+                    mastery_names: ["不熟练", "熟练"],
+                    rarity_list: [1, 2, 3, 4, 5],
+                    sorter: null,
+                    text_filter: "",
+                    text_filter2: "",
+                    rate_filter: [],
+                    cook_filter: [],
+                    rarity_filter: [],
+                    mastery_filter: [],
+                },
+                created: function () {
+                    this.init_cols();
+                },
+                watch: {
+                    text_filter: function (val) {
+                        this.filter();
+                    },
+                    text_filter2: function (val) {
+                        this.filter();
+                    },
+                    rate_filter: function (val) {
+                        this.filter();
+                    },
+                    rarity_filter: function (val) {
+                        this.filter();
+                    },
+                    mastery_filter: function (val) {
+                        this.filter();
+                    },
+                    cook_filter: function (val) {
+                        this.filter();
+                    },
+                    recipes: {
+                        handler(newValue, oldValue) {
+                            // 这种方式有点重
+                            if (newValue.length != oldValue.length)
+                                return;
+                            for (let i = 0; i < newValue.length; i++) {
+                                var recipe = newValue[i];
+                                if (recipe.is_mastery != recipe.old_is_mastery) {
+                                    // 熟练度
+                                    var best = get_best_chefs(recipe, this.chefs, 0);
+                                    recipe.old_is_mastery = recipe.is_mastery;
+                                    recipe.best_price = best[0];
+                                    recipe.best_chefs = best[1].join(",");
+                                    var url = "../db/update_record.php?table_name=bcjh_recipes&primary_key=id|user_id&key_val=" + recipe.recipeId + "|" + this.user_id + "&is_mastery=" + (recipe.is_mastery ? 1 : 0);
+                                    do_ajax(url, function (text) {
+                                    });
+                                }
+                                else if (recipe.rate != recipe.old_rate) {
+                                    recipe.old_rate = recipe.rate;
+                                    var recipe_chefs = get_recipe_chefs(recipe, this.chefs);
+                                    recipe.first_guests = display_first_guests(recipe_chefs, recipe);
+
+                                    var url = "../db/update_record.php?table_name=bcjh_recipes&primary_key=id|user_id&key_val=" + recipe.recipeId + "|" + this.user_id + "&rate=" + recipe.rate;
+                                    do_ajax(url, function (text) {
+                                    });
+                                }
+                                // 级别
+                            }
+                        },
+                        deep: true
+                    },
+                    recipes_schema: {
+                        handler(newValue, oldValue) {
+                            // 这种方式有点重
+                            if (newValue.length != oldValue.length)
+                                return;
+                            for (let i = 0; i < newValue.length; i++) {
+                                var item = newValue[i];
+                                if (item.old_show != item.show) {
+                                    item.old_show = item.show;
+                                    setCookie(item.caption, item.show ? "true" : "false", 14);
+                                }
+                            }
+                        },
+                        deep: true
+                    }
+                },
+                methods: {
+                    load_recipes: function (user_id) {
+                        this.user_id = user_id;
+                        var that = this;
+                        do_ajax("../db/get_records.php?table_name=bcjh_recipes&user_id=" + user_id, function (text) {
+                            var my_recipes = JSON.parse(text);
+                            do_ajax("../db/get_records.php?table_name=bcjh_chefs&user_id=" + user_id, function (text) {
+                                // 菜谱
+                                init_skills(g_bcjh_data.skills);
+                                var my_chefs = JSON.parse(text);
+                                init_chefs(my_chefs);
+                                //var materials = g_bcjh_data.materials;
+                                var new_recipes = build_recipes(g_bcjh_data.recipes, my_recipes, my_chefs);
+                                that.recipes_bak = new_recipes;
+                                ///////////////////
+                                that.chefs = my_chefs;
+                                that.recipes = that.filter_recipes(new_recipes);
+                                ///////////////////
+                                that.$nextTick(function () {
+                                    that.sorter = new TableSorter("tb2");
+                                })
+                            });
+                        });
+                    },
+                    filter: function () {
+                        var that = this;
+                        this.recipes = this.filter_recipes(this.recipes_bak);
+                        this.$nextTick(function () {
+                            that.sorter = new TableSorter("tb2");
+                        })
+                    },
+                    filter_recipes: function (recipes) {
+                        var new_recipes = this.filter_by_text(recipes, this.text_filter, ["name", "materials_name", "best_chefs"]);
+                        new_recipes = this.filter_by_text(new_recipes, this.text_filter2, ["first_guests", "guests_like", "gift"]);
+                        new_recipes = this.filter_by_set(new_recipes, this.rarity_filter, "rarity");
+                        new_recipes = this.filter_by_set(new_recipes, this.rate_filter, "rate");
+                        new_recipes = this.filter_by_set(new_recipes, this.mastery_filter, "is_mastery");
+                        new_recipes = this.filter_by_text_set(new_recipes, this.cook_filter, "cook_name");
+                        return new_recipes;
+                    },
+                    filter_by_text: function (recipes, text, fields) {
+                        if (text == "")
+                            return recipes;
+                        var new_recipes = [];
+                        for (let i = 0; i < recipes.length; i++) {
+                            const recipe = recipes[i];
+                            for (let j = 0; j < fields.length; j++) {
+                                const field = fields[j];
+                                if (recipe[field].indexOf(text) >= 0) {
+                                    new_recipes.push(recipe);
+                                    break;
+                                }
+                            }
+                        }
+                        return new_recipes;
+                    },
+                    filter_by_set: function (recipes, set, field) {
+                        if (set.length == 0)
+                            return recipes;
+                        var new_recipes = [];
+                        for (let i = 0; i < recipes.length; i++) {
+                            const recipe = recipes[i];
+                            if (set.indexOf(Number(recipe[field])) >= 0)
+                                new_recipes.push(recipe);
+                        }
+                        return new_recipes;
+                    },
+                    filter_by_text_set: function (recipes, set, field) {
+                        if (set.length == 0)
+                            return recipes;
+                        var new_recipes = [];
+                        for (let i = 0; i < recipes.length; i++) {
+                            const recipe = recipes[i];
+                            for (let j = 0; j < set.length; j++) {
+                                const name = set[j];
+                                if (recipe[field].indexOf(name) >= 0) {
+                                    new_recipes.push(recipe);
+                                    break;
+                                }
+                            }
+                        }
+                        return new_recipes;
+                    },
+                    add_recipe: function () {
+                        var that = this;
+                        layer.prompt({ offset: '200px' },
+                            function (val, index) {
+                                //layer.msg('得到了' + val);
+                                var recipe = that.find_recipe(val);
+                                if (recipe == null) {
+                                    layer.msg("未找到菜谱[" + val + "]");
+                                    return;
+                                }
+                                layer.close(index);
+                                do_ajax("../db/insert_record.php?table_name=bcjh_recipes&id=" + recipe.recipeId + "&user_id=" + that.user_id, function (text) {
+                                    if (isNaN(text)) {
+                                        layer.alert(text);
+                                        return;
+                                    }
+                                    // ui添加
+                                    that.load_recipes(that.user_id);
+                                });
+                            });
+                    },
+                    find_recipe: function (name) {
+                        var recipes = g_bcjh_data.recipes;
+                        for (let i = 0; i < recipes.length; i++) {
+                            if (name === recipes[i].name) {
+                                return recipes[i];
+                            }
+                        }
+                        return null;
+                    },
+                    init_cols: function () {
+                        for (let i = 0; i < this.recipes_schema.length; i++) {
+                            const item = this.recipes_schema[i];
+                            var val = getCookie(item.caption);
+                            item.show = val != "false";
+                            item.old_show = item.show;
+                        }
+                    }
+                }
+            }
+        );
+
+    </script>
+</body>
+
+</html>

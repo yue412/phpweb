@@ -78,7 +78,7 @@ function build_url_params(arr)
         var str = pair[0] + "=" + pair[1];
         list.push(str);
     }
-    return decodeURIComponent(list.join("&"));
+    return encodeURIComponent(list.join("&"));
 }
 
 function clone(obj)

@@ -1,15 +1,18 @@
 <?php
     function insert_record($db, $table_name, &$fields)
     {
+        $keys = array();
+        $values = array();
         foreach($fields as $key => &$value)
         {
-            if($value == '')
-                $value = 'NULL';
-            else
-                $value = '\''.$value.'\'';
+            if(!($value == '' || $value == "NULL"))
+            {
+                $keys[] = $key;
+                $values[] = '\''.$value.'\'';
+            }
         }
-        $keys = array_keys($fields);
-        $values = array_values($fields);
+        //$keys = array_keys($fields);
+        //$values = array_values($fields);
         $s_fields = '`'.implode('`, `', $keys).'`';
         $s_values = implode(', ', $values);
         $sql = 'INSERT INTO `'.$table_name.'` ('.$s_fields.') VALUES ('.$s_values.')';

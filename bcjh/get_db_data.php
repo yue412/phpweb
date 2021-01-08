@@ -1,6 +1,6 @@
 <?php
-    include_once "db_connect.php";
-    include_once "common.php";
+    include_once "../db/db_connect.php";
+    include_once "../common.php";
     $table_name = get_browser_param('name', '');
     $order_field = get_browser_param('order_field', '');
 ?>

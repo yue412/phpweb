@@ -19,7 +19,7 @@
     </script>
     <script type="text/javascript" src="bcjh_skill.js">
     </script>
-    <script type="text/javascript" src="TableSorterV3.js">
+    <script type="text/javascript" src="../TableSorterV3.js">
     </script>
     <script type="text/javascript" src="vue_components.js">
     </script>
@@ -68,12 +68,12 @@
                 <td>{{chef.veg}}</td>
                 <td>{{chef.meat}}</td>
                 <td>{{chef.skill_name()}}</td>
-                <td>{{chef.ultimate_skill_name()}}</td>
+                <td style="white-space: pre-wrap;" v-bind:class="{'chef-emphasize':chef.ultimate_skill_conditions.length>=3}">{{chef.ultimate_skill_name()}}</td>
                 <td>{{chef.equip_name()}}</td>
                 <td>
-                    <a v-on:click="edit_chef(chef)" href="#">修改</a>
-                    <a v-if="chef.level<3" href="#" v-on:click="set_max_level(chef)">满级</a>
-                    <a v-if="chef.ultimate_skill == null" href="#" v-on:click="set_ultimate_skill(chef)">终极技能</a>
+                    <a v-on:click="edit_chef(chef)" class="link">修改</a>
+                    <a v-if="chef.level<3" v-on:click="set_max_level(chef)" class="link">满级</a>
+                    <a v-if="chef.ultimate_skill == null" v-on:click="set_ultimate_skill(chef)" class="link">终极技能</a>
                 </td>
             </tr>
         </table>
@@ -96,21 +96,58 @@
                             var my_chefs = JSON.parse(text);
                             init_skills(g_bcjh_data.skills);
                             init_chefs(my_chefs);
-                            that.chefs = my_chefs;
-                            that.$nextTick(function () {
-                                that.sorter = new TableSorter("tb2");
+                            do_ajax("../db/get_records.php?table_name=bcjh_recipes&user_id=" + user_id, function (text) {
+                                var my_recipes = JSON.parse(text);
+                                var new_recipes = build_recipes(g_bcjh_data.recipes, my_recipes, my_chefs);
+                                that.chefs = my_chefs;
+                                that.init_ultimate_skill_conditions(new_recipes);
+                                that.$nextTick(function () {
+                                    that.sorter = new TableSorter("tb2");
+                                });
                             });
                         });
                     },
+                    init_ultimate_skill_conditions: function(new_recipes){
+                        for (let i = 0; i < this.chefs.length; i++) {
+                            const chef = this.chefs[i];
+                            var cook = this.get_chef_max_cook(chef);
+                            var list = [];
+                            for (let j = 0; j < new_recipes.length; j++) {
+                                const recipe = new_recipes[j];
+                                if(recipe.rarity == chef.rarity && recipe[cook] > 0)
+                                {
+                                    var rate = calc_rate(recipe, chef);
+                                    if(rate >= 4)
+                                    {
+                                        list.push(recipe.name);
+                                        if(list.length>=3)
+                                            break;
+                                    }
+                                }
+                            }
+                            chef.ultimate_skill_conditions = list;
+                        }
+                    },
+                    get_chef_max_cook: function(chef) {
+                        var cook = g_cook_types[0];
+                        for (let i = 1; i < g_cook_types.length; i++) {
+                            const cook_type = g_cook_types[i];
+                            if(chef[cook_type] > chef[cook])
+                            {
+                                cook = cook_type;
+                            }
+                        }
+                        return cook;
+                    },
                     set_max_level: function (chef) {
                         var that = this;
-                        do_ajax('../db/update_record.php?table_name=bcjh_chefs&primary_key=id|user_id&key_val=' + chef.id + "|" + that.user_id + "&" + _build_chef_params(chef.name), function (text) {
+                        do_ajax('../db/update_record.php?table_name=bcjh_chefs&primary_key=id|user_id&key_val=' + chef.id + "|" + that.user_id + "&" + this._build_chef_params(chef.name), function (text) {
                             that.load_chefs(that.user_id);
                         });
                     },
                     set_ultimate_skill: function (chef) {
                         var that = this;
-                        do_ajax('../db/update_record.php?table_name=bcjh_chefs&primary_key=id|user_id&key_val=' + chef.id + "|" + that.user_id + "&" + _build_chef_ultimate_params(chef.name), function (text) {
+                        do_ajax('../db/update_record.php?table_name=bcjh_chefs&primary_key=id|user_id&key_val=' + chef.id + "|" + that.user_id + "&" + this._build_chef_ultimate_params(chef.name), function (text) {
                             that.load_chefs(that.user_id);
                         });
                     },

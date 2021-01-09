@@ -44,3 +44,13 @@ td {
 .edit-table td:nth-child(even) {
     text-align: left;
 }
+
+.link {
+	cursor: pointer;
+	text-decoration:underline;
+	color: rgb(45, 175, 200);
+}
+
+.link:hover {
+    color: rgb(82, 197, 217);
+}

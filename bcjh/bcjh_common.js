@@ -53,11 +53,18 @@ g_filter_material = "";
 g_filter_recipe = "";
 g_first_guest_name = "";
 
-function get_best_chefs(recipe, chefs, price_add) {
+function get_best_chefs(recipe, chefs, price_add, ChefTagEffect) {
     var result = [0, []];
     for (let i = 0; i < chefs.length; i++) {
         const chef = chefs[i];
-        var price = calc_price(recipe, chef, chefs, price_add);
+        var temp = price_add;
+        if (ChefTagEffect) {
+            for (let i = 0; i < chef.tags.length; i++) {
+                const tag = chef.tags[i];
+                temp += ChefTagEffect[tag] * 100;
+            }
+        }
+        var price = calc_price(recipe, chef, chefs, temp);
         if (price > result[0]) {
             result[0] = price;
             result[1].length = 0;
@@ -324,8 +331,9 @@ function init_chefs(chefs) {
         chef.skill_name = function () {
             return this.skill == null ? "" : this.skill.desc;
         }
+        chef.ultimate_skill_conditions = [];
         chef.ultimate_skill_name = function () {
-            return this.ultimate_skill == null ? "" : this.ultimate_skill.desc;
+            return this.ultimate_skill == null ? this.ultimate_skill_conditions.join("\n") : this.ultimate_skill.desc;
         }
         chef.equip_name = function () {
             return this.equip == null ? "" : this.equip.name;
@@ -467,10 +475,10 @@ function build_recipes(recipes, my_recipes, my_chefs) {
                 return Math.round(this.calc_price() / this.time * 3600);
             }
             recipes[i].unclock_name = function () {
-                this.rate >= 4 ? "-" : this.unlock;
+                return this.rate >= 4 ? "-" : this.unlock;
             }
             recipes[i].gift_name = function () {
-                this.rate >= 4 ? "-" : this.gift;
+                return this.rate >= 4 ? "-" : this.gift;
             }
             var recipe_chefs = get_recipe_chefs(recipes[i], my_chefs);
             recipes[i].recipe_chefs = display_recipe_chefs(recipe_chefs, recipes[i].rate);

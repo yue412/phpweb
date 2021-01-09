@@ -2,55 +2,32 @@
 
 <head>
     <meta http-equiv="content-type" content="text/html;charset=utf-8">
-    <meta name="viewport" content="width=device-width,initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <meta name="viewport"
+        content="width=device-width,initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no" />
     <title>
         爆炒江湖
     </title>
-    <style type="text/css">
-        div.no {
-            font-size: 120%;
-            display: inline
-        }
+    <link rel="stylesheet" href="bcjh.css" />
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    <script type="text/javascript" src="../common.js"></script>
+    <script type="text/javascript" src="bcjh_data.js"></script>
+    <script type="text/javascript" src="bcjh_common.js"></script>
+    <script type="text/javascript" src="bcjh_skill.js"></script>
+    <script type="text/javascript" src="LP.js"></script>
+    <script type="text/javascript" src="../TableSorterV3.js"></script>
+    <script type="text/javascript" src="vue_components.js"></script>
 
-        div.yes {
-            font-size: 80%;
-            display: inline
-        }
-
-        div.content {
-            color: #FF0000;
-            display: inline
-        }
-
-        div.level {
-            display: inline
-        }
-    </style>
-    <script type="text/javascript" src="../common.js">
-    </script>
-    <script type="text/javascript" src="bcjh_data.js">
-    </script>
-    <script type="text/javascript" src="bcjh_common.js">
-    </script>
-    <script type="text/javascript" src="bcjh_skill.js">
-    </script>
-    <script type="text/javascript" src="LP.js">
-    </script>
-    <script type="text/javascript" src="TableSorterV3.js">
-    </script>    
     <script type="text/javascript">
-        function get_recipe_by_id(recipes, id)
-        {
+        function get_recipe_by_id(recipes, id) {
             for (let i = 0; i < recipes.length; i++) {
                 const recipe = recipes[i];
-                if(recipe.recipeId == id)
+                if (recipe.recipeId == id)
                     return recipe;
             }
             return null;
         }
 
-        function filter_recipes(recipes, chefs, comb)
-        {
+        function filter_recipes(recipes, chefs, comb) {
             var chef_recipe = [];
             for (let i = 0; i < comb.length; i++) {
                 chef_recipe.push(new Array());
@@ -61,16 +38,15 @@
                     const index = comb[j];
                     var chef = chefs[index];
                     var price = calc_price(recipe, chef, chefs, 0);
-                    if(price > 0)
-                    {
-                        chef_recipe[j].push([price/recipe.time, recipe]);
+                    if (price > 0) {
+                        chef_recipe[j].push([price / recipe.time, recipe]);
                     }
                 }
             }
             var set = new Set();
             for (let i = 0; i < chef_recipe.length; i++) {
                 var arr = chef_recipe[i];
-                arr.sort(function(a,b){
+                arr.sort(function (a, b) {
                     if (a[0] < (b[0] + g_epsilon))
                         return 1;
                     else if (a[0] > (b[0] - g_epsilon))
@@ -86,12 +62,11 @@
             return Array.from(set);
         }
 
-        function filter_chef(chefs)
-        {
+        function filter_chef(chefs) {
             var arr = [];
             for (let i = 0; i < chefs.length; i++) {
                 const chef = chefs[i];
-                var name = "ck_chef_"+chef.id;
+                var name = "ck_chef_" + chef.id;
                 var e = document.getElementById(name);
                 if (e && e.checked) {
                     arr.push(chef);
@@ -100,10 +75,9 @@
             return arr;
         }
 
-        function build_constraint2(objective_function, constraint_list, select_chefs, chef_recipe_list, rule)
-        {
+        function build_constraint2(objective_function, constraint_list, select_chefs, chef_recipe_list, rule) {
             objective_function.is_max = true;
-            objective_function.items = [];                        
+            objective_function.items = [];
             //var my_recipes_price = [];
 
             // material
@@ -111,14 +85,16 @@
             for (let j = 0; j < g_bcjh_data.materials.length; j++) {
                 const m = g_bcjh_data.materials[j];
                 var val = 0
-                if(isNaN(rule.MaterialsLimit))
+                if (isNaN(rule.MaterialsLimit))
                     val = rule.MaterialsLimit[m.materialId];
                 else
                     val = rule.MaterialsLimit;
+                if (val == null)
+                    val = 0;
                 var constraint_material = new Object(); // 时间限制
                 constraint_material.opr_type = -1;
                 constraint_material.value = val;
-                constraint_material.items = [];                    
+                constraint_material.items = [];
                 material_constraint_map.set(m.materialId, constraint_material);
             }
             for (let k = 0; k < select_chefs.length; k++) {
@@ -128,52 +104,48 @@
                     const r = arr[i];
                     var recipe = r[0];
                     var price = r[1];
-                    var cnt = recipe.limit;
+                    var cnt = rule.DisableMultiCookbook ? 1 : recipe.limit;
                     for (let n = 0; n < recipe.materials.length; n++) {
                         const m = recipe.materials[n];
-                        if(material_constraint_map.has(m.material))
-                        {
+                        if (material_constraint_map.has(m.material)) {
                             var val = material_constraint_map.get(m.material).value;
                             cnt = Math.min(Math.floor(val / m.quantity), cnt);
                         }
-                        else
-                        {
+                        else {
                             cnt = 0;
                             break;
                         }
                     }
-                    if(cnt == 0)
+                    if (cnt == 0)
                         continue;
-                    var var_name = "X_"+recipe.recipeId+"_"+k; // 份数
+                    var var_name = "X_" + recipe.recipeId + "_" + k; // 份数
 
                     var constraint_cnt = new Object(); // 份数限制
                     constraint_cnt.opr_type = -1;
                     constraint_cnt.value = cnt;
                     constraint_cnt.items = [[1, var_name]];
                     constraint_list.push(constraint_cnt);
-                    
+
 
                     objective_function.items.push([price, var_name]);
                     for (let n = 0; n < recipe.materials.length; n++) {
                         const m = recipe.materials[n];
-                        if(material_constraint_map.has(m.material))
-                        {
+                        if (material_constraint_map.has(m.material)) {
                             material_constraint_map.get(m.material).items.push([m.quantity, var_name]);
                         }
                     }
                 }
             }
             material_constraint_map.forEach(constraint => {
-                if(constraint.items.length > 0)
+                if (constraint.items.length > 0)
                     constraint_list.push(constraint);
-            });            
+            });
         }
 
 
-        function build_constraint(objective_function, constraint_list, new_recipes, my_chefs, best_recipe_map, materials_limit)
-        {
+        function build_constraint(objective_function, constraint_list, new_recipes, my_chefs, best_recipe_map, materials_limit, DisableMultiCookbook) {
             objective_function.is_max = true;
-            objective_function.items = [];                        
+            objective_function.items = [];
             //var my_recipes_price = [];
 
             // material
@@ -181,75 +153,73 @@
             for (let j = 0; j < g_bcjh_data.materials.length; j++) {
                 const m = g_bcjh_data.materials[j];
                 var val = 0
-                if(isNaN(materials_limit))
+                if (isNaN(materials_limit))
                     val = materials_limit[m.materialId];
                 else
                     val = materials_limit;
+                if (val == null)
+                    val = 0;
                 var constraint_material = new Object(); // 时间限制
                 constraint_material.opr_type = -1;
                 constraint_material.value = val;
-                constraint_material.items = [];                    
+                constraint_material.items = [];
                 material_constraint_map.set(m.materialId, constraint_material);
             }
             for (let k = 0; k < new_recipes.length; k++) {
                 const recipe = new_recipes[k];
                 if (!best_recipe_map.has(recipe.recipeId))
                     continue;
-                var cnt = recipe.limit;
+                var cnt = DisableMultiCookbook ? 1 : recipe.limit;
                 for (let n = 0; n < recipe.materials.length; n++) {
                     const m = recipe.materials[n];
-                    if(material_constraint_map.has(m.material))
-                    {
+                    if (material_constraint_map.has(m.material)) {
                         var val = material_constraint_map.get(m.material).value;
                         cnt = Math.min(Math.floor(val / m.quantity), cnt);
                     }
-                    else
-                    {
+                    else {
                         cnt = 0;
                         break;
                     }
                 }
-                if(cnt == 0)
+                if (cnt == 0)
                     continue;
                 var best = best_recipe_map.get(recipe.recipeId);
                 //get_best_chefs(recipe, my_chefs, e2.value);
                 //e4.innerHTML = best[0]*recipe.limit;
                 //e5.innerHTML = Math.ceil(best[0]/recipe.time*3600);
                 var price = best[0];
-                var var_name = "X_"+recipe.recipeId; // 份数
+                var var_name = "X_" + recipe.recipeId; // 份数
 
                 var constraint_cnt = new Object(); // 份数限制
                 constraint_cnt.opr_type = -1;
                 constraint_cnt.value = cnt;
                 constraint_cnt.items = [[1, var_name]];
                 constraint_list.push(constraint_cnt);
-                
+
 
                 objective_function.items.push([price, var_name]);
                 for (let n = 0; n < recipe.materials.length; n++) {
                     const m = recipe.materials[n];
-                    if(material_constraint_map.has(m.material))
-                    {
+                    if (material_constraint_map.has(m.material)) {
                         material_constraint_map.get(m.material).items.push([m.quantity, var_name]);
                     }
                 }
             }
             material_constraint_map.forEach(constraint => {
-                if(constraint.items.length > 0)
+                if (constraint.items.length > 0)
                     constraint_list.push(constraint);
-            });            
+            });
         }
 
         var final_result = [];
         var final_objective_value = null;
         var final_comb = null;
-        var filter_chefs = null;
-        var my_chefs = null;
-        var new_recipes = null;
+        //        var filter_chefs = null;
+        //      var my_chefs = null;
+        //    var new_recipes = null;
         var rule_config = null;
 
-        function display_item(recipe, chefs_names, price, cnt)
-        {
+        function display_item(recipe, chefs_names, price, cnt) {
             var s = "";
             //for (let i = 0; i < cnt; i++)
             {
@@ -265,10 +235,10 @@
                 s += "</td>";
                 s += "<td>";
                 s += recipe.materials_name,
-                s += "</td>";
+                    s += "</td>";
                 s += "<td>";
                 s += recipe.cook_name,
-                s += "</td>";
+                    s += "</td>";
                 s += "<td>";
                 s += price;
                 s += "</td>";
@@ -280,36 +250,35 @@
             return s;
         }
 
-        function display_result(recipes, chefs, best_recipe_map, materials_limit)
-        {
+        function display_result(recipes, chefs, best_recipe_map, materials_limit) {
             //var r = solve(objective_function, constraint_list, result, objective_value);
             var e = document.getElementById("price");
             if (("value" in final_objective_value)) {
                 //var s = "复杂度:"+ g_debug_simplex_cnt + "<br>" + final_objective_value.value + "<br>";// + JSON.stringify(result) + "<br>";
                 var s = "<table id=\"tb2\" border=\"1\">";
-                    s += "<tr>";
-                    s += "<td>";
-                    s += "名称";
-                    s += "</td>";
-                    s += "<td>";
-                    s += "菜谱";
-                    s += "</td>";
-                    s += "<td>";
-                    s += "解";
-                    s += "</td>";
-                    s += "<td>";
-                    s += "材料";
-                    s += "</td>";
-                    s += "<td>";
-                    s += "技法";
-                    s += "</td>";
-                    s += "<td>";
-                    s += "单价";
-                    s += "</td>";
-                    s += "<td>";
-                    s += "总价";
-                    s += "</td>";
-                    s += "</tr>";
+                s += "<tr>";
+                s += "<td>";
+                s += "名称";
+                s += "</td>";
+                s += "<td>";
+                s += "菜谱";
+                s += "</td>";
+                s += "<td>";
+                s += "解";
+                s += "</td>";
+                s += "<td>";
+                s += "材料";
+                s += "</td>";
+                s += "<td>";
+                s += "技法";
+                s += "</td>";
+                s += "<td>";
+                s += "单价";
+                s += "</td>";
+                s += "<td>";
+                s += "总价";
+                s += "</td>";
+                s += "</tr>";
                 var total_time = 0;
                 var total_price = 0;
                 var map = new Map();
@@ -317,9 +286,9 @@
                     const pair = final_result[i];
                     //var cnt = Math.round(pair[1]);
                     var cnt = pair[1];
-                    if(Math.abs(cnt) < g_epsilon)
+                    if (Math.abs(cnt) < g_epsilon)
                         continue;
-                    if(pair[0].charAt(0) != "X")
+                    if (pair[0].charAt(0) != "X")
                         continue;
                     var arr = pair[0].split("_");
                     var id = parseInt(arr[1]);
@@ -331,17 +300,16 @@
                     for (let n = 0; n < recipe.materials.length; n++) {
                         const m = recipe.materials[n];
                         var t = 0;
-                        if(map.has(m.material))
-                        {
+                        if (map.has(m.material)) {
                             t = map.get(m.material);
                         }
-                        map.set(m.material, t + m.quantity*cnt);
+                        map.set(m.material, t + m.quantity * cnt);
                     }
                     s += display_item(recipe, best[1].join(","), price, cnt);
                 }
 
                 s += "</table>";
-                s += "总价:"+ total_price + " - " + display_time(total_time);// + JSON.stringify(result) + "<br>";
+                s += "总价:" + total_price + " - " + display_time(total_time);// + JSON.stringify(result) + "<br>";
                 s += "<br>";
                 s += "<table id=\"tb3\" border=\"1\">";
                 s += "<tr>";
@@ -361,44 +329,42 @@
                 for (let i = 0; i < g_bcjh_data.materials.length; i++) {
                     const m = g_bcjh_data.materials[i];
                     //if(!materail_map.has(m.name))
-                       // continue;
+                    // continue;
                     var val = 0
-                    if(isNaN(materials_limit))
+                    if (isNaN(materials_limit))
                         val = materials_limit[m.materialId];
                     else
                         val = materials_limit;
-                       
-                    var act = map.has(m.materialId) ? map.get(m.materialId) : 0; 
+
+                    var act = map.has(m.materialId) ? map.get(m.materialId) : 0;
                     s += "<tr>";
                     s += "<td>";
-                    s += m.name; 
+                    s += m.name;
                     s += "</td>";
                     s += "<td>";
-                    s += val; 
+                    s += val;
                     s += "</td>";
                     s += "<td>";
                     s += act
                     s += "</td>";
                     s += "<td>";
-                    s += val - act; 
+                    s += val - act;
                     s += "</td>";
                     s += "</tr>";
                 }
                 //s += "<br><input type=\"button\" onclick=\"recalc_price()\" value=\"再试一次\">";
-                e.innerHTML =  s;
+                e.innerHTML = s;
                 var x = new TableSorter("tb2");
                 var x2 = new TableSorter("tb3");
             }
-            else
-            {
+            else {
                 e.innerHTML = "无解";
             }
         }
 
-        function sort_result3(a, b)
-        {
-            var t1 = a[1]*a[2];
-            var t2 = b[1]*b[2];
+        function sort_result3(a, b) {
+            var t1 = a[1] * a[2];
+            var t2 = b[1] * b[2];
             if (t1 < (t2 - g_epsilon))
                 return 1;
             else if (t1 > (t2 + g_epsilon))
@@ -406,37 +372,36 @@
             else
                 return 0;
         }
-        
-        function display_result2(recipes, chefs, best_recipe_map, materials_limit)
-        {
+
+        function display_result2(recipes, chefs, best_recipe_map, materials_limit) {
             //var r = solve(objective_function, constraint_list, result, objective_value);
             var e = document.getElementById("price");
             if (("value" in final_objective_value)) {
                 //var s = "复杂度:"+ g_debug_simplex_cnt + "<br>" + final_objective_value.value + "<br>";// + JSON.stringify(result) + "<br>";
                 var s = "<table id=\"tb2\" border=\"1\">";
-                    s += "<tr>";
-                    s += "<td>";
-                    s += "名称";
-                    s += "</td>";
-                    s += "<td>";
-                    s += "菜谱";
-                    s += "</td>";
-                    s += "<td>";
-                    s += "解";
-                    s += "</td>";
-                    s += "<td>";
-                    s += "材料";
-                    s += "</td>";
-                    s += "<td>";
-                    s += "技法";
-                    s += "</td>";
-                    s += "<td>";
-                    s += "单价";
-                    s += "</td>";
-                    s += "<td>";
-                    s += "总价";
-                    s += "</td>";
-                    s += "</tr>";
+                s += "<tr>";
+                s += "<td>";
+                s += "名称";
+                s += "</td>";
+                s += "<td>";
+                s += "菜谱";
+                s += "</td>";
+                s += "<td>";
+                s += "解";
+                s += "</td>";
+                s += "<td>";
+                s += "材料";
+                s += "</td>";
+                s += "<td>";
+                s += "技法";
+                s += "</td>";
+                s += "<td>";
+                s += "单价";
+                s += "</td>";
+                s += "<td>";
+                s += "总价";
+                s += "</td>";
+                s += "</tr>";
                 var total_time = 0;
                 var total_price = 0;
                 //final_result.sort(sort_result);
@@ -445,9 +410,9 @@
                     const pair = final_result[i];
                     var cnt = Math.floor(pair[1]);
                     //var cnt = pair[1];
-                    if(cnt == 0)
+                    if (cnt == 0)
                         continue;
-                    if(pair[0].charAt(0) != "X")
+                    if (pair[0].charAt(0) != "X")
                         continue;
                     var arr = pair[0].split("_");
                     var id = parseInt(arr[1]);
@@ -463,18 +428,16 @@
                 for (let i = 0; i < list.length; i++) {
                     const r = list[i];
                     var arr = null;
-                    if(map.has(r[3]))
-                    {
+                    if (map.has(r[3])) {
                         arr = map.get(r[3]);
                     }
-                    else
-                    {
-                        if(map.size >= 3)
+                    else {
+                        if (map.size >= 3)
                             continue;
                         arr = [];
                         map.set(r[3], arr);
                     }
-                    if(arr.length >= 3)
+                    if (arr.length >= 3)
                         continue;
                     arr.push(r);
                     total_price += r[1] * r[2];
@@ -482,47 +445,45 @@
                 }
 
                 s += "</table>";
-                s += "总价:"+ total_price;// + JSON.stringify(result) + "<br>";
+                s += "总价:" + total_price;// + JSON.stringify(result) + "<br>";
                 s += "<br>";
-                e.innerHTML =  s;
+                e.innerHTML = s;
                 var x = new TableSorter("tb2");
             }
-            else
-            {
+            else {
                 e.innerHTML = "无解";
             }
         }
 
-        function display_result3(recipes, chefs, rule)
-        {
+        function display_result3(recipes, chefs, my_chefs, rule) {
             //var r = solve(objective_function, constraint_list, result, objective_value);
             var e = document.getElementById("price");
             if (("value" in final_objective_value)) {
                 //var s = "复杂度:"+ g_debug_simplex_cnt + "<br>" + final_objective_value.value + "<br>";// + JSON.stringify(result) + "<br>";
                 var s = "<table id=\"tb2\" border=\"1\">";
-                    s += "<tr>";
-                    s += "<td>";
-                    s += "名称";
-                    s += "</td>";
-                    s += "<td>";
-                    s += "菜谱";
-                    s += "</td>";
-                    s += "<td>";
-                    s += "解";
-                    s += "</td>";
-                    s += "<td>";
-                    s += "材料";
-                    s += "</td>";
-                    s += "<td>";
-                    s += "技法";
-                    s += "</td>";
-                    s += "<td>";
-                    s += "单价";
-                    s += "</td>";
-                    s += "<td>";
-                    s += "总价";
-                    s += "</td>";
-                    s += "</tr>";
+                s += "<tr>";
+                s += "<td>";
+                s += "名称";
+                s += "</td>";
+                s += "<td>";
+                s += "菜谱";
+                s += "</td>";
+                s += "<td>";
+                s += "解";
+                s += "</td>";
+                s += "<td>";
+                s += "材料";
+                s += "</td>";
+                s += "<td>";
+                s += "技法";
+                s += "</td>";
+                s += "<td>";
+                s += "单价";
+                s += "</td>";
+                s += "<td>";
+                s += "总价";
+                s += "</td>";
+                s += "</tr>";
                 var total_time = 0;
                 var total_price = 0;
                 //final_result.sort(sort_result);
@@ -531,9 +492,9 @@
                     const pair = final_result[i];
                     var cnt = Math.round(pair[1]);
                     //var cnt = pair[1];
-                    if(cnt == 0)
+                    if (cnt == 0)
                         continue;
-                    if(pair[0].charAt(0) != "X")
+                    if (pair[0].charAt(0) != "X")
                         continue;
                     var arr = pair[0].split("_");
                     var id = parseInt(arr[1]);
@@ -542,55 +503,59 @@
                     var recipe = get_recipe_by_id(recipes, id);
                     var rule_effect = rule.RecipeEffect[recipe.recipeId];
                     if (rule_effect == null)
-                        rule_effect = 0;
-                    var price = calc_price(recipe, chef, my_chefs, rule_effect*100);
+                        continue;//rule_effect = 0;
+                    if (rule.ChefTagEffect) {
+                        for (let i = 0; i < chef.tags.length; i++) {
+                            const tag = chef.tags[i];
+                            rule_effect += rule.ChefTagEffect[tag];
+                        }
+                    }
+                    var price = calc_price(recipe, chef, my_chefs, rule_effect * 100);
                     total_price += price * cnt;
                     s += display_item(recipe, chef.name, price, cnt);
                     // 合计材料
                     for (let n = 0; n < recipe.materials.length; n++) {
                         const m = recipe.materials[n];
                         var t = 0;
-                        if(map.has(m.material))
-                        {
+                        if (map.has(m.material)) {
                             t = map.get(m.material);
                         }
-                        map.set(m.material, t + m.quantity*cnt);
+                        map.set(m.material, t + m.quantity * cnt);
                     }
                 }
 
                 s += "</table>";
-                s += "总价:"+ total_price;// + JSON.stringify(result) + "<br>";
+                s += "总价:" + total_price;// + JSON.stringify(result) + "<br>";
                 s += "<br>";
 
                 for (let i = 0; i < g_bcjh_data.materials.length; i++) {
                     const m = g_bcjh_data.materials[i];
                     //if(!materail_map.has(m.name))
-                       // continue;
-                    var act = map.has(m.materialId) ? map.get(m.materialId) : 0; 
+                    // continue;
+                    var act = map.has(m.materialId) ? map.get(m.materialId) : 0;
 
                     var val = 0
-                    if(isNaN(rule.MaterialsLimit))
+                    if (isNaN(rule.MaterialsLimit))
                         val = rule.MaterialsLimit[m.materialId];
                     else
                         val = rule.MaterialsLimit;
                     var diff = val - act;
-                    if(diff < 0)
-                        s += m.name + ":" + diff + "<br>"; 
-                }                
-                e.innerHTML =  s;
+                    if (diff < 0)
+                        s += m.name + ":" + diff + "<br>";
+                }
+                e.innerHTML = s;
                 var x = new TableSorter("tb2");
             }
-            else
-            {
+            else {
                 e.innerHTML = "无解";
             }
         }
 
-        function init()
-        {
-            do_ajax("get_db_data.php?name=bcjh_recipes&order_field=id", function(text){
+        /*
+        function init() {
+            do_ajax("get_db_data.php?name=bcjh_recipes&order_field=id", function (text) {
                 var my_recipes = JSON.parse(text);
-                do_ajax("get_db_data.php?name=bcjh_chefs&order_field=id", function(text){
+                do_ajax("get_db_data.php?name=bcjh_chefs&order_field=id", function (text) {
                     init_skills(g_bcjh_data.skills);
                     my_chefs = JSON.parse(text);
                     init_chefs(my_chefs);
@@ -599,48 +564,9 @@
                 });
             });
         }
-/*
-        function sort_recipe(a,b)
-        {
-            if (a[1][0] < b[1][0])
-                return 1;
-            else if (a[1][0] > b[1][0])
-                return -1;
-            else
-                return 0;
-        }*/
-
-        function display_price(flag)
-        {
-            filter_chefs = filter_chef(my_chefs);
-
-            var cb = document.getElementById("cb_rules");
-            var rule = rule_config.rules[cb.selectedIndex];
-            var sl = document.getElementById("score_limit");
-            var limit = sl.value;
-            var recipe_limit = document.getElementById("recipe_limit").value;
-
-            final_result = [];
-            final_objective_value = new Object();
-            g_debug_simplex_cnt = 0;
-
-            var dateBegin = new Date();
-            var best_recipe_map = new Map();
-            for (let k = 0; k < new_recipes.length; k++) {
-                const recipe = new_recipes[k];
-                var rule_effect = rule.RecipeEffect[recipe.recipeId];
-                if (rule_effect == null)
-                    rule_effect = 0;
-                var best = get_best_chefs(recipe, filter_chefs, rule_effect*100);
-                if(best[1].length == 0)
-                    continue;
-                best_recipe_map.set(recipe.recipeId, best);
-            }
-
-            if (recipe_limit > 0) {
-                var list = [];
-                best_recipe_map.forEach(function(item, key){list.push([key, item]);});
-                list.sort(function(a,b)
+        */
+        /*
+                function sort_recipe(a,b)
                 {
                     if (a[1][0] < b[1][0])
                         return 1;
@@ -648,370 +574,448 @@
                         return -1;
                     else
                         return 0;
-                }
-                );
-                best_recipe_map.clear();
-                for (let i = 0; i < list.length && i < recipe_limit; i++) {
-                    best_recipe_map.set(list[i][0], list[i][1]);
-                }
-            }
+                }*/
 
-            //var materail_map = get_material_map();
-
-            var objective_function = new Object();
-            var constraint_list = []; 
-            build_constraint(objective_function, constraint_list, new_recipes, filter_chefs, best_recipe_map, rule.MaterialsLimit);
-
-            var result = [];
-            var objective_value = new Object();
-            //var r = solve_fast(objective_function, constraint_list, result, objective_value);
-            g_solve_only_once = false;
-            g_log_objective_value = true;
-            g_objective_value = limit;
-            var r = 0;
-            if (flag == 0)
-            {
-                // 整数
-                r = solve_int(objective_function, constraint_list, result, objective_value);
-            }
-            else if(flag == 1)
-            {
-                // 整数一次
-                g_solve_only_once = true;
-                r = solve_int(objective_function, constraint_list, result, objective_value);
-            }
-            else if(flag == 2 || flag == 3)
-            {
-                r = solve(objective_function, constraint_list, result, objective_value);
-            }
-            if(r==1)
-            {
-                if(!("value" in final_objective_value) || (objective_value.value > final_objective_value.value))
-                {
-                    final_objective_value.value = objective_value.value;
-                    final_result = result;
-                    //final_comb = comb;
-                }
-            }
-            var dateEnd = new Date();
-            var dateDiff = dateEnd.getTime() - dateBegin.getTime();
-            var e = document.getElementById("time");
-            e.innerHTML = "time(ms):" + dateDiff;
-
-            if(flag==3)
-                display_result2(new_recipes, filter_chefs, best_recipe_map, rule.MaterialsLimit);
-            else
-                display_result(new_recipes, filter_chefs, best_recipe_map, rule.MaterialsLimit);
-        }
-
-        function display_price2()
-        {
-            filter_chefs = filter_chef(my_chefs);
-
-            var cb = document.getElementById("cb_rules");
-            var rule = rule_config.rules[cb.selectedIndex];
-            var sl = document.getElementById("score_limit");
-            var limit = sl.value;
-            var recipe_limit = document.getElementById("recipe_limit").value;
-            var calc_limit = document.getElementById("calc_limit").value;
-
-            final_result = [];
-            final_objective_value = new Object();
-            g_debug_simplex_cnt = 0;
-
-            var dateBegin = new Date();
-
-            var comb_list = combination(filter_chefs.length, 3);
-            for (let t = 0; t < comb_list.length; t++) {
-
-                const comb = comb_list[t];
-
-                var select_chefs = [filter_chefs[comb[0]], filter_chefs[comb[1]], filter_chefs[comb[2]]];
-                var best_recipe_map = new Map();
-                for (let k = 0; k < new_recipes.length; k++) {
-                    const recipe = new_recipes[k];
-                    var rule_effect = rule.RecipeEffect[recipe.recipeId];
-                    if (rule_effect == null)
-                        rule_effect = 0;
-                    var best = get_best_chefs(recipe, select_chefs, rule_effect*100);
-                    if(best[1].length == 0)
-                        continue;
-                    best_recipe_map.set(recipe.recipeId, best);
-                }
-
-                if (recipe_limit > 0) {
-                    var list = [];
-                    best_recipe_map.forEach(function(item, key){list.push([key, item]);});
-                    list.sort(function(a,b)
-                    {
-                        if (a[1][0] < b[1][0])
-                            return 1;
-                        else if (a[1][0] > b[1][0])
-                            return -1;
-                        else
-                            return 0;
-                    }
-                    );
-                    best_recipe_map.clear();
-                    for (let i = 0; i < list.length && i < recipe_limit; i++) {
-                        best_recipe_map.set(list[i][0], list[i][1]);
-                    }
-                }
-
-                var objective_function = new Object();
-                var constraint_list = []; 
-                //build_constraint(objective_function, constraint_list, new_recipes, filter_chefs, comb, time_limit);
-                build_constraint(objective_function, constraint_list, new_recipes, select_chefs, best_recipe_map, rule.MaterialsLimit);
-
-                var result = [];
-                var objective_value = new Object();
-                g_log_objective_value = false;
-                var r = solve(objective_function, constraint_list, result, objective_value);
-                if(r!=1)
-                    continue;
-
-                var list = [];
-                for (let i = 0; i < result.length; i++) {
-                    const pair = result[i];
-                    var cnt = Math.floor(pair[1]);
-                    //var cnt = pair[1];
-                    if(cnt == 0)
-                        continue;
-                    if(pair[0].charAt(0) != "X")
-                        continue;
-                    var arr = pair[0].split("_");
-                    var id = parseInt(arr[1]);
-                    var recipe = get_recipe_by_id(new_recipes, id);
-                    var best = best_recipe_map.get(id);
-                    var price = best[0];
-                    list.push([recipe, price, cnt, best[1][0]]);
-                }
-                list.sort(sort_result3);
-                var map = new Map();
-                var index = 0;
-                for (let i = 0; i < list.length; i++) {
-                    const r = list[i];
-                    var arr = null;
-                    if(map.has(r[3]))
-                    {
-                        arr = map.get(r[3]);
-                    }
-                    else
-                    {
-                        if(map.size >= 3)
-                            continue;
-                        arr = [];
-                        map.set(r[3], arr);
-                    }
-                    if(arr.length >= 3)
-                        continue;
-                    arr.push(r);
-                    index = i;
-                }          
-                var recipe_price_list = [[],[],[]];
-                for (let i = 0; i <= index; i++) {
-                    const r = list[i];
-                    var recipe = r[0];
-                    var rule_effect = rule.RecipeEffect[recipe.recipeId];
-                    if (rule_effect == null)
-                        rule_effect = 0;                        
-                    for (let j = 0; j < select_chefs.length; j++) {
-                        const chef = select_chefs[j];
-                        var price = calc_price(recipe, chef, my_chefs, rule_effect*100);
-                        if(price == 0)
-                            continue;
-                        recipe_price_list[j].push([recipe, price]);
-                    }
-                }
-                var clist1 = combination(Math.min(recipe_price_list[0].length, calc_limit), 3);      
-                for (let i = 0; i < clist1.length; i++) {
-                    const arr_index1 = clist1[i];
-                    var arr_id=[recipe_price_list[0][arr_index1[0]][0].recipeId, recipe_price_list[0][arr_index1[1]][0].recipeId, recipe_price_list[0][arr_index1[2]][0].recipeId];
-                    var arr = [recipe_price_list[0][arr_index1[0]], recipe_price_list[0][arr_index1[1]], recipe_price_list[0][arr_index1[2]]];
-                    var left_list = [];
-                    for (let j = 0; j < recipe_price_list[1].length; j++) {
-                        if (arr_id.indexOf(recipe_price_list[1][j][0].recipeId) == -1)
-                            left_list.push(recipe_price_list[1][j]);
-                    }
-                    if(left_list.length<3)
-                        continue;
-                    var clist2 = combination(Math.min(left_list.length, calc_limit), 3);
-                    for (let k = 0; k < clist2.length; k++) {
-                        const arr_index2 = clist2[k];
-                        var arr_id2 = [left_list[arr_index2[0]][0].recipeId, left_list[arr_index2[1]][0].recipeId, left_list[arr_index2[2]][0].recipeId];
-                        var arr2 = [left_list[arr_index2[0]], left_list[arr_index2[1]], left_list[arr_index2[2]]];
-                        var left_list2 = [];
-                        for (let j = 0; j < recipe_price_list[2].length; j++) {
-                            if (arr_id2.indexOf(recipe_price_list[2][j][0].recipeId) == -1 && 
-                                arr_id.indexOf(recipe_price_list[2][j][0].recipeId) == -1)
-                                    left_list2.push(recipe_price_list[2][j]);
-                        }
-                        if(left_list2.length<3)
-                            continue;
-                        var clist3 = combination(Math.min(left_list2.length, calc_limit), 3);
-                        for (let m = 0; m < clist3.length; m++) {
-                            const arr_index3 = clist3[m];
-                            var arr3 = [left_list2[arr_index3[0]], left_list2[arr_index3[1]], left_list2[arr_index3[2]]];
-                            var objective_function = new Object();
-                            var constraint_list = []; 
-                            build_constraint2(objective_function, constraint_list, select_chefs, [arr, arr2, arr3], rule);
-                            var result = [];
-                            var objective_value = new Object();
-                            g_log_objective_value = false;
-                            var r = solve_int(objective_function, constraint_list, result, objective_value);
-                            if(r==1)
-                            {
-                                if(!("value" in final_objective_value) || (objective_value.value > final_objective_value.value))
-                                {
-                                    final_objective_value.value = objective_value.value;
-                                    final_result = result;
-                                    final_comb = select_chefs;
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-
-            var dateEnd = new Date();
-            var dateDiff = dateEnd.getTime() - dateBegin.getTime();
-            var e = document.getElementById("time");
-            e.innerHTML = "time(ms):" + dateDiff;
-
-            display_result3(new_recipes, filter_chefs, rule);
-        }
-
-        function sort_chef(a,b)
-        {
+        function sort_chef(a, b) {
             return b.rarity - a.rarity;
-        }      
-        function display_chefs(chefs)
-        {
+        }
+        function display_chefs(chefs) {
             chefs.sort(sort_chef);
             if (chefs.length == 0)
                 return;
             var e2 = document.getElementById("chefs");
             var rarity = chefs[0].rarity;
             var sChecked = "checked=\"checked\"";
-            var s = "<input type=\"checkbox\" id=\"ck_all_chef_"+rarity+"\" onclick=\"select_chef("+rarity+")\" "+((rarity>1)?sChecked:"")+">全选 ";
+            var s = "<input type=\"checkbox\" id=\"ck_all_chef_" + rarity + "\" onclick=\"select_chef(" + rarity + ")\" " + ((rarity > 1) ? sChecked : "") + ">全选 ";
             for (let i = 0; i < chefs.length; i++) {
                 const chef = chefs[i];
-                if(chef.rarity != rarity)
-                {
-                    s += "<br>" + "<input type=\"checkbox\" id=\"ck_all_chef_"+chef.rarity+"\" onclick=\"select_chef("+chef.rarity+")\" "+((chef.rarity>1)?sChecked:"")+">全选 ";
+                if (chef.rarity != rarity) {
+                    s += "<br>" + "<input type=\"checkbox\" id=\"ck_all_chef_" + chef.rarity + "\" onclick=\"select_chef(" + chef.rarity + ")\" " + ((chef.rarity > 1) ? sChecked : "") + ">全选 ";
                     rarity = chef.rarity;
                 }
-                s += "<input type=\"checkbox\" id=\"ck_chef_"+chef.id+"\" "+((chef.rarity>1)?sChecked:"")+">" + chef.name;
+                s += "<input type=\"checkbox\" id=\"ck_chef_" + chef.id + "\" " + ((chef.rarity > 1) ? sChecked : "") + ">" + chef.name;
             }
             e2.innerHTML = s;
-        }     
-        function select_chef(rarity)
-        {
-            var e = document.getElementById("ck_all_chef_"+rarity);
+        }
+        function select_chef(rarity) {
+            var e = document.getElementById("ck_all_chef_" + rarity);
             for (let i = 0; i < my_chefs.length; i++) {
                 const chef = my_chefs[i];
-                if (chef.rarity == rarity)
-                {
+                if (chef.rarity == rarity) {
                     var e2 = document.getElementById("ck_chef_" + chef.id);
                     e2.checked = e.checked;
                 }
             }
         }
-        function filter_recipes_all()
-        {
+        function filter_recipes_all() {
 
         }
-        function filter_recipes_by_rarity(recipes)
-        {
+        function filter_recipes_by_rarity(recipes) {
             var s = new Set();
             for (let i = 1; i <= 5; i++) {
-                var e = document.getElementById("ck_rarity_"+i);
-                if(e && e.checked)
+                var e = document.getElementById("ck_rarity_" + i);
+                if (e && e.checked)
                     s.add(i);
             }
             var arr = [];
             for (let i = 0; i < recipes.length; i++) {
                 const recipe = recipes[i];
-                if(s.has(recipe.rarity))
+                if (s.has(recipe.rarity))
                     arr.push(recipe);
             }
             return arr;
         }
-        function setScoreLimit(limit)
-        {
+        function setScoreLimit(limit) {
             var e = document.getElementById("score_limit");
             e.value = limit;
         }
-        function changeRule()
-        {
+        function changeRule() {
             var e = document.getElementById("cb_rules");
             var rule = rule_config.rules[e.selectedIndex];
             var s = "";
             for (let i = 0; i < rule.PassLine.length; i++) {
                 sChecked = i == 0 ? "checked=\"checked\"" : "";
-                s += "<input type=\"radio\" name=\"rule_pass_line\" "+sChecked+" onclick=\"setScoreLimit("+rule.PassLine[i]+")\"/>" + rule.PassLine[i];
+                s += "<input type=\"radio\" name=\"rule_pass_line\" " + sChecked + " onclick=\"setScoreLimit(" + rule.PassLine[i] + ")\"/>" + rule.PassLine[i];
             }
             s += "<br>分数基线<input type=\"number\" id=\"score_limit\" />";
             s += "<br>菜谱数<input type=\"number\" id=\"recipe_limit\" value=\"0\"/>";
             var e2 = document.getElementById("passline");
             e2.innerHTML = s;
-            if(rule.PassLine.length > 0)
+            if (rule.PassLine.length > 0)
                 setScoreLimit(rule.PassLine[0]);
         }
-        function load_rule()
-        {
+        function load_rule() {
             var e = document.getElementById("rule_address");
             var url = e.value;
-            do_ajax("cors.php?url="+encodeURIComponent(url), _load_rule);
+            do_ajax("cors.php?url=" + encodeURIComponent(url), _load_rule);
         }
-        function load_rule2()
-        {
+        function load_rule2() {
             do_ajax("get_bcjh_gitee_io.php", _load_rule);
         }
 
-        function _load_rule(text)
-        {
+        function _load_rule(text) {
             rule_config = JSON.parse(text);
             var s = "<select id=\"cb_rules\" onchange=\"changeRule()\">";
             for (let i = 0; i < rule_config.rules.length; i++) {
                 var rule = rule_config.rules[i];
-                s += "<option value =\""+rule.Id+"\">"+rule.Title+"</option>";
+                s += "<option value =\"" + rule.Id + "\">" + rule.Title + "</option>";
             }
             s += "</select>";
             var e = document.getElementById("rules");
             e.innerHTML = s;
             changeRule();
         }
-   
+
     </script>
 </head>
+
 <body>
-    <a href="bcjh_recipes.html">返回</a><br>
-    规则地址：<input type="text" id="rule_address" onchange="setCookie('rule_address', this.value, 14)"/><input type="button" value="加载" onclick="load_rule()"/>
-    <!--input type="button" value="直接加载" onclick="load_rule2()"/-->
-    <input type="button" value="直接加载" onclick='do_ajax("cors.php?url="+encodeURIComponent("https://bcjh.xyz/api/get_rule"), _load_rule)'/>
-    <input type="button" value="加载文本框" onclick='_load_rule(document.getElementById("json_text").value)'/><br>
-    <textarea id="json_text" rows="10" cols="80">
-    </textarea><br>
-    阈值：<input type="number" id="calc_limit" value="6"/>
-    <div id="rules"></div>
-    <div id="passline"></div>
-    <!--input type="button" value="整数计算" onclick="display_price(0)"/>
-    <input type="button" value="整数计算一次" onclick="display_price(1)"/-->
-    <input type="button" value="非整数计算" onclick="display_price(2)"/>
-    <!--input type="button" value="整数计算（Floor_FAST）" onclick="display_price(3)"/-->
-    <input type="button" value="整数计算（FAST）" onclick="display_price2()"/>
-    <br>
-    <div id="chefs"></div>
-    <div id="price"></div>
-    <div id="time"></div>
+    <div id="lp">
+        <a href="index.html">返回</a>
+        <login-panel login-ref="..\login.html" v-on:give-user="load_recipes"></login-panel>
+        <br>
+        规则地址：<input type="text" id="rule_address" onchange="setCookie('rule_address', this.value, 14)" /><input
+            type="button" value="加载" onclick="load_rule()" />
+        <!--input type="button" value="直接加载" onclick="load_rule2()"/-->
+        <input type="button" value="直接加载"
+            onclick='do_ajax("cors.php?url="+encodeURIComponent("https://bcjh.xyz/api/get_rule"), _load_rule)' />
+        <input type="button" value="加载文本框" onclick='_load_rule(document.getElementById("json_text").value)' /><br>
+        <textarea id="json_text" rows="10" cols="80"></textarea>
+        <br>
+        阈值：<input type="number" id="calc_limit" value="6" />
+        <div id="rules"></div>
+        <div id="passline"></div>
+        <!--input type="button" value="整数计算" onclick="display_price(0)"/>
+        <input type="button" value="整数计算一次" onclick="display_price(1)"/-->
+        <input type="button" value="非整数计算" v-on:click="calc_fast()" />
+        <!--input type="button" value="整数计算（Floor_FAST）" onclick="display_price(3)"/-->
+        <input type="button" value="整数计算（FAST）" v-on:click="calc()" />
+        <br>
+        <div id="chefs">
+            <div v-for="rarity in rarity_list">
+                <input type="checkbox" v-bind:id="'ck_all_'+rarity" v-bind:value="rarity" v-model="selected_raritys">
+                <label v-bind:for="'ck_all_'+rarity">全选</label>
+                <span v-for="chef in chefs">
+                    <span v-if="chef.rarity == rarity">
+                        <input type="checkbox" v-bind:id="'ck_'+chef.id" v-bind:value="chef" v-model="selected_chefs">
+                        <label v-bind:for="'ck_'+chef.id">{{chef.name}}</label>
+                    </span>
+                </span>
+            </div>
+            <div id="price"></div>
+            <div id="time"></div>
+        </div>
+    </div>
     <script type="text/javascript">
         //display_price();
         var e = document.getElementById("rule_address");
         e.value = getCookie("rule_address");
-        init();
+        //init();
+        var app = new Vue(
+            {
+                el: '#lp',
+                data: {
+                    chefs: null,
+                    recipes: null,
+                    rarity_list: [5, 4, 3, 2, 1],
+                    selected_chefs: [],
+                    selected_raritys: [],
+                },
+                created: function () {
+                },
+                watch: {
+                    selected_raritys: {
+                        handler(newValue, oldValue) {
+                            this.selected_chefs = [];
+                            for (let i = 0; i < newValue.length; i++) {
+                                var rarity = newValue[i];
+                                for (let j = 0; j < this.chefs.length; j++) {
+                                    const chef = this.chefs[j];
+                                    if (chef.rarity == rarity)
+                                        this.selected_chefs.push(chef);
+                                }
+                            }
+                        },
+                        deep: true
+                    }
+                },
+                methods: {
+                    load_recipes: function (user_id) {
+                        this.user_id = user_id;
+                        var that = this;
+                        do_ajax("../db/get_records.php?table_name=bcjh_recipes&user_id=" + user_id, function (text) {
+                            var my_recipes = JSON.parse(text);
+                            do_ajax("../db/get_records.php?table_name=bcjh_chefs&user_id=" + user_id, function (text) {
+                                // 菜谱
+                                init_skills(g_bcjh_data.skills);
+                                var my_chefs = JSON.parse(text);
+                                init_chefs(my_chefs);
+                                //var materials = g_bcjh_data.materials;
+                                var new_recipes = build_recipes(g_bcjh_data.recipes, my_recipes, my_chefs);
+                                ///////////////////
+                                that.chefs = my_chefs;
+                                that.recipes = new_recipes;
+                            });
+                        });
+                    },
+                    calc_fast: function () {
+                        //filter_chefs = filter_chef(my_chefs);
+                        var filter_chefs = this.selected_chefs;
+
+                        var cb = document.getElementById("cb_rules");
+                        var rule = rule_config.rules[cb.selectedIndex];
+                        var sl = document.getElementById("score_limit");
+                        var limit = sl.value;
+                        var recipe_limit = document.getElementById("recipe_limit").value;
+
+                        final_result = [];
+                        final_objective_value = new Object();
+                        g_debug_simplex_cnt = 0;
+
+                        var dateBegin = new Date();
+                        var best_recipe_map = new Map();
+                        var new_recipes = this.recipes;
+                        for (let k = 0; k < new_recipes.length; k++) {
+                            const recipe = new_recipes[k];
+                            var rule_effect = rule.RecipeEffect[recipe.recipeId];
+                            if (rule_effect == null)
+                                continue;//rule_effect = 0;
+                            var best = get_best_chefs(recipe, filter_chefs, rule_effect * 100, rule.ChefTagEffect);
+                            if (best[1].length == 0)
+                                continue;
+                            best_recipe_map.set(recipe.recipeId, best);
+                        }
+
+                        if (recipe_limit > 0) {
+                            var list = [];
+                            best_recipe_map.forEach(function (item, key) { list.push([key, item]); });
+                            list.sort(function (a, b) {
+                                if (a[1][0] < b[1][0])
+                                    return 1;
+                                else if (a[1][0] > b[1][0])
+                                    return -1;
+                                else
+                                    return 0;
+                            }
+                            );
+                            best_recipe_map.clear();
+                            for (let i = 0; i < list.length && i < recipe_limit; i++) {
+                                best_recipe_map.set(list[i][0], list[i][1]);
+                            }
+                        }
+
+                        //var materail_map = get_material_map();
+
+                        var objective_function = new Object();
+                        var constraint_list = [];
+                        build_constraint(objective_function, constraint_list, new_recipes, filter_chefs, best_recipe_map, rule.MaterialsLimit, rule.DisableMultiCookbook);
+
+                        var result = [];
+                        var objective_value = new Object();
+                        //var r = solve_fast(objective_function, constraint_list, result, objective_value);
+                        g_solve_only_once = false;
+                        g_log_objective_value = true;
+                        g_objective_value = limit;
+                        var r = solve(objective_function, constraint_list, result, objective_value);
+                        if (r == 1) {
+                            if (!("value" in final_objective_value) || (objective_value.value > final_objective_value.value)) {
+                                final_objective_value.value = objective_value.value;
+                                final_result = result;
+                                //final_comb = comb;
+                            }
+                        }
+                        var dateEnd = new Date();
+                        var dateDiff = dateEnd.getTime() - dateBegin.getTime();
+                        var e = document.getElementById("time");
+                        e.innerHTML = "time(ms):" + dateDiff;
+
+                        display_result(new_recipes, filter_chefs, best_recipe_map, rule.MaterialsLimit);
+                    },
+                    calc: function () {
+                        var filter_chefs = this.selected_chefs;
+                        var new_recipes = this.recipes;
+
+                        var cb = document.getElementById("cb_rules");
+                        var rule = rule_config.rules[cb.selectedIndex];
+                        var sl = document.getElementById("score_limit");
+                        var limit = sl.value;
+                        var recipe_limit = document.getElementById("recipe_limit").value;
+                        var calc_limit = document.getElementById("calc_limit").value;
+
+                        final_result = [];
+                        final_objective_value = new Object();
+                        g_debug_simplex_cnt = 0;
+
+                        var dateBegin = new Date();
+
+                        var comb_list = combination(filter_chefs.length, 3);
+                        for (let t = 0; t < comb_list.length; t++) {
+
+                            const comb = comb_list[t];
+
+                            var select_chefs = [filter_chefs[comb[0]], filter_chefs[comb[1]], filter_chefs[comb[2]]];
+                            var best_recipe_map = new Map();
+                            for (let k = 0; k < new_recipes.length; k++) {
+                                const recipe = new_recipes[k];
+                                var rule_effect = rule.RecipeEffect[recipe.recipeId];
+                                if (rule_effect == null)
+                                    continue;//rule_effect = 0;
+                                var best = get_best_chefs(recipe, select_chefs, rule_effect * 100, rule.ChefTagEffect);
+                                if (best[1].length == 0)
+                                    continue;
+                                best_recipe_map.set(recipe.recipeId, best);
+                            }
+
+                            if (recipe_limit > 0) {
+                                var list = [];
+                                best_recipe_map.forEach(function (item, key) { list.push([key, item]); });
+                                list.sort(function (a, b) {
+                                    if (a[1][0] < b[1][0])
+                                        return 1;
+                                    else if (a[1][0] > b[1][0])
+                                        return -1;
+                                    else
+                                        return 0;
+                                }
+                                );
+                                best_recipe_map.clear();
+                                for (let i = 0; i < list.length && i < recipe_limit; i++) {
+                                    best_recipe_map.set(list[i][0], list[i][1]);
+                                }
+                            }
+
+                            var objective_function = new Object();
+                            var constraint_list = [];
+                            //build_constraint(objective_function, constraint_list, new_recipes, filter_chefs, comb, time_limit);
+                            build_constraint(objective_function, constraint_list, new_recipes, select_chefs, best_recipe_map, rule.MaterialsLimit, rule.DisableMultiCookbook);
+
+                            var result = [];
+                            var objective_value = new Object();
+                            g_log_objective_value = false;
+                            var r = solve(objective_function, constraint_list, result, objective_value);
+                            if (r != 1)
+                                continue;
+
+                            var list = [];
+                            for (let i = 0; i < result.length; i++) {
+                                const pair = result[i];
+                                var cnt = Math.floor(pair[1]);
+                                //var cnt = pair[1];
+                                if (cnt == 0)
+                                    continue;
+                                if (pair[0].charAt(0) != "X")
+                                    continue;
+                                var arr = pair[0].split("_");
+                                var id = parseInt(arr[1]);
+                                var recipe = get_recipe_by_id(new_recipes, id);
+                                var best = best_recipe_map.get(id);
+                                var price = best[0];
+                                list.push([recipe, price, cnt, best[1][0]]);
+                            }
+                            list.sort(sort_result3);
+                            var map = new Map();
+                            var index = 0;
+                            for (let i = 0; i < list.length; i++) {
+                                const r = list[i];
+                                var arr = null;
+                                if (map.has(r[3])) {
+                                    arr = map.get(r[3]);
+                                }
+                                else {
+                                    if (map.size >= 3)
+                                        continue;
+                                    arr = [];
+                                    map.set(r[3], arr);
+                                }
+                                if (arr.length >= 3)
+                                    continue;
+                                arr.push(r);
+                                index = i;
+                            }
+                            var recipe_price_list = [[], [], []];
+                            for (let i = 0; i <= index; i++) {
+                                const r = list[i];
+                                var recipe = r[0];
+                                var rule_effect = rule.RecipeEffect[recipe.recipeId];
+                                if (rule_effect == null)
+                                    continue;//rule_effect = 0;
+                                for (let j = 0; j < select_chefs.length; j++) {
+                                    const chef = select_chefs[j];
+                                    var temp = rule_effect;
+                                    if (rule.ChefTagEffect) {
+                                        for (let i = 0; i < chef.tags.length; i++) {
+                                            const tag = chef.tags[i];
+                                            temp += rule.ChefTagEffect[tag];
+                                        }
+                                    }
+                                    var price = calc_price(recipe, chef, this.chefs, rule_effect * 100);
+                                    if (price == 0)
+                                        continue;
+                                    recipe_price_list[j].push([recipe, price]);
+                                }
+                            }
+                            var clist1 = combination(Math.min(recipe_price_list[0].length, calc_limit), 3);
+                            for (let i = 0; i < clist1.length; i++) {
+                                const arr_index1 = clist1[i];
+                                var arr_id = [recipe_price_list[0][arr_index1[0]][0].recipeId, recipe_price_list[0][arr_index1[1]][0].recipeId, recipe_price_list[0][arr_index1[2]][0].recipeId];
+                                var arr = [recipe_price_list[0][arr_index1[0]], recipe_price_list[0][arr_index1[1]], recipe_price_list[0][arr_index1[2]]];
+                                var left_list = [];
+                                for (let j = 0; j < recipe_price_list[1].length; j++) {
+                                    if (arr_id.indexOf(recipe_price_list[1][j][0].recipeId) == -1)
+                                        left_list.push(recipe_price_list[1][j]);
+                                }
+                                if (left_list.length < 3)
+                                    continue;
+                                var clist2 = combination(Math.min(left_list.length, calc_limit), 3);
+                                for (let k = 0; k < clist2.length; k++) {
+                                    const arr_index2 = clist2[k];
+                                    var arr_id2 = [left_list[arr_index2[0]][0].recipeId, left_list[arr_index2[1]][0].recipeId, left_list[arr_index2[2]][0].recipeId];
+                                    var arr2 = [left_list[arr_index2[0]], left_list[arr_index2[1]], left_list[arr_index2[2]]];
+                                    var left_list2 = [];
+                                    for (let j = 0; j < recipe_price_list[2].length; j++) {
+                                        if (arr_id2.indexOf(recipe_price_list[2][j][0].recipeId) == -1 &&
+                                            arr_id.indexOf(recipe_price_list[2][j][0].recipeId) == -1)
+                                            left_list2.push(recipe_price_list[2][j]);
+                                    }
+                                    if (left_list2.length < 3)
+                                        continue;
+                                    var clist3 = combination(Math.min(left_list2.length, calc_limit), 3);
+                                    for (let m = 0; m < clist3.length; m++) {
+                                        const arr_index3 = clist3[m];
+                                        var arr3 = [left_list2[arr_index3[0]], left_list2[arr_index3[1]], left_list2[arr_index3[2]]];
+                                        var objective_function = new Object();
+                                        var constraint_list = [];
+                                        build_constraint2(objective_function, constraint_list, select_chefs, [arr, arr2, arr3], rule);
+                                        var result = [];
+                                        var objective_value = new Object();
+                                        g_log_objective_value = false;
+                                        var r = solve_int(objective_function, constraint_list, result, objective_value);
+                                        if (r == 1) {
+                                            if (!("value" in final_objective_value) || (objective_value.value > final_objective_value.value)) {
+                                                final_objective_value.value = objective_value.value;
+                                                final_result = result;
+                                                final_comb = select_chefs;
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+
+                        var dateEnd = new Date();
+                        var dateDiff = dateEnd.getTime() - dateBegin.getTime();
+                        var e = document.getElementById("time");
+                        e.innerHTML = "time(ms):" + dateDiff;
+
+                        display_result3(new_recipes, filter_chefs, this.chefs, rule);
+                    },
+
+                }
+            }
+        );
+
     </script>
-    
+
 </body>
 
 </html>

@@ -26292,7 +26292,7 @@ var g_bcjh_data = {
 		"creation": 0,
 		"ultimateGoal": [3041, 3010, 3062],
 		"ultimateSkill": 131,
-		"origin": "两周年邮件",
+		"origin": "两周年邮件<br>三周年邮件",
 		"tags": [1],
 		"sweet": 0,
 		"sour": 0,
@@ -28223,6 +28223,32 @@ var g_bcjh_data = {
 		"salty": 0,
 		"bitter": 0,
 		"tasty": 56
+	}, {
+		"chefId": 978,
+		"galleryId": "978",
+		"name": "秋霞",
+		"rarity": 4,
+		"stirfry": 173,
+		"bake": 57,
+		"boil": 347,
+		"steam": 0,
+		"fry": 0,
+		"knife": 231,
+		"skill": 69,
+		"meat": 0,
+		"fish": 6,
+		"veg": 5,
+		"creation": 0,
+		"ultimateGoal": [3041, 3010, 3080],
+		"ultimateSkill": 653,
+		"origin": "限时礼包",
+		"tags": [2],
+		"sweet": 0,
+		"sour": 0,
+		"spicy": 0,
+		"salty": 134,
+		"bitter": 0,
+		"tasty": 0
 	}, {
 		"chefId": 981,
 		"galleryId": "981",
@@ -55161,6 +55187,15 @@ var g_bcjh_data = {
 			"value": 80,
 			"condition": "Self",
 			"cal": "Abs"
+		}]
+	}, {
+		"skillId": 653,
+		"desc": "探索时有一定几率额外获得60%素材",
+		"effect": [{
+			"type": "Material_Gain",
+			"value": 60,
+			"condition": "Self",
+			"cal": "Percent"
 		}]
 	}, {
 		"skillId": 654,

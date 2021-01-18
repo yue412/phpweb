@@ -293,6 +293,17 @@ function get_equip(id) {
     return null;
 }
 
+function get_equip_by_name(name) {
+    var equips = g_bcjh_data.equips;
+    for (let i = 0; i < equips.length; i++) {
+        const equip = equips[i];
+        if (equip.name == name) {
+            return equip;
+        }
+    }
+    return null;
+}
+
 function get_equip_name(id) {
     var equip = get_equip(id);
     if (equip != null)
@@ -333,7 +344,15 @@ function init_chefs(chefs) {
         }
         chef.ultimate_skill_conditions = [];
         chef.ultimate_skill_name = function () {
-            return this.ultimate_skill == null ? this.ultimate_skill_conditions.join("\n") : this.ultimate_skill.desc;
+            if (this.ultimate_skill != null)
+                return this.ultimate_skill.desc;
+            else {
+                if (this.ultimate_skill_conditions.length >= 3)
+                    return this.ultimate_skill_conditions.join("\n");
+                else if (this.ultimate_skill_conditions2 && this.ultimate_skill_conditions2.length >= 3)
+                    return this.ultimate_skill_conditions2.join("\n");
+            }
+            return "";
         }
         chef.equip_name = function () {
             return this.equip == null ? "" : this.equip.name;
@@ -484,7 +503,8 @@ function build_recipes(recipes, my_recipes, my_chefs) {
             recipes[i].recipe_chefs = display_recipe_chefs(recipe_chefs, recipes[i].rate);
             recipes[i].recipe_chefs_arr = recipe_chefs;
             recipes[i].get_recipe_chefs_name = function (index) {
-                return get_chef_names(this.recipe_chefs_arr[index]);
+                var chefs = index <= this.rate || this.recipe_chefs_arr2 == null || this.recipe_chefs_arr[index].length > 0 ? this.recipe_chefs_arr[index] : this.recipe_chefs_arr2[index];
+                return get_chef_names(chefs);
             }
             recipes[i].first_guests = display_first_guests(recipe_chefs, recipes[i]);
             recipes[i].guests_like = display_guests_like(g_bcjh_data.guests, recipes[i]);

@@ -6,26 +6,10 @@
     <title>
         爆炒江湖
     </title>
-    <style type="text/css">
-        div.no {
-            font-size: 120%;
-            display: inline
-        }
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    <link rel="stylesheet" href="bcjh.css" />
+    <script type="text/javascript" src="vue_components.js"></script>
 
-        div.yes {
-            font-size: 80%;
-            display: inline
-        }
-
-        div.content {
-            color: #FF0000;
-            display: inline
-        }
-
-        div.level {
-            display: inline
-        }
-    </style>
     <script type="text/javascript" src="../common.js">
     </script>
     <script type="text/javascript" src="bcjh_data.js">
@@ -34,28 +18,7 @@
     </script>
     <script type="text/javascript" src="bcjh_skill.js">
     </script>
-    <script type="text/javascript" src="LP.js">
-    </script>
     <script type="text/javascript">
-        var my_maps = [
-            {"name":"牧场","type":"meat","value":25}, //25 19 13 6 1
-            {"name":"鸡舍","type":"meat","value":18}, //24 18 14 8 4 1
-            {"name":"猪圈","type":"meat","value":18}, //18 12 7 5 1
-            {"name":"菜棚","type":"veg","value":20}, // 25 20 15 8 4 1
-            {"name":"菜地","type":"veg","value":22}, // 30 22 16 8 5 1
-            {"name":"森林","type":"veg","value":17}, // 32 27 17 12 6 2
-            {"name":"作坊","type":"creation","value":26}, // 26 21 16 11 5 1
-            {"name":"池塘","type":"fish","value":24} // 29 24 19 14 9 5
-        ];
-        function get_chef_by_id(chefs, id)
-        {
-            for (let i = 0; i < chefs.length; i++) {
-                const chef = chefs[i];
-                if(chef.id == id)
-                    return chef;
-            }
-            return null;
-        }
         function display_price()
         {
             do_ajax("get_db_data.php?name=bcjh_recipes&order_field=id", function(text){
@@ -80,13 +43,36 @@
     </script>
 </head>
 <body>
-    <a href="index.html">返回</a><br>
-    <div id="price"></div>
+    <div id="chefs">
+        <login-panel login-ref="..\login.html" v-on:give-user="load_chefs"></login-panel>
+        <div>{{JSON.stringify(chefs)}}</div>
+    </div>
     <script type="text/javascript">
-//        init_maps();
-        display_price();
+        var app = new Vue(
+            {
+                el: '#chefs',
+                data: {
+                    chefs: [],
+                },
+                created: function () {
+                },
+                methods: {
+                    load_chefs: function (user_id) {
+                        this.user_id = user_id;
+                        var that = this;
+                        do_ajax("../db/get_records.php?table_name=bcjh_chefs&user_id=" + user_id, function (text) {
+                            var my_chefs = JSON.parse(text);
+                            init_skills(g_bcjh_data.skills);
+                            init_chefs(my_chefs);
+                            that.chefs = my_chefs;
+                        });
+                    },
+
+                }
+            }
+        );
+
     </script>
-    
 </body>
 
 </html>

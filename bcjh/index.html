@@ -7,6 +7,7 @@
     <title>爆炒江湖</title>
     <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
     <link rel="stylesheet" href="bcjh.css" />
+    <script type="text/javascript" src="vue_components.js"></script>
     <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
     <script src="../layer/layer.js"></script>
     <script type="text/javascript" src="../common.js">
@@ -18,8 +19,6 @@
     <script type="text/javascript" src="bcjh_skill.js">
     </script>
     <script type="text/javascript" src="../TableSorterV3.js">
-    </script>
-    <script type="text/javascript" src="vue_components.js">
     </script>
 </head>
 
@@ -61,7 +60,13 @@
                     <input type="checkbox" v-bind:id="'mastery'+index" v-bind:value="index" v-model="mastery_filter">
                     <label v-bind:for="'mastery'+index">{{item}}</label>
                 </span>
+                <span>采集地: </span>
+                <span v-for="(item, index) in material_source">
+                    <input type="checkbox" v-bind:id="'source'+index" v-bind:value="item" v-model="source_filter">
+                    <label v-bind:for="'source'+index">{{item}}</label>
+                </span>
             </div>
+            <input type="text" placeholder="装备" v-model="selected_equip" />
         </div>
         <div>菜谱数量:{{recipes.length}}</div>
         <table id="tb2">
@@ -93,15 +98,15 @@
                         <option v-for="(item, index) in rate_names" v-bind:value="index">{{item}}</option>
                     </select></td>
                 <td v-bind:class="{'no-show': !recipes_schema[19].show}">{{recipe.unclock_name()}}</td>
-                <td v-bind:class="{'no-show': !recipes_schema[20].show, 'chef-emphasize': recipe.rate<1}"
+                <td v-bind:class="{'no-show': !recipes_schema[20].show, 'chef-emphasize': recipe.rate<1, 'emphasize-font': recipe.rate<1 && (recipe.recipe_chefs_arr2 != null && recipe.recipe_chefs_arr[1].length == 0)}"
                     style="width: 10%;">{{recipe.get_recipe_chefs_name(1)}}</td>
-                <td v-bind:class="{'no-show': !recipes_schema[21].show, 'chef-emphasize': recipe.rate<2}"
+                <td v-bind:class="{'no-show': !recipes_schema[21].show, 'chef-emphasize': recipe.rate<2, 'emphasize-font': recipe.rate<2 && (recipe.recipe_chefs_arr2 != null && recipe.recipe_chefs_arr[2].length == 0)}"
                     style="width: 10%;">{{recipe.get_recipe_chefs_name(2)}}</td>
-                <td v-bind:class="{'no-show': !recipes_schema[22].show, 'chef-emphasize': recipe.rate<3}"
+                <td v-bind:class="{'no-show': !recipes_schema[22].show, 'chef-emphasize': recipe.rate<3, 'emphasize-font': recipe.rate<3 && (recipe.recipe_chefs_arr2 != null && recipe.recipe_chefs_arr[3].length == 0)}"
                     style="width: 10%;">{{recipe.get_recipe_chefs_name(3)}}</td>
-                <td v-bind:class="{'no-show': !recipes_schema[23].show, 'chef-emphasize': recipe.rate<4}"
+                <td v-bind:class="{'no-show': !recipes_schema[23].show, 'chef-emphasize': recipe.rate<4, 'emphasize-font': recipe.rate<4 && (recipe.recipe_chefs_arr2 != null && recipe.recipe_chefs_arr[4].length == 0)}"
                     style="width: 10%;">{{recipe.get_recipe_chefs_name(4)}}</td>
-                <td v-bind:class="{'no-show': !recipes_schema[24].show, 'chef-emphasize': recipe.rate<5}"
+                <td v-bind:class="{'no-show': !recipes_schema[24].show, 'chef-emphasize': recipe.rate<5, 'emphasize-font': recipe.rate<5 && (recipe.recipe_chefs_arr2 != null && recipe.recipe_chefs_arr[5].length == 0)}"
                     style="width: 10%;">{{recipe.get_recipe_chefs_name(5)}}</td>
                 <td v-bind:class="{'no-show': !recipes_schema[25].show}">{{recipe.first_guests}}</td>
                 <td v-bind:class="{'no-show': !recipes_schema[26].show}">{{recipe.guests_like}}</td>
@@ -151,6 +156,7 @@
                     cook_names: g_cook_type_names,
                     mastery_names: ["不熟练", "熟练"],
                     rarity_list: [1, 2, 3, 4, 5],
+                    material_source: ['池塘', '作坊', '牧场', '鸡舍', '猪圈', '菜棚', '菜地', '森林'],
                     sorter: null,
                     text_filter: "",
                     text_filter2: "",
@@ -158,6 +164,9 @@
                     cook_filter: [],
                     rarity_filter: [],
                     mastery_filter: [],
+                    source_filter: [],
+                    equips: g_bcjh_data.equips,
+                    selected_equip: "",
                 },
                 created: function () {
                     this.init_cols();
@@ -180,6 +189,30 @@
                     },
                     cook_filter: function (val) {
                         this.filter();
+                    },
+                    source_filter: function (val) {
+                        this.filter();
+                    },
+                    selected_equip: function (val) {
+                        var equip = get_equip_by_name(val);
+                        if (equip == null) {
+                            for (let i = 0; i < this.recipes.length; i++) {
+                                const recipe = this.recipes[i];
+                                recipe.recipe_chefs_arr2 = null;
+                            }
+                            return;
+                        }
+                        var new_chefs = JSON.parse(JSON.stringify(this.chefs));
+                        for (let i = 0; i < new_chefs.length; i++) {
+                            const chef = new_chefs[i];
+                            chef.equip_id = equip.equipId;
+                        }
+                        init_chefs(new_chefs);
+                        for (let i = 0; i < this.recipes.length; i++) {
+                            const recipe = this.recipes[i];
+                            var recipe_chefs = get_recipe_chefs(recipe, new_chefs);
+                            recipe.recipe_chefs_arr2 = recipe_chefs;
+                        }
                     },
                     recipes: {
                         handler(newValue, oldValue) {
@@ -266,6 +299,7 @@
                         new_recipes = this.filter_by_set(new_recipes, this.rate_filter, "rate");
                         new_recipes = this.filter_by_set(new_recipes, this.mastery_filter, "is_mastery");
                         new_recipes = this.filter_by_text_set(new_recipes, this.cook_filter, "cook_name");
+                        new_recipes = this.filter_by_source(new_recipes, this.source_filter);
                         return new_recipes;
                     },
                     filter_by_text: function (recipes, text, fields) {
@@ -292,6 +326,25 @@
                             const recipe = recipes[i];
                             if (set.indexOf(Number(recipe[field])) >= 0)
                                 new_recipes.push(recipe);
+                        }
+                        return new_recipes;
+                    },
+                    filter_by_source: function (recipes, set) {
+                        if (set.length == 0)
+                            return recipes;
+                        var new_recipes = [];
+                        for (let i = 0; i < recipes.length; i++) {
+                            const recipe = recipes[i];
+                            for (let j = 0; j < recipe.materials.length; j++) {
+                                const item = recipe.materials[j];
+                                var material = material_by_id(item.material);
+                                if (material) {
+                                    if (set.indexOf(material.origin) >= 0) {
+                                        new_recipes.push(recipe);
+                                        break;
+                                    }
+                                }
+                            }
                         }
                         return new_recipes;
                     },

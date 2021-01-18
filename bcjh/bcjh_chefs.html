@@ -30,6 +30,9 @@
         <a v-on:click="add_chef()" href="#">添加厨师</a>
         <a href="index.html">返回</a>
         <login-panel login-ref="..\login.html" v-on:give-user="load_chefs"></login-panel>
+        <div>
+            <input type="text" placeholder="装备" v-model="selected_equip" />
+        </div>
         <div>数量: {{chefs.length}}</div>
         <table id="tb2">
             <tr>
@@ -68,7 +71,8 @@
                 <td>{{chef.veg}}</td>
                 <td>{{chef.meat}}</td>
                 <td>{{chef.skill_name()}}</td>
-                <td style="white-space: pre-wrap;" v-bind:class="{'chef-emphasize':chef.ultimate_skill_conditions.length>=3}">{{chef.ultimate_skill_name()}}</td>
+                <td style="white-space: pre-wrap;"
+                    v-bind:class="{'chef-emphasize':(chef.ultimate_skill == null) && (chef.ultimate_skill_conditions.length>=3), 'emphasize-font':(chef.ultimate_skill == null) && (chef.ultimate_skill_conditions.length<3) && (chef.ultimate_skill_conditions2 != null) && chef.ultimate_skill_conditions2.length>=3}">{{chef.ultimate_skill_name()}}</td>
                 <td>{{chef.equip_name()}}</td>
                 <td>
                     <a v-on:click="edit_chef(chef)" class="link">修改</a>
@@ -84,9 +88,34 @@
                 el: '#bcjh',
                 data: {
                     chefs: [],
+                    recipes: null,
                     sorter: null,
+                    selected_equip: "",
                 },
                 created: function () {
+                },
+                watch: {
+                    selected_equip: function (val) {
+                        var equip = get_equip_by_name(val);
+                        if (equip == null) {
+                            for (let i = 0; i < this.chefs.length; i++) {
+                                const chef = this.chefs[i];
+                                chef.ultimate_skill_conditions2 = null;
+                            }
+                            return;
+                        }
+                        var new_chefs = JSON.parse(JSON.stringify(this.chefs));
+                        for (let i = 0; i < new_chefs.length; i++) {
+                            const chef = new_chefs[i];
+                            chef.equip_id = equip.equipId;
+                        }
+                        init_chefs(new_chefs);
+                        for (let i = 0; i < this.chefs.length; i++) {
+                            const chef = this.chefs[i];
+                            var list = this.get_ultimate_skill_conditions(new_chefs[i], this.recipes);
+                            chef.ultimate_skill_conditions2 = list;
+                        }
+                    },
                 },
                 methods: {
                     load_chefs: function (user_id) {
@@ -100,6 +129,7 @@
                                 var my_recipes = JSON.parse(text);
                                 var new_recipes = build_recipes(g_bcjh_data.recipes, my_recipes, my_chefs);
                                 that.chefs = my_chefs;
+                                that.recipes = new_recipes;
                                 that.init_ultimate_skill_conditions(new_recipes);
                                 that.$nextTick(function () {
                                     that.sorter = new TableSorter("tb2");
@@ -107,33 +137,34 @@
                             });
                         });
                     },
-                    init_ultimate_skill_conditions: function(new_recipes){
-                        for (let i = 0; i < this.chefs.length; i++) {
-                            const chef = this.chefs[i];
-                            var cook = this.get_chef_max_cook(chef);
-                            var list = [];
-                            for (let j = 0; j < new_recipes.length; j++) {
-                                const recipe = new_recipes[j];
-                                if(recipe.rarity == chef.rarity && recipe[cook] > 0)
-                                {
-                                    var rate = calc_rate(recipe, chef);
-                                    if(rate >= 4)
-                                    {
-                                        list.push(recipe.name);
-                                        if(list.length>=3)
-                                            break;
-                                    }
+                    get_ultimate_skill_conditions: function (chef, new_recipes) {
+                        var cook = this.get_chef_max_cook(chef);
+                        var list = [];
+                        for (let j = 0; j < new_recipes.length; j++) {
+                            const recipe = new_recipes[j];
+                            if (recipe.rarity == chef.rarity && recipe[cook] > 0) {
+                                var rate = calc_rate(recipe, chef);
+                                if (rate >= 4) {
+                                    list.push(recipe.name);
+                                    if (list.length >= 3)
+                                        break;
                                 }
                             }
+                        }
+                        return list;
+                    },
+                    init_ultimate_skill_conditions: function (new_recipes) {
+                        for (let i = 0; i < this.chefs.length; i++) {
+                            const chef = this.chefs[i];
+                            var list = this.get_ultimate_skill_conditions(chef, new_recipes);
                             chef.ultimate_skill_conditions = list;
                         }
                     },
-                    get_chef_max_cook: function(chef) {
+                    get_chef_max_cook: function (chef) {
                         var cook = g_cook_types[0];
                         for (let i = 1; i < g_cook_types.length; i++) {
                             const cook_type = g_cook_types[i];
-                            if(chef[cook_type] > chef[cook])
-                            {
+                            if (chef[cook_type] > chef[cook]) {
                                 cook = cook_type;
                             }
                         }

@@ -2,30 +2,13 @@
 
 <head>
     <meta http-equiv="content-type" content="text/html;charset=utf-8">
-    <meta name="viewport" content="width=device-width,initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <meta name="viewport"
+        content="width=device-width,initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no" />
     <title>
         爆炒江湖
     </title>
-    <style type="text/css">
-        div.no {
-            font-size: 120%;
-            display: inline
-        }
-
-        div.yes {
-            font-size: 80%;
-            display: inline
-        }
-
-        div.content {
-            color: #FF0000;
-            display: inline
-        }
-
-        div.level {
-            display: inline
-        }
-    </style>
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    <link rel="stylesheet" href="bcjh.css" />
     <script type="text/javascript" src="../common.js">
     </script>
     <script type="text/javascript" src="bcjh_data.js">
@@ -37,19 +20,20 @@
     <script type="text/javascript" src="LP.js">
     </script>
     <script type="text/javascript" src="../TableSorterV3.js">
-    </script>    
+    </script>
+    <script type="text/javascript" src="vue_components.js">
+    </script>
+
     <script type="text/javascript">
-        function get_recipe_by_id(recipes, id)
-        {
+        function get_recipe_by_id(recipes, id) {
             for (let i = 0; i < recipes.length; i++) {
                 const recipe = recipes[i];
-                if(recipe.recipeId == id)
+                if (recipe.recipeId == id)
                     return recipe;
             }
             return null;
         }
-        function sort_result(a,b)
-        {
+        function sort_result(a, b) {
             if (a[0] < (b[0] - g_epsilon))
                 return 1;
             else if (a[0] > (b[0] + g_epsilon))
@@ -57,10 +41,9 @@
             else
                 return 0;
         }
-        function sort_result2(a,b)
-        {
-            var t1 = a[1]*a[2].limit;
-            var t2 = b[1]*b[2].limit;
+        function sort_result2(a, b) {
+            var t1 = a[1] * a[2].limit;
+            var t2 = b[1] * b[2].limit;
             if (t1 < (t2 - g_epsilon))
                 return 1;
             else if (t1 > (t2 + g_epsilon))
@@ -68,186 +51,8 @@
             else
                 return 0;
         }
-        /*
-        function display_price()
-        {
-            do_ajax("get_db_data.php?name=bcjh_recipes&order_field=id", function(text){
-                var my_recipes = JSON.parse(text);
-                do_ajax("get_db_data.php?name=bcjh_chefs&order_field=id", function(text){
-                    init_skills(g_bcjh_data.skills);
-                    my_chefs = JSON.parse(text);
-                    init_chefs(my_chefs);
 
-                    var new_recipes = build_recipes(g_bcjh_data.recipes, my_recipes, my_chefs);
-
-                    var e2 = document.getElementById("time_limit");
-                    var time_limit = e2.value*3600;
-                    var comb_list = combination(my_chefs.length, 3);
-                    var final_objective_value = -1;
-                    var final_result = [];
-                    var dateBegin = new Date();
-                    for (let i = 0; i < comb_list.length; i++) {
-
-                        const comb = comb_list[i];
-
-                        var result = [];
-                        for (let k = 0; k < new_recipes.length; k++) {
-                            const recipe = new_recipes[k];
-                            for (let j = 0; j < comb.length; j++) {
-                                const index = comb[j];
-                                var chef = my_chefs[index];
-                                var price = calc_price(recipe, chef, my_chefs, 0);
-                                if(price > 0)
-                                {
-                                    result.push([price/recipe.time, price, recipe, chef]);
-                                }
-                            }
-                        }
-                        if(time_limit==0)
-                            result.sort(sort_result2);
-                        else
-                            result.sort(sort_result);
-                        var result2 = [];
-                        var total_value = 0;
-                        var map = new Map();
-                        var recipe_map = new Map();
-                        if(time_limit == 0)
-                        {
-                            for (let j = 0; j < result.length; j++) {
-                                const r = result[j];
-                                if (recipe_map.has(r[2].name)) 
-                                    continue;
-                                if (map.has(r[3].name))
-                                {
-                                    if(map.get(r[3].name) >= 3)
-                                        continue;
-                                }
-                                else
-                                {
-                                    map.set(r[3].name, 0);
-                                }
-                                map.set(r[3].name, map.get(r[3].name)+1);
-                                result2.push([r[1], r[2].limit, r[2], r[3]]);
-                                total_value += r[1]*r[2].limit;
-                                recipe_map.set(r[2].name, 1);
-                                if(result2.length >= 9)
-                                    break;
-                            }
-                        }
-                        else 
-                        {
-                            var left_time = time_limit;
-                            for (let j = 0; j < result.length; j++) {
-                                const r = result[j];
-                                if (recipe_map.has(r[2].name)) 
-                                    continue;
-                                if (map.has(r[3].name))
-                                {
-                                    if(map.get(r[3].name) >= 3)
-                                        continue;
-                                }
-                                else
-                                {
-                                    map.set(r[3].name, 0);
-                                }
-                                map.set(r[3].name, map.get(r[3].name)+1);
-                                var cnt = Math.min(Math.floor(left_time / r[2].time), r[2].limit);
-                                if(cnt == 0)
-                                    continue;
-                                result2.push([r[1], cnt, r[2], r[3]]);
-                                left_time -= cnt*r[2].time;
-                                total_value += r[1]*cnt;
-                                recipe_map.set(r[2].name, 1);
-                                if(result2.length >= 9 || left_time <= 0)
-                                    break;
-                            }
-                        }
-                        if(total_value > final_objective_value)
-                        {
-                            final_objective_value = total_value;
-                            final_result = result2;
-                        }                        
-                    }
-                    var dateEnd = new Date();
-                    var dateDiff = dateEnd.getTime() - dateBegin.getTime();
-                    var e = document.getElementById("time");
-                    e.innerHTML = "time(ms):" + dateDiff;
-                    //var r = solve(objective_function, constraint_list, result, objective_value);
-                    var e = document.getElementById("price");
-                    //var s = "复杂度:"+ g_debug_simplex_cnt + "<br>" + final_objective_value.value + "<br>";// + JSON.stringify(result) + "<br>";
-                    var s = "<table id=\"tb2\" border=\"1\">";
-                        s += "<tr>";
-                        s += "<td>";
-                        s += "名称";
-                        s += "</td>";
-                        s += "<td>";
-                        s += "菜谱";
-                        s += "</td>";
-                        s += "<td>";
-                        s += "解";
-                        s += "</td>";
-                        s += "<td>";
-                        s += "单价";
-                        s += "</td>";
-                        s += "<td>";
-                        s += "数量";
-                        s += "</td>";
-                        s += "<td>";
-                        s += "总价";
-                        s += "</td>";
-                        s += "<td>";
-                        s += "时间(秒)";
-                        s += "</td>";
-                        s += "<td>";
-                        s += "时间";
-                        s += "</td>";
-                        s += "</tr>";
-                    var total_time = 0;
-                    for (let i = 0; i < final_result.length; i++) {
-                        const r = final_result[i];
-                        var recipe = r[2];
-                        var chef = r[3];
-                        var price = r[0];
-                        var cnt = r[1];
-                        total_time += recipe.time*cnt;
-                        s += "<tr>";
-                        s += "<td>";
-                        s += chef.name;
-                        s += "</td>";
-                        s += "<td>";
-                        s += recipe.name;
-                        s += "</td>";
-                        s += "<td>";
-                        s += 1;
-                        s += "</td>";
-                        s += "<td>";
-                        s += price;
-                        s += "</td>";
-                        s += "<td>";
-                        s += cnt;
-                        s += "</td>";
-                        s += "<td>";
-                        s += price * cnt;
-                        s += "</td>";
-                        s += "<td>";
-                        s += recipe.time * cnt;
-                        s += "</td>";
-                        s += "<td>";
-                        s += display_time(recipe.time * cnt);
-                        s += "</td>";
-                        s += "</tr>";
-                    }
-                    s += "</table>";
-                    s += "合计:" + final_objective_value + " - " + display_time(total_time);// + JSON.stringify(result) + "<br>";
-                    e.innerHTML =  s;
-                    var x = new TableSorter("tb2");
-                });
-            });
-        }
-        */
-
-        function filter_recipes(recipes, chefs, comb)
-        {
+        function filter_recipes(recipes, chefs, comb) {
             var chef_recipe = [];
             for (let i = 0; i < comb.length; i++) {
                 chef_recipe.push(new Array());
@@ -258,16 +63,15 @@
                     const index = comb[j];
                     var chef = chefs[index];
                     var price = calc_price(recipe, chef, chefs, 0);
-                    if(price > 0)
-                    {
-                        chef_recipe[j].push([price/recipe.time, recipe]);
+                    if (price > 0) {
+                        chef_recipe[j].push([price / recipe.time, recipe]);
                     }
                 }
             }
             var set = new Set();
             for (let i = 0; i < chef_recipe.length; i++) {
                 var arr = chef_recipe[i];
-                arr.sort(function(a,b){
+                arr.sort(function (a, b) {
                     if (a[0] < (b[0] + g_epsilon))
                         return 1;
                     else if (a[0] > (b[0] - g_epsilon))
@@ -283,12 +87,11 @@
             return Array.from(set);
         }
 
-        function filter_chef(chefs)
-        {
+        function filter_chef(chefs) {
             var arr = [];
             for (let i = 0; i < chefs.length; i++) {
                 const chef = chefs[i];
-                var name = "ck_chef_"+chef.id;
+                var name = "ck_chef_" + chef.id;
                 var e = document.getElementById(name);
                 if (e && e.checked) {
                     arr.push(chef);
@@ -296,139 +99,23 @@
             }
             return arr;
         }
-
-        function getMinOrMax()
-        {
-            var e = document.getElementById("rb_min");
-            if(e.checked)
-                return 0;
-            e = document.getElementById("rb_max");
-            if(e.checked)
-                return 2;
-            return 1;
-        }
-
-        function get_material_map()
-        {
-            var nTag = getMinOrMax();
-            var material_map = new Map();
-            for (let i = 0; i < g_bcjh_data.maps.length; i++) {
-                const map = g_bcjh_data.maps[i];
-                var e = document.getElementById("ck_material_cnt_"+i);
-                var index = e.checked ? 4 : 3;
-                for (let j = 0; j < map.materials.length; j++) {
-                    const material = map.materials[j];
-                    var e2 = document.getElementById("material_"+i+"_"+j);
-                    var quantity = 0;
-                    if (nTag == 0) {
-                        quantity = material.quantity[index][0];
-                    }
-                    else if(nTag == 1){
-                        quantity = Math.round((material.quantity[index][0] + material.quantity[index][1])/2);
-                    }
-                    else {
-                        quantity = material.quantity[index][1];
-                    }
-                    if(index == 3)
-                        quantity *= 2;
-                    material_map.set(material.name, quantity);
-                    if (e2.checked) {
-                        break;
-                    }
+        /*
+                function getMinOrMax() {
+                    var e = document.getElementById("rb_min");
+                    if (e.checked)
+                        return 0;
+                    e = document.getElementById("rb_max");
+                    if (e.checked)
+                        return 2;
+                    return 1;
                 }
-            }
-            return material_map;
-        }
-
-        function build_constraint(objective_function, constraint_list, new_recipes, my_chefs, time_limit, best_recipe_map, material_map)
-        {
-            objective_function.is_max = true;
-            objective_function.items = [];                        
-            //var my_recipes_price = [];
-
-            var constraint_time = new Object(); // 时间限制
-            constraint_time.opr_type = -1;
-            constraint_time.value = time_limit;
-            constraint_time.items = [];
-
-            var e = document.getElementById("ck_milk");
-            // material
-            var material_constraint_map = new Map();
-            for (let j = 0; j < g_bcjh_data.materials.length; j++) {
-                const m = g_bcjh_data.materials[j];
-                var val = 0;
-                if (material_map.has(m.name) && (m.name != "牛乳" || !e.checked))
-                    val = material_map.get(m.name);
-                var constraint_material = new Object(); // 时间限制
-                constraint_material.opr_type = -1;
-                constraint_material.value = val;
-                constraint_material.items = [];                    
-                material_constraint_map.set(m.materialId, constraint_material);
-            }
-            var e2 = document.getElementById("price_add");
-            for (let k = 0; k < new_recipes.length; k++) {
-                const recipe = new_recipes[k];
-                if (!best_recipe_map.has(recipe.recipeId))
-                    continue;
-                var cnt = 90000;
-                for (let n = 0; n < recipe.materials.length; n++) {
-                    const m = recipe.materials[n];
-                    if(material_constraint_map.has(m.material))
-                    {
-                        var val = material_constraint_map.get(m.material).value;
-                        cnt = Math.min(Math.floor(val / m.quantity / recipe.limit), cnt);
-                    }
-                    else
-                    {
-                        cnt = 0;
-                        break;
-                    }
-                }
-                if(cnt == 0)
-                    continue;
-                var best = best_recipe_map.get(recipe.recipeId);
-                //get_best_chefs(recipe, my_chefs, e2.value);
-                //e4.innerHTML = best[0]*recipe.limit;
-                //e5.innerHTML = Math.ceil(best[0]/recipe.time*3600);
-                var price = best[0];
-                var var_name = "X_"+recipe.recipeId; // 份数
-
-                var constraint_cnt = new Object(); // 时间限制
-                constraint_cnt.opr_type = -1;
-                constraint_cnt.value = cnt;
-                constraint_cnt.items = [[1, var_name]];
-                constraint_list.push(constraint_cnt);
-                
-
-                objective_function.items.push([price*recipe.limit, var_name]);
-                constraint_time.items.push([recipe.time*recipe.limit, var_name]);
-                for (let n = 0; n < recipe.materials.length; n++) {
-                    const m = recipe.materials[n];
-                    if(material_constraint_map.has(m.material))
-                    {
-                        material_constraint_map.get(m.material).items.push([m.quantity*recipe.limit, var_name]);
-                    }
-                }
-            }
-            if(time_limit> g_epsilon)
-            {
-                constraint_list.push(constraint_time);
-            }
-            material_constraint_map.forEach(constraint => {
-                if(constraint.items.length > 0)
-                    constraint_list.push(constraint);
-            });            
-        }
+        */
 
         var final_result = [];
         var final_objective_value = null;
         var final_comb = null;
-        var filter_chefs = null;
-        var my_chefs = null;
-        var new_recipes = null;
 
-        function display_item(recipe, chefs_names, price, cnt)
-        {
+        function display_item(recipe, chefs_names, price, cnt) {
             var s = "";
             for (let i = 0; i < cnt; i++) {
                 s += "<tr>";
@@ -443,10 +130,10 @@
                 s += "</td>";
                 s += "<td>";
                 s += recipe.materials_name,
-                s += "</td>";
+                    s += "</td>";
                 s += "<td>";
                 s += recipe.cook_name,
-                s += "</td>";
+                    s += "</td>";
                 s += "<td>";
                 s += price;
                 s += "</td>";
@@ -467,306 +154,515 @@
             return s;
         }
 
-        function display_result(recipes, chefs, best_recipe_map, materail_map)
-        {
-            //var r = solve(objective_function, constraint_list, result, objective_value);
-            var e = document.getElementById("price");
-            if (("value" in final_objective_value)) {
-                //var s = "复杂度:"+ g_debug_simplex_cnt + "<br>" + final_objective_value.value + "<br>";// + JSON.stringify(result) + "<br>";
-                var s = "<table id=\"tb2\" border=\"1\">";
-                    s += "<tr>";
-                    s += "<td>";
-                    s += "名称";
-                    s += "</td>";
-                    s += "<td>";
-                    s += "菜谱";
-                    s += "</td>";
-                    s += "<td>";
-                    s += "解";
-                    s += "</td>";
-                    s += "<td>";
-                    s += "材料";
-                    s += "</td>";
-                    s += "<td>";
-                    s += "技法";
-                    s += "</td>";
-                    s += "<td>";
-                    s += "单价";
-                    s += "</td>";
-                    s += "<td>";
-                    s += "数量";
-                    s += "</td>";
-                    s += "<td>";
-                    s += "总价";
-                    s += "</td>";
-                    s += "<td>";
-                    s += "时间(秒)";
-                    s += "</td>";
-                    s += "<td>";
-                    s += "时间";
-                    s += "</td>";
-                    s += "</tr>";
-                var total_time = 0;
-                var total_price = 0;
-                var map = new Map();
-                for (let i = 0; i < final_result.length; i++) {
-                    const pair = final_result[i];
-                    var cnt = Math.round(pair[1]);
-                    if(cnt == 0)
-                        continue;
-                    if(pair[0].charAt(0) != "X")
-                        continue;
-                    var arr = pair[0].split("_");
-                    var id = parseInt(arr[1]);
-                    var recipe = get_recipe_by_id(recipes, id);
-                    var best = best_recipe_map.get(id);
-                    var price = best[0];
-                    total_time += recipe.time * cnt *recipe.limit;
-                    total_price += price * cnt *recipe.limit;
-                    for (let n = 0; n < recipe.materials.length; n++) {
-                        const m = recipe.materials[n];
-                        var t = 0;
-                        if(map.has(m.material))
-                        {
-                            t = map.get(m.material);
-                        }
-                        map.set(m.material, t + m.quantity*cnt*recipe.limit);
-                    }
-                    s += display_item(recipe, best[1].join(","), price, cnt);
+        /*
+                function init() {
+                    do_ajax("get_db_data.php?name=bcjh_recipes&order_field=id", function (text) {
+                        var my_recipes = JSON.parse(text);
+                        do_ajax("get_db_data.php?name=bcjh_chefs&order_field=id", function (text) {
+                            init_skills(g_bcjh_data.skills);
+                            my_chefs = JSON.parse(text);
+                            init_chefs(my_chefs);
+                            new_recipes = build_recipes(g_bcjh_data.recipes, my_recipes, my_chefs);
+                            display_chefs(my_chefs);
+                        });
+                    });
                 }
-
-                var set = new Set();
-                for (let i = 0; i < g_bcjh_data.materials.length; i++) {
-                    const m = g_bcjh_data.materials[i];
-                    if(map.has(m.materialId))
-                        set.add(m.name);
-                }
-                display_materials_color(set);
-
-                s += "</table>";
-                s += "总价:"+ total_price + " - " + display_time(total_time);// + JSON.stringify(result) + "<br>";
-                s += "<br>";
-                s += "<table id=\"tb3\" border=\"1\">";
-                s += "<tr>";
-                s += "<td>";
-                s += "名称";
-                s += "</td>";
-                s += "<td>";
-                s += "上限";
-                s += "</td>";
-                s += "<td>";
-                s += "实际";
-                s += "</td>";
-                s += "<td>";
-                s += "差值";
-                s += "</td>";
-                s += "</tr>";
-                for (let i = 0; i < g_bcjh_data.materials.length; i++) {
-                    const m = g_bcjh_data.materials[i];
-                    if(!materail_map.has(m.name))
-                        continue;
-                    var act = map.has(m.materialId) ? map.get(m.materialId) : 0; 
-                    s += "<tr>";
-                    s += "<td>";
-                    s += m.name; 
-                    s += "</td>";
-                    s += "<td>";
-                    s += materail_map.get(m.name); 
-                    s += "</td>";
-                    s += "<td>";
-                    s += act
-                    s += "</td>";
-                    s += "<td>";
-                    s += materail_map.get(m.name) - act; 
-                    s += "</td>";
-                    s += "</tr>";
-                }
-                //s += "<br><input type=\"button\" onclick=\"recalc_price()\" value=\"再试一次\">";
-                e.innerHTML =  s;
-                var x = new TableSorter("tb2");
-                var x2 = new TableSorter("tb3");
-            }
-            else
-            {
-                e.innerHTML = "无解";
-            }
-        }
-        
-        function init()
-        {
-            do_ajax("get_db_data.php?name=bcjh_recipes&order_field=id", function(text){
-                var my_recipes = JSON.parse(text);
-                do_ajax("get_db_data.php?name=bcjh_chefs&order_field=id", function(text){
-                    init_skills(g_bcjh_data.skills);
-                    my_chefs = JSON.parse(text);
-                    init_chefs(my_chefs);
-                    new_recipes = build_recipes(g_bcjh_data.recipes, my_recipes, my_chefs);
-                    display_chefs(my_chefs);
-                });
-            });
-        }
-
-        function display_price()
-        {
-            filter_chefs = filter_chef(my_chefs);
-
-            var e2 = document.getElementById("time_limit");
-            var time_limit = e2.value*3600;
-
-            final_result = [];
-            final_objective_value = new Object();
-
-            var dateBegin = new Date();
-
-            var e = document.getElementById("price_add");
-            var best_recipe_map = new Map();
-            for (let k = 0; k < new_recipes.length; k++) {
-                const recipe = new_recipes[k];
-                var best = get_best_chefs(recipe, filter_chefs, e.value);
-                if(best[1].length == 0)
-                    continue;
-                best_recipe_map.set(recipe.recipeId, best);
-            }
-
-            var materail_map = get_material_map();
-
-            var objective_function = new Object();
-            var constraint_list = []; 
-            build_constraint(objective_function, constraint_list, new_recipes, filter_chefs, time_limit, best_recipe_map, materail_map);
-
-            var result = [];
-            var objective_value = new Object();
-            //var r = solve_fast(objective_function, constraint_list, result, objective_value);
-            g_log_objective_value = false;
-            var r = solve_int(objective_function, constraint_list, result, objective_value);
-            if(r==1)
-            {
-                if(!("value" in final_objective_value) || (objective_value.value > final_objective_value.value))
-                {
-                    final_objective_value.value = objective_value.value;
-                    final_result = result;
-                    //final_comb = comb;
-                }
-            }
-            var dateEnd = new Date();
-            var dateDiff = dateEnd.getTime() - dateBegin.getTime();
-            var e = document.getElementById("time");
-            e.innerHTML = "time(ms):" + dateDiff;
-
-            display_result(new_recipes, filter_chefs, best_recipe_map, materail_map);
-        }
-
+        */
         function select_material_cnt(id, checked) {
             setCookie(id, checked ? "true" : "false", 14);
         }
-        function display_materials_color(material_set)
-        {
-            for (let i = 0; i < g_bcjh_data.maps.length; i++) {
-                const map = g_bcjh_data.maps[i];
-                for (let j = 0; j < map.materials.length; j++) {
-                    const material = map.materials[j];
-                    var e = document.getElementById("material_name_"+i+"_"+j);
-                    if(material_set.has(material.name))
-                        e.style.color = "Red";
-                    else
-                        e.style.color = "Black";
-                }
-            }
-        }
-        function display_materials()
-        {
+        function display_materials() {
             var e = document.getElementById("materials");
             var s = "";
             for (let i = 0; i < g_bcjh_data.maps.length; i++) {
                 const map = g_bcjh_data.maps[i];
-                var val = getCookie("ck_material_cnt_"+i);
-                var sval = val=="true" ? "checked=\"checked\"" : "";
+                var val = getCookie("ck_material_cnt_" + i);
+                var sval = val == "true" ? "checked=\"checked\"" : "";
                 s += map.name + ":";
-                s += "<input type=\"checkbox\" id=\"ck_material_cnt_"+i+"\" onclick=\"select_material_cnt(this.id, this.checked)\" "+sval+"/>" + "满 ";
+                s += "<input type=\"checkbox\" id=\"ck_material_cnt_" + i + "\" onclick=\"select_material_cnt(this.id, this.checked)\" " + sval + "/>" + "满 ";
                 for (let j = 0; j < map.materials.length; j++) {
                     const material = map.materials[j];
-                    s += "<input type=\"radio\"  name= \"map_"+i+"\" id=\"material_"+i+"_"+j+"\" value=\""+material.name+"\"  onclick=\"setCookie(this.name, "+j+", 14)\" /><div id=\"material_name_"+i+"_"+j+"\" style=\"display:inline-block\">" + material.name + "("+material.skill+")</div>";
+                    s += "<input type=\"radio\"  name= \"map_" + i + "\" id=\"material_" + i + "_" + j + "\" value=\"" + material.name + "\"  onclick=\"setCookie(this.name, " + j + ", 14)\" /><div id=\"material_name_" + i + "_" + j + "\" style=\"display:inline-block\">" + material.name + "(" + material.skill + ")</div>";
                 }
                 s += "<br>";
             }
             e.innerHTML = s;
             for (let i = 0; i < g_bcjh_data.maps.length; i++) {
-                restore_radio_checked("map_"+i);
+                restore_radio_checked("map_" + i);
             }
         }
-        function restore_value(id)
-        {
+        function restore_value(id) {
             var val = getCookie(id);
             var e = document.getElementById(id);
             e.value = val;
         }
-        function restore_radio_checked(name)
-        {
+        function restore_radio_checked(name) {
             var val = getCookie(name);
             var arr = document.getElementsByName(name);
             if (val != "") {
                 arr[val].checked = true;
             }
         }
-        function sort_chef(a,b)
-        {
+        function sort_chef(a, b) {
             return b.rarity - a.rarity;
-        }  
-        function select_chef(rarity)
-        {
-            var e = document.getElementById("ck_all_chef_"+rarity);
+        }
+        function select_chef(rarity) {
+            var e = document.getElementById("ck_all_chef_" + rarity);
             for (let i = 0; i < my_chefs.length; i++) {
                 const chef = my_chefs[i];
-                if (chef.rarity == rarity)
-                {
+                if (chef.rarity == rarity) {
                     var e2 = document.getElementById("ck_chef_" + chef.id);
                     e2.checked = e.checked;
                 }
             }
-        }         
-        function display_chefs(chefs)
-        {
+        }
+        function display_chefs(chefs) {
             chefs.sort(sort_chef);
             if (chefs.length == 0)
                 return;
             var e2 = document.getElementById("chefs");
             var rarity = chefs[0].rarity;
             var sChecked = "checked=\"checked\"";
-            var s = "<input type=\"checkbox\" id=\"ck_all_chef_"+rarity+"\" onclick=\"select_chef("+rarity+")\" "+((rarity>1)?sChecked:"")+">全选 ";
+            var s = "<input type=\"checkbox\" id=\"ck_all_chef_" + rarity + "\" onclick=\"select_chef(" + rarity + ")\" " + ((rarity > 1) ? sChecked : "") + ">全选 ";
             for (let i = 0; i < chefs.length; i++) {
                 const chef = chefs[i];
-                if(chef.rarity != rarity)
-                {
-                    s += "<br>" + "<input type=\"checkbox\" id=\"ck_all_chef_"+chef.rarity+"\" onclick=\"select_chef("+chef.rarity+")\" "+((chef.rarity>1)?sChecked:"")+">全选 ";
+                if (chef.rarity != rarity) {
+                    s += "<br>" + "<input type=\"checkbox\" id=\"ck_all_chef_" + chef.rarity + "\" onclick=\"select_chef(" + chef.rarity + ")\" " + ((chef.rarity > 1) ? sChecked : "") + ">全选 ";
                     rarity = chef.rarity;
                 }
-                s += "<input type=\"checkbox\" id=\"ck_chef_"+chef.id+"\" "+((chef.rarity>1)?sChecked:"")+">" + chef.name;
+                s += "<input type=\"checkbox\" id=\"ck_chef_" + chef.id + "\" " + ((chef.rarity > 1) ? sChecked : "") + ">" + chef.name;
             }
             e2.innerHTML = s;
         }          
     </script>
 </head>
+
 <body>
-    <a href="index.html">返回</a><br>
-    餐桌加成：<input type="number" id="price_add" onchange="setCookie(this.id, this.value, 14)"/>%
-    时间限制(h)：<input type="number" id="time_limit" onchange="setCookie(this.id, this.value, 14)"/><input type="button" value="计算" onclick="display_price()"/><br>
-    <input type="radio" name="map_quantity" id="rb_min" checked="checked" onclick="setCookie(this.name, 0, 14)"/>最小值
-    <input type="radio" name="map_quantity" id="rb_average"  onclick="setCookie(this.name, 1, 14)"/>平均值
-    <input type="radio" name="map_quantity" id="rb_max"  onclick="setCookie(this.name, 2, 14)"/>最大值
-    <input type="checkbox" id="ck_milk" checked="checked" />禁用牛乳
-    <div id="materials"></div>
-    <div id="chefs"></div>
-    <div id="price"></div>
-    <div id="time"></div>
+    <div id="lp_daily">
+        <div>
+            <a href="index.html">返回</a>
+            <login-panel login-ref="..\login.html" v-on:give-user="load_recipes"></login-panel>
+        </div>
+        <div>
+            餐桌加成：<input type="number" v-model="price_add" />%
+            时间限制(h)：<input type="number" v-model="time_limit" />
+            <input type="button" value="计算" v-on:click="calc()" />
+        </div>
+        <div>
+            <input type="radio" id="rb_min" value="0" v-model="map_quantity" />
+            <label for="rb_min">最小值</label>
+            <input type="radio" id="rb_average" value="1" v-model="map_quantity" />
+            <label for="rb_average">平均值</label>
+            <input type="radio" id="rb_max" value="2" v-model="map_quantity" />
+            <label for="rb_max">最大值</label>
+            <input type="checkbox" id="ck_milk" v-model="disable_milk" />
+            <label for="ck_milk">禁用牛乳</label>
+        </div>
+        <div id="materials">
+            <div v-for="(map, index) in maps">
+                {{map.name}}:<input type="checkbox" v-bind:id="'ck_map'+index" v-model="map_infos[index].all">
+                <label v-bind:for="'ck_map'+index">满</label>
+                <span v-for="(material, j) in map.materials">
+                    <input type="radio" v-bind:id="'m_'+index+'_'+j" v-bind:value="j" v-model="map_infos[index].max" />
+                    <label v-bind:for="'m_'+index+'_'+j"
+                        v-bind:class="{'chef-emphasize': used_material[index][j]}">{{material.name + "(" +
+                        material.skill + ")"}}</label>
+                </span>
+            </div>
+        </div>
+        <div id="chefs">
+            <div v-for="rarity in rarity_list">
+                <input type="checkbox" v-bind:id="'ck_all_'+rarity" v-bind:value="rarity" v-model="selected_raritys">
+                <label v-bind:for="'ck_all_'+rarity">全选</label>
+                <span v-for="chef in chefs">
+                    <span v-if="chef.rarity == rarity">
+                        <input type="checkbox" v-bind:id="'ck_'+chef.id" v-bind:value="chef" v-model="selected_chefs">
+                        <label v-bind:for="'ck_'+chef.id">{{chef.name}}</label>
+                    </span>
+                </span>
+            </div>
+        </div>
+        <div id="price"></div>
+        <div id="time"></div>
+    </div>
     <script type="text/javascript">
-        //display_price();
-        init();
-        display_materials();
-        restore_value("price_add");
-        restore_value("time_limit");
-        restore_radio_checked("map_quantity");
+        //display_materials();
     </script>
-    
+    <script type="text/javascript">
+        var app = new Vue(
+            {
+                el: '#lp_daily',
+                data: {
+                    chefs: null,
+                    recipes: null,
+                    price_add: 0,
+                    time_limit: 0,
+                    map_quantity: 0,
+                    disable_milk: true,
+                    maps: g_bcjh_data.maps,
+                    map_infos: [],
+
+                    rarity_list: [5, 4, 3, 2, 1],
+                    selected_chefs: [],
+                    selected_raritys: [5, 4, 3, 2],
+                    used_material: [],
+                    //setCookie(this.name, 0, 14)
+                },
+                created: function () {
+                    this.price_add = getCookie("price_add");
+                    this.time_limit = getCookie("time_limit");
+                    this.map_quantity = getCookie("map_quantity");
+                    for (let i = 0; i < g_bcjh_data.maps.length; i++) {
+                        const map = g_bcjh_data.maps[i];
+                        var info = new Object();
+                        info.all = getCookie("map" + i + "_all");
+                        info.max = getCookie("map" + i + "_max");
+                        this.map_infos.push(info);
+                        this.used_material.push(new Array(map.materials.length).fill(false));
+                    }
+                },
+                watch: {
+                    price_add: function (val) {
+                        setCookie("price_add", val, 14);
+                    },
+                    time_limit: function (val) {
+                        setCookie("time_limit", val, 14);
+                    },
+                    map_quantity: function (val) {
+                        setCookie("map_quantity", val, 14);
+                    },
+                    map_infos: {
+                        handler(newValue, oldValue) {
+                            for (let i = 0; i < newValue.length; i++) {
+                                var info = newValue[i];
+                                setCookie("map" + i + "_all", info.all, 14);
+                                setCookie("map" + i + "_max", info.max, 14);
+                            }
+                        },
+                        deep: true
+                    },
+                    selected_raritys: {
+                        handler(newValue, oldValue) {
+                            this.selected_chefs = [];
+                            for (let i = 0; i < newValue.length; i++) {
+                                var rarity = newValue[i];
+                                for (let j = 0; j < this.chefs.length; j++) {
+                                    const chef = this.chefs[j];
+                                    if (chef.rarity == rarity)
+                                        this.selected_chefs.push(chef);
+                                }
+                            }
+                        },
+                        deep: true
+                    }
+                },
+                methods: {
+                    load_recipes: function (user_id) {
+                        this.user_id = user_id;
+                        var that = this;
+                        do_ajax("../db/get_records.php?table_name=bcjh_recipes&user_id=" + user_id, function (text) {
+                            var my_recipes = JSON.parse(text);
+                            do_ajax("../db/get_records.php?table_name=bcjh_chefs&user_id=" + user_id, function (text) {
+                                // 菜谱
+                                init_skills(g_bcjh_data.skills);
+                                var my_chefs = JSON.parse(text);
+                                init_chefs(my_chefs);
+                                //var materials = g_bcjh_data.materials;
+                                var new_recipes = build_recipes(g_bcjh_data.recipes, my_recipes, my_chefs);
+                                for (let i = 0; i < my_chefs.length; i++) {
+                                    const chef = my_chefs[i];
+                                    if (chef.rarity > 1)
+                                        that.selected_chefs.push(chef);
+                                }
+                                ///////////////////
+                                that.chefs = my_chefs;
+                                that.recipes = new_recipes;
+                            });
+                        });
+                    },
+                    calc: function () {
+                        filter_chefs = this.selected_chefs;
+
+                        var time_limit = this.time_limit * 3600;
+
+                        final_result = [];
+                        final_objective_value = new Object();
+
+                        var dateBegin = new Date();
+                        var new_recipes = this.recipes;
+
+                        var best_recipe_map = new Map();
+                        for (let k = 0; k < new_recipes.length; k++) {
+                            const recipe = new_recipes[k];
+                            var best = get_best_chefs(recipe, filter_chefs, this.price_add);
+                            if (best[1].length == 0)
+                                continue;
+                            best_recipe_map.set(recipe.recipeId, best);
+                        }
+
+                        var materail_map = this.get_material_map();
+
+                        var objective_function = new Object();
+                        var constraint_list = [];
+                        this.build_constraint(objective_function, constraint_list, new_recipes, filter_chefs, time_limit, best_recipe_map, materail_map);
+
+                        var result = [];
+                        var objective_value = new Object();
+                        //var r = solve_fast(objective_function, constraint_list, result, objective_value);
+                        g_log_objective_value = false;
+                        var r = solve_int(objective_function, constraint_list, result, objective_value);
+                        if (r == 1) {
+                            if (!("value" in final_objective_value) || (objective_value.value > final_objective_value.value)) {
+                                final_objective_value.value = objective_value.value;
+                                final_result = result;
+                                //final_comb = comb;
+                            }
+                        }
+                        var dateEnd = new Date();
+                        var dateDiff = dateEnd.getTime() - dateBegin.getTime();
+                        var e = document.getElementById("time");
+                        e.innerHTML = "time(ms):" + dateDiff;
+
+                        this.display_result(new_recipes, filter_chefs, best_recipe_map, materail_map);
+                    },
+                    get_material_map: function () {
+                        var nTag = this.map_quantity;//getMinOrMax();
+                        var material_map = new Map();
+                        for (let i = 0; i < g_bcjh_data.maps.length; i++) {
+                            const map = g_bcjh_data.maps[i];
+                            var info = this.map_infos[i];
+                            var index = info.all ? 4 : 3;
+                            for (let j = 0; j < map.materials.length && j <= info.max; j++) {
+                                const material = map.materials[j];
+                                var quantity = 0;
+                                if (nTag == 0) {
+                                    quantity = material.quantity[index][0];
+                                }
+                                else if (nTag == 1) {
+                                    quantity = Math.round((material.quantity[index][0] + material.quantity[index][1]) / 2);
+                                }
+                                else {
+                                    quantity = material.quantity[index][1];
+                                }
+                                if (index == 3)
+                                    quantity *= 2;
+                                material_map.set(material.name, quantity);
+                            }
+                        }
+                        return material_map;
+                    },
+                    build_constraint: function (objective_function, constraint_list, new_recipes, my_chefs, time_limit, best_recipe_map, material_map) {
+                        objective_function.is_max = true;
+                        objective_function.items = [];
+                        //var my_recipes_price = [];
+
+                        var constraint_time = new Object(); // 时间限制
+                        constraint_time.opr_type = -1;
+                        constraint_time.value = time_limit;
+                        constraint_time.items = [];
+
+                        // material
+                        var material_constraint_map = new Map();
+                        for (let j = 0; j < g_bcjh_data.materials.length; j++) {
+                            const m = g_bcjh_data.materials[j];
+                            var val = 0;
+                            if (material_map.has(m.name) && (m.name != "牛乳" || !this.disable_milk))
+                                val = material_map.get(m.name);
+                            var constraint_material = new Object(); // 时间限制
+                            constraint_material.opr_type = -1;
+                            constraint_material.value = val;
+                            constraint_material.items = [];
+                            material_constraint_map.set(m.materialId, constraint_material);
+                        }
+                        for (let k = 0; k < new_recipes.length; k++) {
+                            const recipe = new_recipes[k];
+                            if (!best_recipe_map.has(recipe.recipeId))
+                                continue;
+                            var cnt = 90000;
+                            for (let n = 0; n < recipe.materials.length; n++) {
+                                const m = recipe.materials[n];
+                                if (material_constraint_map.has(m.material)) {
+                                    var val = material_constraint_map.get(m.material).value;
+                                    cnt = Math.min(Math.floor(val / m.quantity / recipe.limit), cnt);
+                                }
+                                else {
+                                    cnt = 0;
+                                    break;
+                                }
+                            }
+                            if (cnt == 0)
+                                continue;
+                            var best = best_recipe_map.get(recipe.recipeId);
+                            //get_best_chefs(recipe, my_chefs, e2.value);
+                            //e4.innerHTML = best[0]*recipe.limit;
+                            //e5.innerHTML = Math.ceil(best[0]/recipe.time*3600);
+                            var price = best[0];
+                            var var_name = "X_" + recipe.recipeId; // 份数
+
+                            var constraint_cnt = new Object(); // 时间限制
+                            constraint_cnt.opr_type = -1;
+                            constraint_cnt.value = cnt;
+                            constraint_cnt.items = [[1, var_name]];
+                            constraint_list.push(constraint_cnt);
+
+
+                            objective_function.items.push([price * recipe.limit, var_name]);
+                            constraint_time.items.push([recipe.time * recipe.limit, var_name]);
+                            for (let n = 0; n < recipe.materials.length; n++) {
+                                const m = recipe.materials[n];
+                                if (material_constraint_map.has(m.material)) {
+                                    material_constraint_map.get(m.material).items.push([m.quantity * recipe.limit, var_name]);
+                                }
+                            }
+                        }
+                        if (time_limit > g_epsilon) {
+                            constraint_list.push(constraint_time);
+                        }
+                        material_constraint_map.forEach(constraint => {
+                            if (constraint.items.length > 0)
+                                constraint_list.push(constraint);
+                        });
+                    },
+                    display_result: function (recipes, chefs, best_recipe_map, materail_map) {
+                        //var r = solve(objective_function, constraint_list, result, objective_value);
+                        var e = document.getElementById("price");
+                        if (("value" in final_objective_value)) {
+                            //var s = "复杂度:"+ g_debug_simplex_cnt + "<br>" + final_objective_value.value + "<br>";// + JSON.stringify(result) + "<br>";
+                            var s = "<table id=\"tb2\" border=\"1\">";
+                            s += "<tr>";
+                            s += "<td>";
+                            s += "名称";
+                            s += "</td>";
+                            s += "<td>";
+                            s += "菜谱";
+                            s += "</td>";
+                            s += "<td>";
+                            s += "解";
+                            s += "</td>";
+                            s += "<td>";
+                            s += "材料";
+                            s += "</td>";
+                            s += "<td>";
+                            s += "技法";
+                            s += "</td>";
+                            s += "<td>";
+                            s += "单价";
+                            s += "</td>";
+                            s += "<td>";
+                            s += "数量";
+                            s += "</td>";
+                            s += "<td>";
+                            s += "总价";
+                            s += "</td>";
+                            s += "<td>";
+                            s += "时间(秒)";
+                            s += "</td>";
+                            s += "<td>";
+                            s += "时间";
+                            s += "</td>";
+                            s += "</tr>";
+                            var total_time = 0;
+                            var total_price = 0;
+                            var map = new Map();
+                            for (let i = 0; i < final_result.length; i++) {
+                                const pair = final_result[i];
+                                var cnt = Math.round(pair[1]);
+                                if (cnt == 0)
+                                    continue;
+                                if (pair[0].charAt(0) != "X")
+                                    continue;
+                                var arr = pair[0].split("_");
+                                var id = parseInt(arr[1]);
+                                var recipe = get_recipe_by_id(recipes, id);
+                                var best = best_recipe_map.get(id);
+                                var price = best[0];
+                                total_time += recipe.time * cnt * recipe.limit;
+                                total_price += price * cnt * recipe.limit;
+                                for (let n = 0; n < recipe.materials.length; n++) {
+                                    const m = recipe.materials[n];
+                                    var t = 0;
+                                    if (map.has(m.material)) {
+                                        t = map.get(m.material);
+                                    }
+                                    map.set(m.material, t + m.quantity * cnt * recipe.limit);
+                                }
+                                s += display_item(recipe, best[1].join(","), price, cnt);
+                            }
+
+                            var set = new Set();
+                            for (let i = 0; i < g_bcjh_data.materials.length; i++) {
+                                const m = g_bcjh_data.materials[i];
+                                if (map.has(m.materialId))
+                                    set.add(m.name);
+                            }
+                            this.display_materials_color(set);
+
+                            s += "</table>";
+                            s += "总价:" + total_price + " - " + display_time(total_time);// + JSON.stringify(result) + "<br>";
+                            s += "<br>";
+                            s += "<table id=\"tb3\" border=\"1\">";
+                            s += "<tr>";
+                            s += "<td>";
+                            s += "名称";
+                            s += "</td>";
+                            s += "<td>";
+                            s += "上限";
+                            s += "</td>";
+                            s += "<td>";
+                            s += "实际";
+                            s += "</td>";
+                            s += "<td>";
+                            s += "差值";
+                            s += "</td>";
+                            s += "</tr>";
+                            for (let i = 0; i < g_bcjh_data.materials.length; i++) {
+                                const m = g_bcjh_data.materials[i];
+                                if (!materail_map.has(m.name))
+                                    continue;
+                                var act = map.has(m.materialId) ? map.get(m.materialId) : 0;
+                                s += "<tr>";
+                                s += "<td>";
+                                s += m.name;
+                                s += "</td>";
+                                s += "<td>";
+                                s += materail_map.get(m.name);
+                                s += "</td>";
+                                s += "<td>";
+                                s += act
+                                s += "</td>";
+                                s += "<td>";
+                                s += materail_map.get(m.name) - act;
+                                s += "</td>";
+                                s += "</tr>";
+                            }
+                            //s += "<br><input type=\"button\" onclick=\"recalc_price()\" value=\"再试一次\">";
+                            e.innerHTML = s;
+                            var x = new TableSorter("tb2");
+                            var x2 = new TableSorter("tb3");
+                        }
+                        else {
+                            e.innerHTML = "无解";
+                        }
+                    },
+                    display_materials_color: function (material_set) {
+                        for (let i = 0; i < g_bcjh_data.maps.length; i++) {
+                            const map = g_bcjh_data.maps[i];
+                            for (let j = 0; j < map.materials.length; j++) {
+                                const material = map.materials[j];
+                                if (material_set.has(material.name)) {
+                                    Vue.set(this.used_material[i], j, true);
+                                }
+                            }
+                        }
+                    },
+
+                }
+            }
+        );
+
+
+    </script>
+
 </body>
 
 </html>

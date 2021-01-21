@@ -7,7 +7,8 @@
     <title>
         爆炒江湖
     </title>
-    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    <!--script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script-->
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.6.12"></script>
     <link rel="stylesheet" href="bcjh.css" />
     <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
     <script src="../layer/layer.js"></script>
@@ -236,24 +237,30 @@
                                     title: '新增',
                                     maxmin: false,
                                     area: ['530px', '490px'],
+                                    offset: '200px',
                                     content: url
                                 });
                             });
                     },
                     edit_chef: function (chef) {
                         var that = this;
-                        /*
+
                         var clone_chef = JSON.parse(JSON.stringify(chef));
-                        clone_chef.level = 3;
-                        clone_chef.id = clone_chef.chefId;
-                        */
-                        if (chef.skill_id == null)
-                            chef.skill_id = -1;
-                        if (chef.ultimate_skill_id == null)
-                            chef.ultimate_skill_id = -1;
-                        if (chef.equip_id == null)
-                            chef.equip_id = -1;
-                        var url = "edit_chef.html?" + build_url_params([["record", JSON.stringify(chef).replace(/\"/g, "'")]]);
+                        for (let i = 0; i < g_cook_types.length; i++) {
+                            const cook = g_cook_types[i];
+                            clone_chef[cook] = clone_chef[cook + "_raw"];
+                        }
+                        for (let j = 0; j < g_material_types.length; j++) {
+                            const type = g_material_types[j];
+                            clone_chef[type] = clone_chef[type + "_raw"];
+                        }
+                        if (clone_chef.skill_id == null)
+                            clone_chef.skill_id = -1;
+                        if (clone_chef.ultimate_skill_id == null)
+                            clone_chef.ultimate_skill_id = -1;
+                        if (clone_chef.equip_id == null)
+                            clone_chef.equip_id = -1;
+                        var url = "edit_chef.html?" + build_url_params([["record", JSON.stringify(clone_chef).replace(/\"/g, "'")]]);
                         layer.open({
                             type: 2,
                             btn: ['确定', '取消'],
@@ -285,6 +292,7 @@
                             title: '修改',
                             maxmin: false,
                             area: ['530px', '490px'],
+                            offset: '200px',
                             content: url
                         });
                     },

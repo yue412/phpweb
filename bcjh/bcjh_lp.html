@@ -8,7 +8,8 @@
         爆炒江湖
     </title>
     <link rel="stylesheet" href="bcjh.css" />
-    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    <!--script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script-->
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.6.12"></script>
     <script type="text/javascript" src="../common.js"></script>
     <script type="text/javascript" src="bcjh_data.js"></script>
     <script type="text/javascript" src="bcjh_common.js"></script>
@@ -85,10 +86,14 @@
             for (let j = 0; j < g_bcjh_data.materials.length; j++) {
                 const m = g_bcjh_data.materials[j];
                 var val = 0
-                if (isNaN(rule.MaterialsLimit))
-                    val = rule.MaterialsLimit[m.materialId];
-                else
-                    val = rule.MaterialsLimit;
+                if (rule.MaterialsLimit == null)
+                    val = 10000;
+                else {
+                    if (isNaN(rule.MaterialsLimit))
+                        val = rule.MaterialsLimit[m.materialId];
+                    else
+                        val = rule.MaterialsLimit;
+                }
                 if (val == null)
                     val = 0;
                 var constraint_material = new Object(); // 时间限制
@@ -153,10 +158,16 @@
             for (let j = 0; j < g_bcjh_data.materials.length; j++) {
                 const m = g_bcjh_data.materials[j];
                 var val = 0
-                if (isNaN(materials_limit))
-                    val = materials_limit[m.materialId];
-                else
-                    val = materials_limit;
+                if (materials_limit == null) // 没有限制
+                {
+                    val = 10000;
+                }
+                else {
+                    if (isNaN(materials_limit))
+                        val = materials_limit[m.materialId];
+                    else
+                        val = materials_limit;
+                }
                 if (val == null)
                     val = 0;
                 var constraint_material = new Object(); // 时间限制
@@ -331,10 +342,14 @@
                     //if(!materail_map.has(m.name))
                     // continue;
                     var val = 0
-                    if (isNaN(materials_limit))
-                        val = materials_limit[m.materialId];
-                    else
-                        val = materials_limit;
+                    if (materials_limit == null)
+                        val = 10000;
+                    else {
+                        if (isNaN(materials_limit))
+                            val = materials_limit[m.materialId];
+                        else
+                            val = materials_limit;
+                    }
 
                     var act = map.has(m.materialId) ? map.get(m.materialId) : 0;
                     s += "<tr>";
@@ -535,10 +550,14 @@
                     var act = map.has(m.materialId) ? map.get(m.materialId) : 0;
 
                     var val = 0
-                    if (isNaN(rule.MaterialsLimit))
-                        val = rule.MaterialsLimit[m.materialId];
-                    else
-                        val = rule.MaterialsLimit;
+                    if (rule.MaterialsLimit == null)
+                        val = 10000;
+                    else {
+                        if (isNaN(rule.MaterialsLimit))
+                            val = rule.MaterialsLimit[m.materialId];
+                        else
+                            val = rule.MaterialsLimit;
+                    }
                     var diff = val - act;
                     if (diff < 0)
                         s += m.name + ":" + diff + "<br>";

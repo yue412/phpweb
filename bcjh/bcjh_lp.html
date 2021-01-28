@@ -76,12 +76,55 @@
             return arr;
         }
 
+        function get_material_constraint_map(materials_limit) {
+            var material_constraint_map = new Map();
+            for (let j = 0; j < g_bcjh_data.materials.length; j++) {
+                const m = g_bcjh_data.materials[j];
+                var val = 0
+                if (materials_limit == null) // 没有限制
+                {
+                    val = 10000;
+                }
+                else {
+                    if (isNaN(materials_limit))
+                        val = materials_limit[m.materialId];
+                    else
+                        val = materials_limit;
+                }
+                if (val == null)
+                    val = 0;
+                var constraint_material = new Object(); // 时间限制
+                constraint_material.opr_type = -1;
+                constraint_material.value = val;
+                constraint_material.items = [];
+                material_constraint_map.set(m.materialId, constraint_material);
+            }
+            return material_constraint_map;
+        }
+
+        function get_recipe_count(recipe, material_constraint_map, DisableMultiCookbook) {
+            var cnt = DisableMultiCookbook ? 1 : recipe.limit;
+            for (let n = 0; n < recipe.materials.length; n++) {
+                const m = recipe.materials[n];
+                if (material_constraint_map.has(m.material)) {
+                    var val = material_constraint_map.get(m.material).value;
+                    cnt = Math.min(Math.floor(val / m.quantity), cnt);
+                }
+                else {
+                    cnt = 0;
+                    break;
+                }
+            }
+            return cnt;
+        }
+
         function build_constraint2(objective_function, constraint_list, select_chefs, chef_recipe_list, rule) {
             objective_function.is_max = true;
             objective_function.items = [];
             //var my_recipes_price = [];
 
             // material
+            /*
             var material_constraint_map = new Map();
             for (let j = 0; j < g_bcjh_data.materials.length; j++) {
                 const m = g_bcjh_data.materials[j];
@@ -102,6 +145,8 @@
                 constraint_material.items = [];
                 material_constraint_map.set(m.materialId, constraint_material);
             }
+            */
+            var material_constraint_map = get_material_constraint_map(rule.MaterialsLimit);
             for (let k = 0; k < select_chefs.length; k++) {
                 const chef = select_chefs[k];
                 var arr = chef_recipe_list[k];
@@ -109,18 +154,7 @@
                     const r = arr[i];
                     var recipe = r[0];
                     var price = r[1];
-                    var cnt = rule.DisableMultiCookbook ? 1 : recipe.limit;
-                    for (let n = 0; n < recipe.materials.length; n++) {
-                        const m = recipe.materials[n];
-                        if (material_constraint_map.has(m.material)) {
-                            var val = material_constraint_map.get(m.material).value;
-                            cnt = Math.min(Math.floor(val / m.quantity), cnt);
-                        }
-                        else {
-                            cnt = 0;
-                            break;
-                        }
-                    }
+                    var cnt = get_recipe_count(recipe, material_constraint_map, rule.DisableMultiCookbook);
                     if (cnt == 0)
                         continue;
                     var var_name = "X_" + recipe.recipeId + "_" + k; // 份数
@@ -147,51 +181,17 @@
             });
         }
 
-
         function build_constraint(objective_function, constraint_list, new_recipes, my_chefs, best_recipe_map, materials_limit, DisableMultiCookbook) {
             objective_function.is_max = true;
             objective_function.items = [];
             //var my_recipes_price = [];
-
+            var material_constraint_map = get_material_constraint_map(materials_limit);
             // material
-            var material_constraint_map = new Map();
-            for (let j = 0; j < g_bcjh_data.materials.length; j++) {
-                const m = g_bcjh_data.materials[j];
-                var val = 0
-                if (materials_limit == null) // 没有限制
-                {
-                    val = 10000;
-                }
-                else {
-                    if (isNaN(materials_limit))
-                        val = materials_limit[m.materialId];
-                    else
-                        val = materials_limit;
-                }
-                if (val == null)
-                    val = 0;
-                var constraint_material = new Object(); // 时间限制
-                constraint_material.opr_type = -1;
-                constraint_material.value = val;
-                constraint_material.items = [];
-                material_constraint_map.set(m.materialId, constraint_material);
-            }
             for (let k = 0; k < new_recipes.length; k++) {
                 const recipe = new_recipes[k];
                 if (!best_recipe_map.has(recipe.recipeId))
                     continue;
-                var cnt = DisableMultiCookbook ? 1 : recipe.limit;
-                for (let n = 0; n < recipe.materials.length; n++) {
-                    const m = recipe.materials[n];
-                    if (material_constraint_map.has(m.material)) {
-                        var val = material_constraint_map.get(m.material).value;
-                        cnt = Math.min(Math.floor(val / m.quantity), cnt);
-                    }
-                    else {
-                        cnt = 0;
-                        break;
-                    }
-                }
+                var cnt = get_recipe_count(recipe, material_constraint_map, DisableMultiCookbook);
                 if (cnt == 0)
                     continue;
                 var best = best_recipe_map.get(recipe.recipeId);
@@ -850,6 +850,24 @@
 
                         display_result(new_recipes, filter_chefs, best_recipe_map, rule.MaterialsLimit);
                     },
+                    get_expensive_recipes: function (chef, limit, rule) {
+                        var list = [];
+                        var material_constraint_map = get_material_constraint_map(rule.MaterialsLimit);
+                        for (let i = 0; i < this.recipes.length; i++) {
+                            const recipe = this.recipes[i];
+                            // price count
+                            var rule_effect = rule.RecipeEffect[recipe.recipeId];
+                            if (rule_effect == null)
+                                continue;//rule_effect = 0;
+                            var price = calc_price2(recipe, chef, this.chefs, rule_effect * 100, rule.ChefTagEffect);
+                            var count = get_recipe_count(recipe, material_constraint_map, rule.DisableMultiCookbook);
+                            if (price == 0 || count == 0)
+                                continue;
+                            list.push([recipe, price, count]);
+                        }
+                        list.sort(sort_result3);
+                        return list.slice(0, limit);
+                    },
                     calc: function () {
                         var filter_chefs = this.selected_chefs;
                         var new_recipes = this.recipes;
@@ -873,6 +891,7 @@
                             const comb = comb_list[t];
 
                             var select_chefs = [filter_chefs[comb[0]], filter_chefs[comb[1]], filter_chefs[comb[2]]];
+                            /*
                             var best_recipe_map = new Map();
                             for (let k = 0; k < new_recipes.length; k++) {
                                 const recipe = new_recipes[k];
@@ -932,6 +951,7 @@
                                 list.push([recipe, price, cnt, best[1][0]]);
                             }
                             list.sort(sort_result3);
+                            
                             var map = new Map();
                             var index = 0;
                             for (let i = 0; i < list.length; i++) {
@@ -951,7 +971,14 @@
                                 arr.push(r);
                                 index = i;
                             }
+                            */
                             var recipe_price_list = [[], [], []];
+                            for (let i = 0; i < select_chefs.length; i++) {
+                                const chef = select_chefs[i];
+                                var list = this.get_expensive_recipes(chef, calc_limit, rule);
+                                recipe_price_list[i] = list;
+                            }
+                            /*
                             for (let i = 0; i <= index; i++) {
                                 const r = list[i];
                                 var recipe = r[0];
@@ -973,6 +1000,7 @@
                                     recipe_price_list[j].push([recipe, price]);
                                 }
                             }
+                            */
                             var clist1 = combination(Math.min(recipe_price_list[0].length, calc_limit), 3);
                             for (let i = 0; i < clist1.length; i++) {
                                 const arr_index1 = clist1[i];

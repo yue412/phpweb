@@ -53,18 +53,24 @@ g_filter_material = "";
 g_filter_recipe = "";
 g_first_guest_name = "";
 
+function calc_price2(recipe, chef, chefs, price_add, ChefTagEffect)
+{
+    var temp = price_add;
+    if (ChefTagEffect) {
+        for (let i = 0; i < chef.tags.length; i++) {
+            const tag = chef.tags[i];
+            temp += ChefTagEffect[tag] * 100;
+        }
+    }
+    var price = calc_price(recipe, chef, chefs, temp);
+    return price;
+}
+
 function get_best_chefs(recipe, chefs, price_add, ChefTagEffect) {
     var result = [0, []];
     for (let i = 0; i < chefs.length; i++) {
         const chef = chefs[i];
-        var temp = price_add;
-        if (ChefTagEffect) {
-            for (let i = 0; i < chef.tags.length; i++) {
-                const tag = chef.tags[i];
-                temp += ChefTagEffect[tag] * 100;
-            }
-        }
-        var price = calc_price(recipe, chef, chefs, temp);
+        var price = calc_price2(recipe, chef, chefs, price_add, ChefTagEffect);
         if (price > result[0]) {
             result[0] = price;
             result[1].length = 0;

@@ -258,6 +258,8 @@
             <label for="rb_max">最大值</label>
             <input type="checkbox" id="ck_milk" v-model="disable_milk" />
             <label for="ck_milk">禁用牛乳</label>
+            <input type="checkbox" id="ck_master" v-model="disable_master" />
+            <label for="ck_master">禁用精通</label>
         </div>
         <div id="materials">
             <div v-for="(map, index) in maps">
@@ -300,6 +302,7 @@
                     time_limit: 0,
                     map_quantity: 0,
                     disable_milk: true,
+                    disable_master: false,
                     maps: g_bcjh_data.maps,
                     map_infos: [],
 
@@ -391,6 +394,15 @@
 
                         var dateBegin = new Date();
                         var new_recipes = this.recipes;
+                        if(this.disable_master)
+                        {
+                            new_recipes = [];
+                            for (let i = 0; i < this.recipes.length; i++) {
+                                const recipe = this.recipes[i];
+                                if(!recipe.is_mastery)
+                                    new_recipes.push(recipe);
+                            }
+                        }
 
                         var best_recipe_map = new Map();
                         for (let k = 0; k < new_recipes.length; k++) {

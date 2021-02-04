@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta http-equiv="content-type" content="text/html;charset=utf-8">
+    <title>开心水族箱</title>
+    <link rel="stylesheet" href="https://unpkg.zhimg.com/element-ui/lib/theme-chalk/index.css">
+    <script type="text/javascript" src="data.js"></script>
+    <script type="text/javascript" src="../common.js"></script>
+</head>
+
+<body>
+    <div id="kxszx">
+        <el-row>
+            <el-col :span="8">
+                <el-input v-model="search" size="mini" placeholder="输入关键字搜索" />
+            </el-col>
+        </el-row>
+        <el-table :data="results_table.slice((currentPage-1)*pagesize,currentPage*pagesize)" style="width: 100%"
+            :default-sort="{prop: 'id', order: 'ascending'}" @sort-change="sortChange" @filter-change="filterChange">
+            <el-table-column type="expand">
+                <template slot-scope="props">
+                    <el-row>
+                        <el-col :span="8">
+                            <el-tag>生成公式</el-tag>
+                            <el-form label-position="left" inline class="demo-table-expand" v-if="props.row.type==3">
+                                <div v-for="item in props.row.dict.fishes">
+                                    <el-form-item :label="item.fish">
+                                        <span>{{ item.cnt }}</span>
+                                    </el-form-item>
+                                </div>
+                            </el-form>
+                            <el-form label-position="left" inline class="demo-table-expand"
+                                v-else-if="props.row.type==2">
+                                <div v-for="item in props.row.dict.jewels">
+                                    <el-form-item :label="item.fish">
+                                        <span>{{ item.cnt }}</span>
+                                    </el-form-item>
+                                </div>
+                            </el-form>
+                        </el-col>
+                        <el-col :span="8">
+                            <el-tag>可生成皇冠鱼</el-tag>
+                            <el-form label-position="left" inline class="demo-table-expand">
+                                <div v-for="item in props.row.create_crown_fish">
+                                    <el-form-item :label="item.fish">
+                                        <span>{{ item.cnt }}</span>
+                                    </el-form-item>
+                                </div>
+                            </el-form>
+                        </el-col>
+                        <el-col :span="8">
+                            <el-tag>可生成宝石鱼</el-tag>
+                            <el-form label-position="left" inline class="demo-table-expand">
+                                <div v-for="item in props.row.create_jewel_fish">
+                                    <el-form-item :label="item.fish">
+                                        <span>{{ item.cnt }}</span>
+                                    </el-form-item>
+                                </div>
+                            </el-form>
+                        </el-col>
+                    </el-row>
+                </template>
+            </el-table-column>
+            <el-table-column prop="id" label="序号" width="180" sortable>
+            </el-table-column>
+            <el-table-column prop="name" label="名称" sortable>
+            </el-table-column>
+            <el-table-column label="类型" width="180"
+                :filters="[{ text: '其它', value: 0 }, { text: '金币', value: 1 }, { text: '宝石', value: 2 }, { text: '皇冠', value: 3 }]"
+                column-key='type'>
+                <!--:filter-method="filterType"-->
+                <template slot-scope="scope">{{ scope.row.type_name() }}</template>
+            </el-table-column>
+            <el-table-column prop="cnt" label="已有" width="180" sortable>
+            </el-table-column>
+            <el-table-column prop="crown" label="皇冠数" width="180" sortable>
+            </el-table-column>
+            <el-table-column prop="need" label="还需" width="180" sortable>
+            </el-table-column>
+            <el-table-column prop="jewel" label="鱼宝数" width="180" sortable>
+            </el-table-column>
+            <el-table-column fixed="right" label="操作" width="100">
+                <template slot-scope="scope">
+                    <el-button @click="handleClick(scope.row)" type="text" size="small">编辑</el-button>
+                </template>
+            </el-table-column>
+        </el-table>
+        <el-row>
+            <el-col :span="12">
+                <el-pagination @size-change="handleSizeChange" @current-change="handleCurrentChange"
+                    :current-page="currentPage" :page-sizes="[10, 20, 30, 40]" :page-size="pagesize"
+                    layout="total, sizes, prev, pager, next, jumper" :total="results_table.length">
+                </el-pagination>
+            </el-col>
+        </el-row>
+        <el-dialog title="编辑" :visible.sync="dialogFormVisible">
+            <el-form :model="edit_fish">
+                <el-form-item label="已有" label-width="120px">
+                    <el-input-number v-model="edit_fish.cnt"></el-input-number>
+                </el-form-item>
+                <el-form-item label="皇冠数" label-width="120px">
+                    <el-input-number v-model="edit_fish.crown"></el-input-number>
+                </el-form-item>
+            </el-form>
+            <div slot="footer" class="dialog-footer">
+                <el-button @click="dialogFormVisible = false">取 消</el-button>
+                <el-button type="primary" @click="handleConfirm()">确 定</el-button>
+            </div>
+        </el-dialog>
+
+        <!--
+        <div>
+            <el-checkbox v-model="allEnable">全选</el-checkbox>
+        </div>
+        <div>
+            <el-checkbox v-for="c in crown" v-model="c.enable">{{c.dest}}</el-checkbox>
+        </div>
+        <el-tabs v-model="activeTab" @tab-click="handleTabChange">
+            <el-tab-pane label="合计" name="collect">
+            </el-tab-pane>
+            <el-tab-pane label="皇冠鱼合计" name="crown">
+                <el-table :data="crown_table" style="width: 100%" :default-sort="{prop: 'cnt', order: 'descending'}">
+                    <el-table-column prop="id" label="序号" width="180" sortable>
+                    </el-table-column>
+                    <el-table-column prop="fish" label="名称" sortable>
+                    </el-table-column>
+                    <el-table-column prop="cnt" label="个数" width="180" sortable>
+                    </el-table-column>
+                </el-table>
+            </el-tab-pane>
+            <el-tab-pane label="鱼宝合计" name="jewel">
+                <el-table :data="jewel_table" style="width: 100%" :default-sort="{prop: 'cnt', order: 'descending'}">
+                    <el-table-column prop="id" label="序号" width="180" sortable>
+                    </el-table-column>
+                    <el-table-column prop="fish" label="名称" sortable>
+                    </el-table-column>
+                    <el-table-column prop="type" label="类型" width="200" sortable>
+                    </el-table-column>
+                    <el-table-column prop="cnt" label="个数" width="180" sortable>
+                    </el-table-column>
+                </el-table>
+            </el-tab-pane>
+        </el-tabs>
+        -->
+    </div>
+</body>
+<script src="https://unpkg.zhimg.com/vue/dist/vue.js"></script>
+<script src="https://unpkg.zhimg.com/element-ui/lib/index.js"></script>
+<script type="text/javascript" src="main.js"></script>
+
+</html>

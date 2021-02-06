@@ -508,6 +508,7 @@
 
                         final_result = [];
                         final_objective_value = new Object();
+                        final_objective_value.value = 0;
                         g_debug_simplex_cnt = 0;
 
                         var dateBegin = new Date();
@@ -581,7 +582,7 @@
                                 var list = this.get_expensive_recipes(new_recipes, chef, calc_limit);
                                 recipe_price_list[i] = list;
                             }
-                            final_objective_value.value = 0;
+                            //final_objective_value.value = 0;
                             var clist1 = combination(Math.min(recipe_price_list[0].length, calc_limit), 3);
                             for (let i = 0; i < clist1.length; i++) {
                                 const arr_index1 = clist1[i];

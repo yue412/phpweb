@@ -4,29 +4,25 @@ var g_objective_value = 0;
 var g_log_objective_value = false;
 var g_solve_only_once = false;
 
-function solve_int(objective_function, constraint_list, result, objective_value)
-{
+function solve_int(objective_function, constraint_list, result, objective_value) {
     var r = solve(objective_function, constraint_list, result, objective_value);
-    if(r != 1)
+    if (r != 1)
         return r;
     // 剪枝
-    if(g_log_objective_value)
-    {
-        if(objective_function.is_max)
-        {   
-            if(objective_value.value < g_objective_value)
+    if (g_log_objective_value) {
+        if (objective_function.is_max) {
+            if (objective_value.value < g_objective_value)
                 return 0;
         }
-        else 
-        {
-            if(objective_value.value > g_objective_value)
+        else {
+            if (objective_value.value > g_objective_value)
                 return 0;
         }
     }
     for (let i = 0; i < result.length; i++) {
         const pair = result[i];
         var int_val = Math.round(pair[1])
-        if (Math.abs(int_val - pair[1]) < g_epsilon) 
+        if (Math.abs(int_val - pair[1]) < g_epsilon)
             continue;
         int_val = Math.ceil(pair[1]);
         // 非整数
@@ -39,17 +35,16 @@ function solve_int(objective_function, constraint_list, result, objective_value)
             constraint.value = int_val;
             constraint.items = [[1, pair[0]]];
             new_constraint_list1.push(constraint);
-        }        
+        }
         var new_result1 = [];
         var new_value1 = new Object();
         var r1 = solve_int(objective_function, new_constraint_list1, new_result1, new_value1);
         // 只计算一次
-        if(g_solve_only_once && r1 == 1)
-        {
+        if (g_solve_only_once && r1 == 1) {
             copy_array(new_result1, result);
             //result = JSON.parse(JSON.stringify(new_result1));
             objective_value.value = new_value1.value;
-            return r1;            
+            return r1;
         }
         // 非整数
         var new_constraint_list2 = JSON.parse(s);
@@ -57,27 +52,25 @@ function solve_int(objective_function, constraint_list, result, objective_value)
             // 作坊
             var constraint = new Object();
             constraint.opr_type = -1;
-            constraint.value = int_val-1;
+            constraint.value = int_val - 1;
             constraint.items = [[1, pair[0]]];
             new_constraint_list2.push(constraint);
-        }        
+        }
         var new_result2 = [];
         var new_value2 = new Object();
         var r2 = solve_int(objective_function, new_constraint_list2, new_result2, new_value2);
-        if(r1 == -1 || r2 == -1){
+        if (r1 == -1 || r2 == -1) {
             return -1;
         }
         if (r1 == 1 || r2 == 1) {
             if (r1 == 1 && r2 == 1) {
-                if ((Math.round(new_value1.value) >= Math.round(new_value2.value) && objective_function.is_max) || 
-                    (Math.round(new_value1.value) <= Math.round(new_value2.value) && !objective_function.is_max))
-                {
+                if ((Math.round(new_value1.value) >= Math.round(new_value2.value) && objective_function.is_max) ||
+                    (Math.round(new_value1.value) <= Math.round(new_value2.value) && !objective_function.is_max)) {
                     copy_array(new_result1, result);
                     //result = JSON.parse(JSON.stringify(new_result1));
                     objective_value.value = new_value1.value;
                 }
-                else
-                {
+                else {
                     copy_array(new_result2, result);
                     //result = JSON.parse(JSON.stringify(new_result2));
                     objective_value.value = new_value2.value;
@@ -88,8 +81,7 @@ function solve_int(objective_function, constraint_list, result, objective_value)
                 //result = JSON.parse(JSON.stringify(new_result1));
                 objective_value.value = new_value1.value;
             }
-            else
-            {
+            else {
                 copy_array(new_result2, result);
                 //result = JSON.parse(JSON.stringify(new_result2));
                 objective_value.value = new_value2.value;
@@ -107,21 +99,21 @@ function solve_int(objective_function, constraint_list, result, objective_value)
 }
 
 //先不考虑整数
-function solve(objective_function, constraint_list, result, objective_value)
-{
+function solve(objective_function, constraint_list, result, objective_value) {
     var var_list = [];
     var Ct = [];
     var factor = objective_function.is_max ? 1 : -1;
     for (let i = 0; i < objective_function.items.length; i++) {
         const pair = objective_function.items[i];
         var_list.push(pair[1]); // 变量名
-        Ct.push(pair[0]*factor); // 系数
+        Ct.push(pair[0] * factor); // 系数
     }
     var b = [];
     var A = [];
     var new_var_no = 0;
     var base = [];
-    var rows = [];
+    //var rows = [];
+    var index = 0;
     for (let i = 0; i < constraint_list.length; i++) {
         const constraint = constraint_list[i];
         //var factor = constraint.value < - g_epsilon ? -1 : 1; /////????
@@ -131,30 +123,30 @@ function solve(objective_function, constraint_list, result, objective_value)
         for (let j = 0; j < constraint.items.length; j++) {
             const pair = constraint.items[j];
             var k = index_of_val_list(var_list, pair[1]);
-            var val = pair[0]*factor;
-            if (k == -1)
-            {
+            var val = pair[0] * factor;
+            if (k == -1) {
                 //var_list.push("_t"+(new_var_no++));
                 var_list.push(pair[1]);
                 row.push(val);
             }
-            else
-            {
+            else {
                 row[k] = val;
             }
         }
+        var b_val = constraint.value * factor;
+        A.push(row);
+        b.push(b_val);
         if (constraint.opr_type != 0) // ==0 may be error
         {
-            var_list.push("_t"+(new_var_no++));
+            var_list.push("_t" + (new_var_no++));
             row.push(1);
-            if(row[row.length-1] < 0)
-                rows.push(A.length);
-            base.push(row.length-1);
+            if (b_val - b[index] < - g_epsilon)
+                index = i;
+            base.push(row.length - 1);
         }
-        A.push(row);
-        b.push(Math.abs(constraint.value));
     }
 
+    /*
     for (let i = 0; i < rows.length; i++) {
         const index = rows[i];
         var row = A[index];
@@ -163,6 +155,7 @@ function solve(objective_function, constraint_list, result, objective_value)
         }
         b[index] = -b[index];
     }
+    */
 
     grow_number_array(Ct, var_list.length);
     for (let i = 0; i < A.length; i++) {
@@ -176,7 +169,7 @@ function solve(objective_function, constraint_list, result, objective_value)
                 continue;
             result.push([var_list[i], X[i]]);
         }
-        if(!objective_function.is_max)
+        if (!objective_function.is_max)
             objective_value.value = -objective_value.value;
     }
     return r;
@@ -186,9 +179,8 @@ function solve(objective_function, constraint_list, result, objective_value)
 // max(Ct*X)
 // AX=b
 // b>=0 X>=0
-function simplex2(Ct, A, b, base, result, objective_value)
-{
-    
+function simplex2(Ct, A, b, base, result, objective_value) {
+
     // 构造Matrix
     // ( A,b)
     // (Ct,0)
@@ -222,20 +214,18 @@ function simplex2(Ct, A, b, base, result, objective_value)
     while (true) {
         var isValid = true;
         for (let i = 0; i < height; i++) {
-            if(matrix[i][width]<-g_epsilon)
-            {
+            if (matrix[i][width] < -g_epsilon) {
                 isValid = false;
                 var bSucc = false;
                 for (let j = 0; j < width; j++) {
-                    if (matrix[i][j] < -g_epsilon)
-                    {
+                    if (matrix[i][j] < -g_epsilon) {
                         gaussian(matrix, i, j);
                         base[i] = j;
                         bSucc = true;
                         break;
                     }
                 }
-                if(!bSucc)
+                if (!bSucc)
                     return 0;
             }
         }
@@ -247,8 +237,7 @@ function simplex2(Ct, A, b, base, result, objective_value)
 }
 
 //单纯形法
-function simplex(matrix, base, result, objective_value)
-{
+function simplex(matrix, base, result, objective_value) {
     ++g_debug_simplex_cnt;
     // 构造Matrix
     // ( A,b)
@@ -260,8 +249,7 @@ function simplex(matrix, base, result, objective_value)
         var max_val = 0;
         var col = -1;
         for (let i = 0; i < width; i++) {
-            if(matrix[height][i] > (max_val + g_epsilon))
-            {
+            if (matrix[height][i] > (max_val + g_epsilon)) {
                 max_val = matrix[height][i];
                 col = i;
             }
@@ -305,9 +293,8 @@ function simplex(matrix, base, result, objective_value)
     }
 }
 
-function gaussian(matrix, row, col)
-{
-    if(Math.abs(matrix[row][col]) < g_epsilon)
+function gaussian(matrix, row, col) {
+    if (Math.abs(matrix[row][col]) < g_epsilon)
         return;
     // 归一
     var d = matrix[row][col];
@@ -316,19 +303,18 @@ function gaussian(matrix, row, col)
     }
     // 高斯消元
     for (let i = 0; i < matrix.length; i++) {
-        if (i == row) 
+        if (i == row)
             continue;
-//        if(Math.abs(r[col]) < g_epsilon)
-//            continue;
+        //        if(Math.abs(r[col]) < g_epsilon)
+        //            continue;
         var factor = matrix[i][col];
         for (let j = 0; j < matrix[i].length; j++) {
-            matrix[i][j] -= matrix[row][j]*factor;
+            matrix[i][j] -= matrix[row][j] * factor;
         }
     }
 }
 
-function init_matrix(Ct, A, b)
-{
+function init_matrix(Ct, A, b) {
     // 构造Matrix
     // ( A,b)
     // (Ct,0)
@@ -354,23 +340,20 @@ function init_matrix(Ct, A, b)
     return matrix;
 }
 
-function grow_number_array(array, new_cnt)
-{
+function grow_number_array(array, new_cnt) {
     var cnt = new_cnt - array.length;
     for (let i = 0; i < cnt; i++) {
         array.push(0);
     }
 }
 
-function init_number_array(array)
-{
+function init_number_array(array) {
     for (let i = 0; i < array.length; i++) {
         array[i] = 0;
     }
 }
 
-function index_of_val_list(var_list, var_name)
-{
+function index_of_val_list(var_list, var_name) {
     for (let i = 0; i < var_list.length; i++) {
         if (var_list[i] == var_name)
             return i;
@@ -378,16 +361,14 @@ function index_of_val_list(var_list, var_name)
     return -1;
 }
 
-function copy_array(src, dest)
-{
+function copy_array(src, dest) {
     dest.length = 0;
     for (let i = 0; i < src.length; i++) {
         dest.push(src[i]);
     }
 }
 
-function calc_new_lp(lp, col, int_val)
-{
+function calc_new_lp(lp, col, int_val) {
     // clone
     var _lp = clone_LP_info(lp);
     var width = _lp.matrix[0].length;
@@ -404,24 +385,22 @@ function calc_new_lp(lp, col, int_val)
         if (val < - g_epsilon) {
             return null; // 无解
         }
-    }    
+    }
     return _lp;
 }
 
-function clone_LP_info(lp)
-{
+function clone_LP_info(lp) {
     var new_lp = new Object();
     new_lp.base = lp.base.slice(0);
     new_lp.matrix = [];
     for (let i = 0; i < lp.matrix.length; i++) {
         var row = lp.matrix[i].slice(0);
         new_lp.matrix.push(row);
-    }  
+    }
     return new_lp;
 }
 
-function in_base(base, col)
-{
+function in_base(base, col) {
     for (let i = 0; i < base.length; i++) {
         if (col == base[i])
             return true;

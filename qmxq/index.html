@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta http-equiv="content-type" content="text/html;charset=utf-8">
+    <title>奇妙星球</title>
+    <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
+    <script type="text/javascript" src="data.js"></script>
+    <script type="text/javascript" src="../bcjh/LP.js"></script>
+    <script type="text/javascript" src="../common.js"></script>
+</head>
+
+<body>
+    <div id="qmxq">
+        <div>
+            <el-checkbox v-for="e in employees" v-model="e.enable">{{e.name}}</el-checkbox>
+        </div>
+        <div v-for="(item, index) in factory">
+            <el-row>
+                <el-col :span="4">
+                    <el-checkbox v-model="item.enable">{{item.name}}</el-checkbox>
+                </el-col>
+                <el-col :span="4">
+                    人数: <el-input-number size="small" v-model="item.employeesCount"></el-input-number>
+                </el-col>
+                <el-col :span="4">
+                    技巧: <el-input-number size="small" v-model="item.skill"></el-input-number>
+                </el-col>
+                <el-col :span="4">
+                    亲和: <el-input-number size="small" v-model="item.affinity"></el-input-number>
+                </el-col>
+                <el-col :span="4">
+                    力量: <el-input-number size="small" v-model="item.power"></el-input-number>
+                </el-col>
+                <el-col :span="4">
+                    智力: <el-input-number size="small" v-model="item.intelligence"></el-input-number>
+                </el-col>
+            </el-row>
+        </div>
+        <el-button @click="calc">计算</el-button>
+        <div v-for="(item, index) in results">
+            <div>{{factory[index].name}}:<span v-for="e in item">{{e.name}},</span></div>
+            <div>
+                技巧:{{sum_prop(item, 'skill')}}|
+                亲和:{{sum_prop(item, 'affinity')}}|
+                力量:{{sum_prop(item, 'power')}}|
+                智力:{{sum_prop(item, 'intelligence')}}|
+            </div>
+        </div>
+    </div>
+</body>
+<script src="https://unpkg.com/vue/dist/vue.js"></script>
+<script src="https://unpkg.com/element-ui/lib/index.js"></script>
+<script type="text/javascript" src="main.js"></script>
+
+</html>

@@ -1,0 +1,77 @@
+<html>
+
+<head>
+    <meta http-equiv="content-type" content="text/html;charset=utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>
+        LP
+    </title>
+    <style type="text/css">
+        div.no {
+            font-size: 120%;
+            display: inline
+        }
+
+        div.yes {
+            font-size: 80%;
+            display: inline
+        }
+
+        div.content {
+            color: #FF0000;
+            display: inline
+        }
+
+        div.level {
+            display: inline
+        }
+    </style>
+    <script type="text/javascript" src="LP.js">
+    </script>
+    <script type="text/javascript">
+        function main()
+        {
+            var objective_function = new Object();
+            var constraint_list = []; 
+            var result = [];
+            var objective_value = new Object();
+            objective_function.is_max = true;
+            objective_function.items = [[1, "X1"], [1, "X2"]];
+            {
+                var constraint = new Object();
+                constraint.opr_type = -1;
+                constraint.value = 5;
+                constraint.items = [[1,"X1"], [-1, "X2"]];
+                constraint_list.push(constraint);
+            }
+            {
+                var constraint = new Object();
+                constraint.opr_type = -1;
+                constraint.value = 7;
+                constraint.items = [[1,"X1"], [2, "X2"]];
+                constraint_list.push(constraint);
+            }
+            var r = solve(objective_function, constraint_list, result, objective_value);
+            var e = document.getElementById("result");
+            if (r == 1) {
+                e.innerHTML = objective_value.value + "<br>" + JSON.stringify(result);
+            }
+            else if( r == 0)
+            {
+                e.innerHTML = "无解"
+            }
+            else{
+                e.innerHTML = "无穷解"
+            }
+        }        
+    </script>
+</head>
+<body>
+    <div id="result"></div>
+    <script type="text/javascript">
+        main();
+    </script>
+    
+</body>
+
+</html>

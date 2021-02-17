@@ -398,7 +398,7 @@
     <div id="lp">
         <a href="index.html">返回</a>
         <login-panel login-ref="..\login.html" v-on:give-user="load_recipes"></login-panel>
-        <el-input placeholder="请输入菜谱过滤条件" v-model="recipe_filter"></el-input>
+        <el-input type="textarea" :rows="7" placeholder="请输入菜谱过滤条件" v-model="recipe_filter"></el-input>
         阈值：<el-input-number v-model="calc_limit"></el-input-number>
         <el-button @click="display_price()">非整数计算</el-button>
         <el-button @click="display_price2()">整数计算（FAST）</el-button>
@@ -582,6 +582,8 @@
                                 var list = this.get_expensive_recipes(new_recipes, chef, calc_limit);
                                 recipe_price_list[i] = list;
                             }
+                            if (recipe_price_list[0].length < 3 || recipe_price_list[1].length < 3 || recipe_price_list[2].length < 3)
+                                continue;
                             //final_objective_value.value = 0;
                             var clist1 = combination(Math.min(recipe_price_list[0].length, calc_limit), 3);
                             for (let i = 0; i < clist1.length; i++) {

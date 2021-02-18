@@ -18957,6 +18957,45 @@ var g_bcjh_data = {
 		"gift": "剪刀蟹",
 		"condiment": "Sweet"
 	}, {
+		"recipeId": 557,
+		"galleryId": "557",
+		"name": "金玉田鸡",
+		"rarity": 4,
+		"unlock": "-",
+		"stirfry": 0,
+		"boil": 82,
+		"knife": 0,
+		"fry": 0,
+		"bake": 50,
+		"steam": 0,
+		"materials": [{
+			"material": 2,
+			"quantity": 4
+		}, {
+			"material": 35,
+			"quantity": 3
+		}, {
+			"material": 34,
+			"quantity": 2
+		}, {
+			"material": 12,
+			"quantity": 4
+		}],
+		"price": 759,
+		"exPrice": 38,
+		"time": 373,
+		"limit": 20,
+		"origin": "限时签到",
+		"guests": [{
+			"guest": "王子"
+		}, {
+			"guest": "王子"
+		}, {
+			"guest": "苏轼"
+		}],
+		"gift": "耐煮的水草",
+		"condiment": "Salty"
+	}, {
 		"recipeId": 558,
 		"galleryId": "558",
 		"name": "花生酥",

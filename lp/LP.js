@@ -46,6 +46,8 @@ function solve_int(objective_function, constraint_list, result, objective_value)
             objective_value.value = new_value1.value;
             return r1;
         }
+        if (r1 == -1)
+            return -1;
         // 非整数
         var new_constraint_list2 = JSON.parse(s);
         {
@@ -161,8 +163,17 @@ function solve(objective_function, constraint_list, result, objective_value) {
     for (let i = 0; i < A.length; i++) {
         grow_number_array(A[i], var_list.length);
     }
+    if (b[index] < g_epsilon) {
+        //构造辅助线性规划函数
+        //var_list.push("_s");
+        var r = adjust_help(A, b, base, index);
+        if (r != 1)
+            return r;
+    }
     var X = new Array(var_list.length);
-    var r = simplex2(Ct, A, b, base, X, objective_value);
+    var matrix = init_matrix(Ct, A, b);
+    adjust_Ct(matrix, base);
+    var r = simplex(matrix, base, X, objective_value);
     if (r == 1) {
         for (let i = 0; i < var_list.length; i++) {
             if (var_list[i].charAt(0) == "_")
@@ -171,6 +182,73 @@ function solve(objective_function, constraint_list, result, objective_value) {
         }
         if (!objective_function.is_max)
             objective_value.value = -objective_value.value;
+    }
+    return r;
+}
+
+function adjust_Ct(matrix, base) {
+    var height = matrix.length;
+    for (let i = 0; i < base.length; i++) {
+        const col = base[i];
+        var Ct_row = matrix[height - 1];
+        if (Math.abs(Ct_row[col]) > g_epsilon) {
+            gaussian(matrix, i, col);
+        }
+    }
+}
+
+function adjust_help(A, b, base, index) {
+    var var_len = A[0].length;
+    for (let i = 0; i < A.length; i++) {
+        A[i].push(-1);
+    }
+    var Ct1 = new Array(var_len + 1);
+    Ct1.fill(0);
+    Ct1[var_len] = -1;
+    var matrix = init_matrix(Ct1, A, b);
+    gaussian(matrix, index, var_len);
+    base[index] = var_len;
+    //
+    var result = new Array(var_len + 1);
+    var objective_value = new Object();
+    var r = simplex(matrix, base, result, objective_value);
+    if (r == 1) {
+        if (Math.abs(result[var_len]) > g_epsilon) {
+            return 0;
+        }
+        else {
+            if(base[index] == var_len)
+            {
+                // 此种情况下，必然为0
+                if(Math.abs(matrix[index][var_len+1]) > g_epsilon)
+                    return 0;
+                // 重新找基
+                var new_col = -1;
+                for (let i = 0; i <= var_len; i++) {
+                    if (Math.abs(matrix[index][i])>g_epsilon)
+                    {
+                        new_col = i;
+                        break;
+                    }
+                }
+                if(new_col != -1)
+                {
+                    gaussian(matrix, index, new_col);
+                    base[index] = new_col;
+                }
+                else
+                    base[index] = -1;//全部为零，无基
+            }
+            var width = var_len;
+            var height = b.length;
+            for (let i = 0; i < height; i++) {
+                for (let j = 0; j < width; j++) {
+                    A[i][j] = matrix[i][j];
+                }
+                A[i].pop();
+                b[i] = matrix[i][width + 1]; // jump '_s'
+            }
+        }
     }
     return r;
 }
@@ -211,6 +289,7 @@ function simplex2(Ct, A, b, base, result, objective_value) {
     }
     */
     //b有可能是负的了，要处理
+    /*
     while (true) {
         var isValid = true;
         for (let i = 0; i < height; i++) {
@@ -233,6 +312,7 @@ function simplex2(Ct, A, b, base, result, objective_value) {
             break;
         }
     }
+    */
     return simplex(matrix, base, result, objective_value);
 }
 

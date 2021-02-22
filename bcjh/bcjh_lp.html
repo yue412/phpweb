@@ -14,7 +14,8 @@
     <script type="text/javascript" src="bcjh_data.js"></script>
     <script type="text/javascript" src="bcjh_common.js"></script>
     <script type="text/javascript" src="bcjh_skill.js"></script>
-    <script type="text/javascript" src="LP.js"></script>
+    <!--<script type="text/javascript" src="LP.js"></script>-->
+    <script type="text/javascript" src="../lp/LP.js"></script>
     <script type="text/javascript" src="../TableSorterV3.js"></script>
     <script type="text/javascript" src="vue_components.js"></script>
 
@@ -891,7 +892,6 @@
                             const comb = comb_list[t];
 
                             var select_chefs = [filter_chefs[comb[0]], filter_chefs[comb[1]], filter_chefs[comb[2]]];
-                            /*
                             var best_recipe_map = new Map();
                             for (let k = 0; k < new_recipes.length; k++) {
                                 const recipe = new_recipes[k];
@@ -951,7 +951,6 @@
                                 list.push([recipe, price, cnt, best[1][0]]);
                             }
                             list.sort(sort_result3);
-                            
                             var map = new Map();
                             var index = 0;
                             for (let i = 0; i < list.length; i++) {
@@ -971,14 +970,7 @@
                                 arr.push(r);
                                 index = i;
                             }
-                            */
                             var recipe_price_list = [[], [], []];
-                            for (let i = 0; i < select_chefs.length; i++) {
-                                const chef = select_chefs[i];
-                                var list = this.get_expensive_recipes(chef, calc_limit, rule);
-                                recipe_price_list[i] = list;
-                            }
-                            /*
                             for (let i = 0; i <= index; i++) {
                                 const r = list[i];
                                 var recipe = r[0];
@@ -1000,7 +992,6 @@
                                     recipe_price_list[j].push([recipe, price]);
                                 }
                             }
-                            */
                             var clist1 = combination(Math.min(recipe_price_list[0].length, calc_limit), 3);
                             for (let i = 0; i < clist1.length; i++) {
                                 const arr_index1 = clist1[i];

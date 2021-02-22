@@ -35,20 +35,20 @@
             var constraint_list = []; 
             var result = [];
             var objective_value = new Object();
-            objective_function.is_max = true;
-            objective_function.items = [[1, "X1"], [1, "X2"]];
+            objective_function.is_max = false;
+            objective_function.items = [[1, "X1"], [2, "X2"]];
             {
                 var constraint = new Object();
                 constraint.opr_type = -1;
-                constraint.value = 5;
-                constraint.items = [[1,"X1"], [-1, "X2"]];
+                constraint.value = 2;
+                constraint.items = [[1,"X1"], [1, "X2"]];
                 constraint_list.push(constraint);
             }
             {
                 var constraint = new Object();
-                constraint.opr_type = -1;
-                constraint.value = 7;
-                constraint.items = [[1,"X1"], [2, "X2"]];
+                constraint.opr_type = 1;
+                constraint.value = 1;
+                constraint.items = [[1,"X1"], [1, "X2"]];
                 constraint_list.push(constraint);
             }
             var r = solve(objective_function, constraint_list, result, objective_value);

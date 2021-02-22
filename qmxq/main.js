@@ -6,11 +6,23 @@ var app = new Vue(
             factory: g_qmxq_data.factory,
             employees: g_qmxq_data.employees,
             results: [],
+            f_ranks: [],
+            f_marks: [],
+            already_calc: false,
         },
         created: function () {
             for (let i = 0; i < this.employees.length; i++) {
                 var e = this.employees[i];
                 e.enable = getCookie(e.name) == 'true';
+            }
+            for (let i = 0; i < this.factory.length; i++) {
+                const f = this.factory[i];
+                this.f_ranks.push(f.ranks.length-1-2);
+                var obj = new Object;
+                for (let j = 0; j < f.ranks.length; j++) {
+                    obj[j] = f.ranks[j].name;
+                }
+                this.f_marks.push(obj);
             }
         },
         watch: {
@@ -30,8 +42,9 @@ var app = new Vue(
         methods: {
             calc: function () {
                 // 目标函数
+                this.already_calc = true;
                 var objective_function = new Object();
-                objective_function.is_max = true;
+                objective_function.is_max = false;
                 objective_function.items = [];
                 // 约束函数
                 var constraint_list = [];
@@ -49,14 +62,15 @@ var app = new Vue(
                     var arr_factor = new Array(this.employees.length).fill(0);
                     for (let j = 0; j < props.length; j++) {
                         const prop = props[j];
-                        if (f[prop] > 0) {
+                        var rank = f.ranks[this.f_ranks[i]];
+                        if (rank[prop] > 0) {
                             var constraint = new Object();
-                            constraint.opr_type = -1;
-                            constraint.value = f[prop];
+                            constraint.opr_type = 1;
+                            constraint.value = rank[prop];
                             constraint.items = []; //[1, var_name]
                             for (let k = 0; k < this.employees.length; k++) {
                                 const e = this.employees[k];
-                                if (e.enable && (e[prop] > 0)) {
+                                if (e.enable && (e[prop] > 10)) {
                                     var var_name = 'X_' + i + '_' + k;
                                     var_set.add(var_name);
                                     arr_var_set[k].add(var_name);

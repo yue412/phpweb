@@ -4,9 +4,9 @@
 <head>
     <meta http-equiv="content-type" content="text/html;charset=utf-8">
     <title>奇妙星球</title>
-    <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
+    <link rel="stylesheet" href="https://unpkg.zhimg.com/element-ui/lib/theme-chalk/index.css">
     <script type="text/javascript" src="data.js"></script>
-    <script type="text/javascript" src="../bcjh/LP.js"></script>
+    <script type="text/javascript" src="../lp/LP.js"></script>
     <script type="text/javascript" src="../common.js"></script>
 </head>
 
@@ -23,21 +23,13 @@
                 <el-col :span="4">
                     人数: <el-input-number size="small" v-model="item.employeesCount"></el-input-number>
                 </el-col>
-                <el-col :span="4">
-                    技巧: <el-input-number size="small" v-model="item.skill"></el-input-number>
-                </el-col>
-                <el-col :span="4">
-                    亲和: <el-input-number size="small" v-model="item.affinity"></el-input-number>
-                </el-col>
-                <el-col :span="4">
-                    力量: <el-input-number size="small" v-model="item.power"></el-input-number>
-                </el-col>
-                <el-col :span="4">
-                    智力: <el-input-number size="small" v-model="item.intelligence"></el-input-number>
+                <el-col :span="12">
+                    <el-slider v-model="f_ranks[index]" :min="0" :max="item.ranks.length-1" :marks="f_marks[index]"></el-slider>
                 </el-col>
             </el-row>
         </div>
         <el-button @click="calc">计算</el-button>
+        <div v-if="already_calc && results.length == 0">无解</div>
         <div v-for="(item, index) in results">
             <div>{{factory[index].name}}:<span v-for="e in item">{{e.name}},</span></div>
             <div>
@@ -49,8 +41,8 @@
         </div>
     </div>
 </body>
-<script src="https://unpkg.com/vue/dist/vue.js"></script>
-<script src="https://unpkg.com/element-ui/lib/index.js"></script>
+<script src="https://unpkg.zhimg.com/vue/dist/vue.js"></script>
+<script src="https://unpkg.zhimg.com/element-ui/lib/index.js"></script>
 <script type="text/javascript" src="main.js"></script>
 
 </html>

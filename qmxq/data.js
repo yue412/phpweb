@@ -63,8 +63,9 @@ var g_qmxq_data = {
             new Rank("A", 693, 415, 0, 0),
             new Rank("A+", 852, 511, 0, 0),
             new Rank("S-", 869, 521, 0, 0),
+            new Rank("S", 1064, 638, 0, 0),
         ]),
-        new Factory("超市", 6, [
+        new Factory("超市", 7, [
             new Rank("E+", 0, 114, 68, 0),
             new Rank("D-", 0, 128, 76, 0),
             new Rank("D", 0, 195, 117, 0),
@@ -77,7 +78,7 @@ var g_qmxq_data = {
             new Rank("B+", 0, 892, 535, 0),
             new Rank("A-", 0, 918, 550, 0),
         ]),
-        new Factory("警局", 3, [
+        new Factory("警局", 4, [
             new Rank("F-", 0, 0, 1, 1),
             new Rank("F", 0, 0, 48, 29),
             new Rank("F+", 0, 0, 75, 45),
@@ -88,6 +89,8 @@ var g_qmxq_data = {
             new Rank("D", 0, 0, 315, 189),
             new Rank("D+", 0, 0, 431, 258),
             new Rank("C-", 0, 0, 460, 276),
+            new Rank("C", 0, 0, 625, 375),
+            new Rank("C+", 0, 0, 810, 486),
         ]),
     ],
     employees: [
@@ -126,6 +129,9 @@ var g_qmxq_data = {
         ),
         new Empolyee("奶茶王子", 3, CLS_WIND,
             510, 180, 29, 0, 22, 53, 81, 22
+        ),
+        new Empolyee("啤酒王子", 3, CLS_LIGHT,
+            510, 96, 29, 0, 22, 53, 81, 22
         ),
         new Empolyee("阿宁", 3, CLS_LIGHT,
             558, 315, 2, 8, 33, 78, 3, 3
@@ -182,7 +188,7 @@ var g_qmxq_data = {
             448, 88, 0, 0, 104, 42, 42, 104
         ),
         new Empolyee("小黄", 1, CLS_FIRE,
-            132, 633, 0, 0, 42, 42, 143, 130
+            162, 750, 0, 0, 52, 52, 172, 159
         ),
         new Empolyee("小橙", 1, CLS_FIRE,
             72, 419, 0, 0, 66, 22, 84, 22

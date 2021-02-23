@@ -8,13 +8,31 @@
     <script type="text/javascript" src="data.js"></script>
     <script type="text/javascript" src="../lp/LP.js"></script>
     <script type="text/javascript" src="../common.js"></script>
+    <link rel="stylesheet" href="main.css">
 </head>
 
 <body>
     <div id="qmxq">
         <div>
-            <el-checkbox v-for="e in employees" v-model="e.enable">{{e.name}}</el-checkbox>
+            <table>
+                <tr>
+                    <td>稀有度</td>
+                    <td style="width: 18%;">水</td>
+                    <td style="width: 18%;">火</td>
+                    <td style="width: 18%;">风</td>
+                    <td style="width: 18%;">光</td>
+                    <td style="width: 18%;">暗</td>
+                </tr>
+                <tr v-for="rarity in [5,4,3,2,1]">
+                    <td>{{rarity}}</td>
+                    <td v-for="cls in [1,2,3,4,5]">
+                        <el-checkbox v-for="e in employees" v-model="e.enable" v-if="e.rarity==rarity&&e.cls==cls">{{e.name}}</el-checkbox>
+                    </td>
+                </tr>
+            </table>
         </div>
+        <el-button @click="select_all">全选</el-button>
+        <el-checkbox v-model="update">是否更新</el-checkbox>
         <div v-for="(item, index) in factory">
             <el-row>
                 <el-col :span="4">

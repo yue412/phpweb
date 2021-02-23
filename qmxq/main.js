@@ -9,6 +9,7 @@ var app = new Vue(
             f_ranks: [],
             f_marks: [],
             already_calc: false,
+            update: false,
         },
         created: function () {
             for (let i = 0; i < this.employees.length; i++) {
@@ -17,7 +18,7 @@ var app = new Vue(
             }
             for (let i = 0; i < this.factory.length; i++) {
                 const f = this.factory[i];
-                this.f_ranks.push(f.ranks.length-1-2);
+                this.f_ranks.push(f.ranks.length - 1 - 2);
                 var obj = new Object;
                 for (let j = 0; j < f.ranks.length; j++) {
                     obj[j] = f.ranks[j].name;
@@ -134,6 +135,20 @@ var app = new Vue(
                             this.results[f_id] = [];
                         this.results[f_id].push(this.employees[id]);
                     }
+                    if (this.update) {
+                        for (let k = 0; k < this.employees.length; k++) {
+                            const e = this.employees[k];
+                            e.enable = false;
+                        }
+                        for (let i = 0; i < this.results.length; i++) {
+                            const f = this.results[i];
+                            for (let j = 0; j < f.length; j++) {
+                                const e = f[j];
+                                e.enable = true;
+                            }
+                        }
+
+                    }
 
                 }
                 else {
@@ -141,8 +156,8 @@ var app = new Vue(
                 }
 
             },
-            sum_prop: function(list, prop){
-                if (list==null)
+            sum_prop: function (list, prop) {
+                if (list == null)
                     return 0;
                 var result = 0;
                 for (let i = 0; i < list.length; i++) {
@@ -150,6 +165,12 @@ var app = new Vue(
                     result += e[prop];
                 }
                 return result;
+            },
+            select_all: function () {
+                for (let i = 0; i < this.employees.length; i++) {
+                    const e = this.employees[i];
+                    e.enable = true;
+                }
             },
         },
     }

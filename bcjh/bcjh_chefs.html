@@ -1,3 +1,4 @@
+<!DOCTYPE html>
 <html>
 
 <head>
@@ -8,8 +9,10 @@
         爆炒江湖
     </title>
     <!--script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script-->
-    <script src="https://cdn.jsdelivr.net/npm/vue@2.6.12"></script>
-    <link rel="stylesheet" href="bcjh.css" />
+    <link rel="stylesheet" href="https://unpkg.zhimg.com/element-ui/lib/theme-chalk/index.css">
+    <!--script src="https://cdn.jsdelivr.net/npm/vue@2.6.12"></script>
+
+    <link rel="stylesheet" href="bcjh.css" /-->
     <script src="https://ajax.aspnetcdn.com/ajax/jQuery/jquery-3.5.1.js"></script>
     <script src="../layer/layer.js"></script>
     <script type="text/javascript" src="../common.js">
@@ -20,20 +23,100 @@
     </script>
     <script type="text/javascript" src="bcjh_skill.js">
     </script>
-    <script type="text/javascript" src="../TableSorterV3.js">
-    </script>
+
+    <script src="https://unpkg.zhimg.com/vue/dist/vue.js"></script>
+    <script src="https://unpkg.zhimg.com/element-ui/lib/index.js"></script>
+
     <script type="text/javascript" src="vue_components.js">
     </script>
+    <style type="text/css">
+        .chef-emphasize {
+            background-color: #CCFFCC;
+        }
+    
+        .emphasize-font {
+            color: red;
+        }
+    </style>
 </head>
 
 <body>
     <div id="bcjh">
-        <a v-on:click="add_chef()" href="#">添加厨师</a>
-        <a href="index.html">返回</a>
+        <el-button @click="add_chef()" type="text">添加厨师</el-button>
+        <el-link type="primary" :underline="false" href="index.html">返回</el-link>
         <login-panel login-ref="..\login.html" v-on:give-user="load_chefs"></login-panel>
-        <div>
-            <input type="text" placeholder="装备" v-model="selected_equip" />
-        </div>
+
+        <el-row>
+            <el-col :span="8">
+                <el-input v-model="search" size="mini" placeholder="输入关键字搜索" />
+            </el-col>
+            <el-col :span="8">
+                <el-input size="mini" placeholder="装备测试" v-model="selected_equip" />
+            </el-col>
+        </el-row>
+        <el-table :data="filter_chefs.slice((currentPage-1)*pageSize,currentPage*pageSize)" style="width: 100%"
+            :default-sort="{prop: 'id', order: 'ascending'}" @sort-change="sortChange" @filter-change="filterChange">
+            <el-table-column prop="id" label="序号" width="80" sortable>
+            </el-table-column>
+            <el-table-column prop="name" label="名称" width="100" sortable>
+            </el-table-column>
+            <el-table-column prop="level" label="级别"  width="80" sortable>
+            </el-table-column>
+            <el-table-column prop="rarity" label="稀有度"  width="100" sortable
+                :filters="[{ text: '5', value: 5 }, { text: '4', value: 4 }, { text: '3', value: 3 }, { text: '2', value: 2 }, { text: '1', value: 1 }]"
+                column-key='rarity'>
+            </el-table-column>
+            <el-table-column prop="stirfry" label="炒" :width="p_width" sortable>
+            </el-table-column>
+            <el-table-column prop="steam" label="蒸" :width="p_width" sortable>
+            </el-table-column>
+            <el-table-column prop="knife" label="切" :width="p_width" sortable>
+            </el-table-column>
+            <el-table-column prop="fry" label="炸" :width="p_width" sortable>
+            </el-table-column>
+            <el-table-column prop="boil" label="煮" :width="p_width" sortable>
+            </el-table-column>
+            <el-table-column prop="bake" label="烤" :width="p_width" sortable>
+            </el-table-column>
+            <el-table-column prop="fish" label="鱼" :width="p_width" sortable>
+            </el-table-column>
+            <el-table-column prop="creation" label="面" :width="p_width" sortable>
+            </el-table-column>
+            <el-table-column prop="veg" label="菜" :width="p_width" sortable>
+            </el-table-column>
+            <el-table-column prop="meat" label="肉" :width="p_width" sortable>
+            </el-table-column>
+            <el-table-column label="技能" >
+                <template slot-scope="scope">{{ scope.row.skill_name() }}</template>
+            </el-table-column>
+            <el-table-column label="终极技能" >
+                <template slot-scope="scope">
+                    <div style="white-space: pre-wrap;"
+                        v-bind:class="{'chef-emphasize':(scope.row.ultimate_skill == null) && (scope.row.ultimate_skill_conditions.length>=3), 'emphasize-font':(scope.row.ultimate_skill == null) && (scope.row.ultimate_skill_conditions.length<3) && (scope.row.ultimate_skill_conditions2 != null) && scope.row.ultimate_skill_conditions2.length>=3}">{{scope.row.ultimate_skill_name()}}</div>
+                </template>
+            </el-table-column>
+            <el-table-column label="装备" >
+                <template slot-scope="scope">{{ scope.row.equip_name() }}</template>
+            </el-table-column>
+            <el-table-column fixed="right" label="编辑" width="100">
+                <template slot-scope="scope">
+                    <div><el-button @click="edit_chef(scope.row)" type="text" style="padding: 0px;">修改</el-button></div>
+                    <div><el-button v-if="scope.row.level<3" @click="set_max_level(scope.row)" type="text"style="padding: 0px;">满级</el-button></div>
+                    <div><el-button v-if="scope.row.ultimate_skill == null" @click="set_ultimate_skill(scope.row)" type="text"style="padding: 0px;">终极技能</el-button></div>
+                </template>
+            </el-table-column>
+        </el-table>
+        <el-row>
+            <el-col :span="12">
+                <el-pagination @size-change="handleSizeChange" @current-change="handleCurrentChange"
+                    :current-page="currentPage" :page-sizes="[10, 20, 30, 40]" :page-size="pageSize"
+                    layout="total, sizes, prev, pager, next, jumper" :total="filter_chefs.length">
+                </el-pagination>
+            </el-col>
+        </el-row>
+
+
+        <!--
         <div>数量: {{chefs.length}}</div>
         <table id="tb2">
             <tr>
@@ -73,7 +156,8 @@
                 <td>{{chef.meat}}</td>
                 <td>{{chef.skill_name()}}</td>
                 <td style="white-space: pre-wrap;"
-                    v-bind:class="{'chef-emphasize':(chef.ultimate_skill == null) && (chef.ultimate_skill_conditions.length>=3), 'emphasize-font':(chef.ultimate_skill == null) && (chef.ultimate_skill_conditions.length<3) && (chef.ultimate_skill_conditions2 != null) && chef.ultimate_skill_conditions2.length>=3}">{{chef.ultimate_skill_name()}}</td>
+                    v-bind:class="{'chef-emphasize':(chef.ultimate_skill == null) && (chef.ultimate_skill_conditions.length>=3), 'emphasize-font':(chef.ultimate_skill == null) && (chef.ultimate_skill_conditions.length<3) && (chef.ultimate_skill_conditions2 != null) && chef.ultimate_skill_conditions2.length>=3}">
+                    {{chef.ultimate_skill_name()}}</td>
                 <td>{{chef.equip_name()}}</td>
                 <td>
                     <a v-on:click="edit_chef(chef)" class="link">修改</a>
@@ -82,6 +166,7 @@
                 </td>
             </tr>
         </table>
+        -->
     </div>
     <script type="text/javascript">
         var app = new Vue(
@@ -89,9 +174,17 @@
                 el: '#bcjh',
                 data: {
                     chefs: [],
+                    filter_chefs: [],
                     recipes: null,
                     sorter: null,
                     selected_equip: "",
+
+                    currentPage: 1,
+                    pageSize: 10,
+                    search: '',
+                    type_filter: [],
+                    sort_arg: null,
+                    p_width: 60,
                 },
                 created: function () {
                 },
@@ -117,8 +210,46 @@
                             chef.ultimate_skill_conditions2 = list;
                         }
                     },
+                    search: function (newValue, oldValue) {
+                        if (newValue != oldValue) {
+                            this.gen_filter_chefs();
+                        }
+                    },
                 },
                 methods: {
+                    gen_filter_chefs: function()
+                    {
+                        if (this.search == '' && this.type_filter.length == 0)
+                            this.filter_chefs = this.chefs;
+                        else {
+                            this.filter_chefs = [];
+                            for (let i = 0; i < this.chefs.length; i++) {
+                                const chef = this.chefs[i];
+                                if(this.search != '' && chef.name.indexOf(this.search) == -1)
+                                    continue;
+                                if(this.type_filter.length > 0)
+                                {
+                                    var bFilter = false;
+                                    for (let j = 0; j < this.type_filter.length; j++) {
+                                        const val = this.type_filter[j];
+                                        if(chef.rarity == val)
+                                        {
+                                            bFilter = true;
+                                            break;
+                                        }
+                                    }
+                                    if(!bFilter)
+                                        continue;
+                                }
+                                this.filter_chefs.push(chef);
+                            }
+                        }
+                        if (this.sort_arg)
+                            this.sortChange(this.sort_arg);
+                        var last_page = Math.max(Math.ceil(this.filter_chefs.length / this.pagesize), 1);
+                        if (this.currentPage > last_page)
+                            this.currentPage = last_page;
+                    },
                     load_chefs: function (user_id) {
                         this.user_id = user_id;
                         var that = this;
@@ -132,9 +263,7 @@
                                 that.chefs = my_chefs;
                                 that.recipes = new_recipes;
                                 that.init_ultimate_skill_conditions(new_recipes);
-                                that.$nextTick(function () {
-                                    that.sorter = new TableSorter("tb2");
-                                });
+                                that.gen_filter_chefs();
                             });
                         });
                     },
@@ -327,7 +456,70 @@
                             return s;
                         }
                         return "";
-                    }
+                    },
+                    handleCurrentChange: function (currentPage) {
+                        this.currentPage = currentPage;
+                    },
+                    handleSizeChange: function (pageSize) {
+                        this.pagesize = pageSize;
+                    },
+                    sortChange: function (arg) {
+                        if (arg.column) {
+                            this.sort_arg = arg;
+                            //let sortTableData = cloneDeep(this.tableData);
+                            if (arg.order === 'descending') {
+                                if ( arg.prop == null || arg.prop === 'name') {
+                                    this.filter_chefs.sort(this.sortByName(arg.prop, true));
+                                } else {
+                                    this.filter_chefs.sort(this.sortByProp(arg.prop, true));
+                                }
+                            } else {
+                                if (arg.prop == null || arg.prop === 'name') {
+                                    this.filter_chefs.sort(this.sortByName(arg.prop, false));
+                                } else {
+                                    this.filter_chefs.sort(this.sortByProp(arg.prop, false));
+                                }
+                            }
+                            //                    this.tableData = sortTableData;
+                        }
+                        /*else {
+                            this.tableData = this.jobListRaw;
+                        }
+                        this.page = 1;*/
+                    },
+                    sortByProp: function (sortKey, order) {
+                        if (order) {
+                            return (a, b) => {
+                                return b[sortKey] - a[sortKey];
+                            };
+                        } else {
+                            return (a, b) => {
+                                return a[sortKey] - b[sortKey];
+                            };
+                        }
+                    },
+                    // 根据名称对表格进行排序
+                    sortByName: function (sortKey, order) {
+                        if (order) {
+                            return (a, b) => {
+                                a[sortKey] = a[sortKey] == null ? '' : a[sortKey];
+                                b[sortKey] = b[sortKey] == null ? '' : b[sortKey];
+                                return b[sortKey].localeCompare(a[sortKey]);
+                            };
+                        } else {
+                            return (a, b) => {
+                                a[sortKey] = a[sortKey] == null ? '' : a[sortKey];
+                                b[sortKey] = b[sortKey] == null ? '' : b[sortKey];
+                                return a[sortKey].localeCompare(b[sortKey]);
+                            };
+                        }
+                    },
+                    filterChange: function (filters, e) {
+                        if (filters['rarity']) {
+                            this.type_filter = filters['rarity'];
+                            this.gen_filter_chefs();
+                        }
+                    },
                 }
             }
         );

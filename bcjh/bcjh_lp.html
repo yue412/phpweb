@@ -246,6 +246,9 @@
                 s += cnt;
                 s += "</td>";
                 s += "<td>";
+                s += recipe.is_mastery;
+                s += "</td>";
+                s += "<td>";
                 s += recipe.materials_name,
                     s += "</td>";
                 s += "<td>";
@@ -277,6 +280,9 @@
                 s += "</td>";
                 s += "<td>";
                 s += "解";
+                s += "</td>";
+                s += "<td>";
+                s += "专精";
                 s += "</td>";
                 s += "<td>";
                 s += "材料";
@@ -406,6 +412,9 @@
                 s += "解";
                 s += "</td>";
                 s += "<td>";
+                s += "专精";
+                s += "</td>";
+                s += "<td>";
                 s += "材料";
                 s += "</td>";
                 s += "<td>";
@@ -486,6 +495,9 @@
                 s += "</td>";
                 s += "<td>";
                 s += "解";
+                s += "</td>";
+                s += "<td>";
+                s += "专精";
                 s += "</td>";
                 s += "<td>";
                 s += "材料";
@@ -718,7 +730,7 @@
                 <span v-for="chef in chefs">
                     <span v-if="chef.rarity == rarity">
                         <input type="checkbox" v-bind:id="'ck_'+chef.id" v-bind:value="chef" v-model="selected_chefs">
-                        <label v-bind:for="'ck_'+chef.id">{{chef.name}}</label>
+                        <label v-bind:for="'ck_'+chef.id">{{chef.name}}({{chef.equip_name()}})</label>
                     </span>
                 </span>
             </div>

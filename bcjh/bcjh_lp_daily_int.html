@@ -18,7 +18,7 @@
     </script>
     <script type="text/javascript" src="bcjh_skill.js">
     </script>
-    <script type="text/javascript" src="LP.js">
+    <script type="text/javascript" src="../lp/LP.js">
     </script>
     <script type="text/javascript" src="../TableSorterV3.js">
     </script>
@@ -53,53 +53,6 @@
                 return 0;
         }
 
-        function filter_recipes(recipes, chefs, comb) {
-            var chef_recipe = [];
-            for (let i = 0; i < comb.length; i++) {
-                chef_recipe.push(new Array());
-            }
-            for (let k = 0; k < recipes.length; k++) {
-                const recipe = recipes[k];
-                for (let j = 0; j < comb.length; j++) {
-                    const index = comb[j];
-                    var chef = chefs[index];
-                    var price = calc_price(recipe, chef, chefs, 0);
-                    if (price > 0) {
-                        chef_recipe[j].push([price / recipe.time, recipe]);
-                    }
-                }
-            }
-            var set = new Set();
-            for (let i = 0; i < chef_recipe.length; i++) {
-                var arr = chef_recipe[i];
-                arr.sort(function (a, b) {
-                    if (a[0] < (b[0] + g_epsilon))
-                        return 1;
-                    else if (a[0] > (b[0] - g_epsilon))
-                        return -1;
-                    else
-                        return 0;
-                })
-                for (let j = 0; j < arr.length && j < 9; j++) {
-                    const obj = arr[j];
-                    set.add(obj[1]);
-                }
-            }
-            return Array.from(set);
-        }
-
-        function filter_chef(chefs) {
-            var arr = [];
-            for (let i = 0; i < chefs.length; i++) {
-                const chef = chefs[i];
-                var name = "ck_chef_" + chef.id;
-                var e = document.getElementById(name);
-                if (e && e.checked) {
-                    arr.push(chef);
-                }
-            }
-            return arr;
-        }
         /*
                 function getMinOrMax() {
                     var e = document.getElementById("rb_min");
@@ -169,72 +122,6 @@
                     });
                 }
         */
-        function select_material_cnt(id, checked) {
-            setCookie(id, checked ? "true" : "false", 14);
-        }
-        function display_materials() {
-            var e = document.getElementById("materials");
-            var s = "";
-            for (let i = 0; i < g_bcjh_data.maps.length; i++) {
-                const map = g_bcjh_data.maps[i];
-                var val = getCookie("ck_material_cnt_" + i);
-                var sval = val == "true" ? "checked=\"checked\"" : "";
-                s += map.name + ":";
-                s += "<input type=\"checkbox\" id=\"ck_material_cnt_" + i + "\" onclick=\"select_material_cnt(this.id, this.checked)\" " + sval + "/>" + "满 ";
-                for (let j = 0; j < map.materials.length; j++) {
-                    const material = map.materials[j];
-                    s += "<input type=\"radio\"  name= \"map_" + i + "\" id=\"material_" + i + "_" + j + "\" value=\"" + material.name + "\"  onclick=\"setCookie(this.name, " + j + ", 14)\" /><div id=\"material_name_" + i + "_" + j + "\" style=\"display:inline-block\">" + material.name + "(" + material.skill + ")</div>";
-                }
-                s += "<br>";
-            }
-            e.innerHTML = s;
-            for (let i = 0; i < g_bcjh_data.maps.length; i++) {
-                restore_radio_checked("map_" + i);
-            }
-        }
-        function restore_value(id) {
-            var val = getCookie(id);
-            var e = document.getElementById(id);
-            e.value = val;
-        }
-        function restore_radio_checked(name) {
-            var val = getCookie(name);
-            var arr = document.getElementsByName(name);
-            if (val != "") {
-                arr[val].checked = true;
-            }
-        }
-        function sort_chef(a, b) {
-            return b.rarity - a.rarity;
-        }
-        function select_chef(rarity) {
-            var e = document.getElementById("ck_all_chef_" + rarity);
-            for (let i = 0; i < my_chefs.length; i++) {
-                const chef = my_chefs[i];
-                if (chef.rarity == rarity) {
-                    var e2 = document.getElementById("ck_chef_" + chef.id);
-                    e2.checked = e.checked;
-                }
-            }
-        }
-        function display_chefs(chefs) {
-            chefs.sort(sort_chef);
-            if (chefs.length == 0)
-                return;
-            var e2 = document.getElementById("chefs");
-            var rarity = chefs[0].rarity;
-            var sChecked = "checked=\"checked\"";
-            var s = "<input type=\"checkbox\" id=\"ck_all_chef_" + rarity + "\" onclick=\"select_chef(" + rarity + ")\" " + ((rarity > 1) ? sChecked : "") + ">全选 ";
-            for (let i = 0; i < chefs.length; i++) {
-                const chef = chefs[i];
-                if (chef.rarity != rarity) {
-                    s += "<br>" + "<input type=\"checkbox\" id=\"ck_all_chef_" + chef.rarity + "\" onclick=\"select_chef(" + chef.rarity + ")\" " + ((chef.rarity > 1) ? sChecked : "") + ">全选 ";
-                    rarity = chef.rarity;
-                }
-                s += "<input type=\"checkbox\" id=\"ck_chef_" + chef.id + "\" " + ((chef.rarity > 1) ? sChecked : "") + ">" + chef.name;
-            }
-            e2.innerHTML = s;
-        }          
     </script>
 </head>
 
@@ -247,7 +134,8 @@
         <div>
             餐桌加成：<input type="number" v-model="price_add" />%
             时间限制(h)：<input type="number" v-model="time_limit" />
-            <input type="button" value="计算" v-on:click="calc()" />
+            <input type="button" value="计算" @click="calc()" />
+            <input type="button" value="计算采集" @click="calc_c()" />
         </div>
         <div>
             <input type="radio" id="rb_min" value="0" v-model="map_quantity" />
@@ -260,9 +148,11 @@
             <label for="ck_milk">禁用牛乳</label>
             <input type="checkbox" id="ck_master" v-model="disable_master" />
             <label for="ck_master">禁用精通</label>
+            计算时间：{{calc_time}} ms
         </div>
         <div id="materials">
             <div v-for="(map, index) in maps">
+                <input type="checkbox" v-model="map_infos[index].enable">
                 {{map.name}}:<input type="checkbox" v-bind:id="'ck_map'+index" v-model="map_infos[index].all">
                 <label v-bind:for="'ck_map'+index">满</label>
                 <span v-for="(material, j) in map.materials">
@@ -270,6 +160,9 @@
                     <label v-bind:for="'m_'+index+'_'+j"
                         v-bind:class="{'chef-emphasize': used_material[index][j]}">{{material.name + "(" +
                         material.skill + ")"}}</label>
+                </span>
+                <span>
+                    <span v-for="(chef, i) in map_infos[index].chefs"> {{chef.name}}({{chef[map_infos[index].skill]}}), </span>
                 </span>
             </div>
         </div>
@@ -305,11 +198,23 @@
                     disable_master: false,
                     maps: g_bcjh_data.maps,
                     map_infos: [],
+                    map_skills: [
+                            { name:"牧场", skill:"meat"},
+                            { name:"鸡舍", skill:"meat"},
+                            { name:"猪圈", skill:"meat"},
+                            { name:"菜棚", skill:"veg"},
+                            { name:"菜地", skill:"veg"},
+                            { name:"森林", skill:"veg"},
+                            { name:"作坊", skill:"creation"},
+                            { name:"池塘", skill:"fish"},
+                        ],
+                    exclude_chefs: new Set(),
 
                     rarity_list: [5, 4, 3, 2, 1],
                     selected_chefs: [],
                     selected_raritys: [5, 4, 3, 2],
                     used_material: [],
+                    calc_time: 0,
                     //setCookie(this.name, 0, 14)
                 },
                 created: function () {
@@ -321,6 +226,9 @@
                         var info = new Object();
                         info.all = getCookie("map" + i + "_all");
                         info.max = getCookie("map" + i + "_max");
+                        info.chefs = [];
+                        info.enable = true;
+                        info.skill = this.get_map_skill(map.name);
                         this.map_infos.push(info);
                         this.used_material.push(new Array(map.materials.length).fill(false));
                     }
@@ -383,6 +291,108 @@
                                 that.recipes = new_recipes;
                             });
                         });
+                    },
+                    get_map_skill: function(map_name) {
+                        for (let i = 0; i < this.map_skills.length; i++) {
+                            const map = this.map_skills[i];
+                            if(map.name == map_name)
+                                return map.skill;
+                        }
+                        return "";
+                    },
+                    get_chef_by_id: function(id) {
+                        for (let i = 0; i < this.chefs.length; i++) {
+                            const chef = this.chefs[i];
+                            if(chef.id == id)
+                                return chef;
+                        }
+                        return null;
+                    },
+                    calc_c: function() {
+                        //菜
+                        var objective_function = new Object();
+                        objective_function.is_max = false;
+                        objective_function.items = [];
+
+                        var chef_map = new Map();
+                        var constraint_list = [];
+                        for (let i = 0; i < this.map_infos.length; i++) {
+                            const info = this.map_infos[i];
+                            info.chefs = [];
+                            if(!info.enable)
+                                continue;
+                            var map = this.maps[i];
+                            var skill = info.skill;
+                             // 每个地图技能
+                            var constraint_map = new Object(); 
+                            constraint_map.opr_type = 1;
+                            constraint_map.value = map.materials[info.max].skill;
+                            constraint_map.items = [];
+                            constraint_list.push(constraint_map);
+
+                            // 每个地图最多五人
+                            var constraint_map_cnt = new Object(); 
+                            constraint_map_cnt.opr_type = -1;
+                            constraint_map_cnt.value = 5;
+                            constraint_map_cnt.items = [];
+                            constraint_list.push(constraint_map_cnt);
+                            this.chefs.sort(function(a, b){
+                                return -(a[skill] - b[skill]);
+                            });
+                            var count = 0; // 最多40个
+                            for (let j = 0; j < this.chefs.length; j++) {
+                                const chef = this.chefs[j];
+                                if(this.exclude_chefs.has(chef))
+                                    continue;
+                                var id = chef.id;
+                                var var_name = "X_" + id +"_"+ i;
+                                if(chef[skill] > 0)
+                                {
+                                    if(count++ >= 40)
+                                        break;
+                                    constraint_map.items.push([chef[skill], var_name]);
+                                    objective_function.items.push([chef[skill], var_name]);
+                                    constraint_map_cnt.items.push([1, var_name]);
+                                    if(!chef_map.has(id))
+                                    {
+                                        var constraint_chef_cnt = new Object(); 
+                                        constraint_chef_cnt.opr_type = -1;
+                                        constraint_chef_cnt.value = 1;
+                                        constraint_chef_cnt.items = [];
+                                        constraint_list.push(constraint_chef_cnt);
+                                        chef_map.set(id, constraint_chef_cnt);
+                                    }
+                                    constraint_chef_cnt = chef_map.get(id);
+                                    constraint_chef_cnt.items.push([1, var_name]);
+                                }
+                            }
+                        }
+                        var dateBegin = new Date();
+                        var result = [];
+                        var objective_value = new Object();
+                        //var r = solve_fast(objective_function, constraint_list, result, objective_value);
+                        g_log_objective_value = false;
+                        var r = solve_int(objective_function, constraint_list, result, objective_value);
+                        var dateEnd = new Date();
+                        this.calc_time = dateEnd.getTime() - dateBegin.getTime();
+                        if (r == 1) {
+                            for (let i = 0; i < result.length; i++) {
+                                const pair = result[i];
+                                var cnt = Math.round(pair[1]);
+                                if (cnt == 0)
+                                    continue;
+                                if (pair[0].charAt(0) != "X")
+                                    continue;
+                                var arr = pair[0].split("_");
+                                var id = parseInt(arr[1]);
+                                var map_index = parseInt(arr[2]);
+                                var chef = this.get_chef_by_id(id);
+                                this.map_infos[map_index].chefs.push(chef);
+                            }
+                        }
+                        else{
+
+                        }
                     },
                     calc: function () {
                         filter_chefs = this.selected_chefs;
@@ -536,8 +546,18 @@
                                 constraint_list.push(constraint);
                         });
                     },
+                    find_chef: function (name) {
+                        var chefs = this.chefs;
+                        for (let i = 0; i < chefs.length; i++) {
+                            if (name === chefs[i].name) {
+                                return chefs[i];
+                            }
+                        }
+                        return null;
+                    },
                     display_result: function (recipes, chefs, best_recipe_map, materail_map) {
                         //var r = solve(objective_function, constraint_list, result, objective_value);
+                        this.exclude_chefs.clear();
                         var e = document.getElementById("price");
                         if (("value" in final_objective_value)) {
                             //var s = "复杂度:"+ g_debug_simplex_cnt + "<br>" + final_objective_value.value + "<br>";// + JSON.stringify(result) + "<br>";
@@ -598,6 +618,12 @@
                                         t = map.get(m.material);
                                     }
                                     map.set(m.material, t + m.quantity * cnt * recipe.limit);
+                                }
+                                for (let i = 0; i < best[1].length; i++) {
+                                    const name = best[1][i];
+                                    var chef = this.find_chef(name);
+                                    if(chef)
+                                        this.exclude_chefs.add(chef);
                                 }
                                 s += display_item(recipe, best[1].join(","), price, cnt);
                             }

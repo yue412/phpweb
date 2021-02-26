@@ -78,7 +78,7 @@ var g_qmxq_data = {
             new Rank("B+", 0, 892, 535, 0),
             new Rank("A-", 0, 918, 550, 0),
         ]),
-        new Factory("警局", 4, [
+        new Factory("警局", 5, [
             new Rank("F-", 0, 0, 1, 1),
             new Rank("F", 0, 0, 48, 29),
             new Rank("F+", 0, 0, 75, 45),
@@ -131,7 +131,7 @@ var g_qmxq_data = {
             510, 180, 29, 0, 22, 53, 81, 22
         ),
         new Empolyee("啤酒王子", 3, CLS_LIGHT,
-            918, 180, 29, 0, 22, 71, 126, 22
+            969, 180, 29, 0, 22, 71, 135, 22
         ),
         new Empolyee("阿宁", 3, CLS_LIGHT,
             558, 315, 2, 8, 33, 78, 3, 3

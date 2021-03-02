@@ -231,21 +231,40 @@ var app = new Vue(
                 this.dialogFormVisible = true;
             },
             handleConfirm: function () {
-                var url = "../db/update_record.php?table_name=kxszx_fish&primary_key=name&key_val=" + this.edit_fish.name + "&cnt=" + this.edit_fish.cnt + "&crown_cnt=" + this.edit_fish.crown;
+                var url = "../db/get_records.php?table_name=kxszx_fish&name=" + this.edit_fish.name;
                 var _this = this;
                 do_ajax(url, function (text) {
-                    var fish = _this.get_fish(_this.edit_fish.name);
-                    fish.cnt = _this.edit_fish.cnt;
-                    fish.crown = _this.edit_fish.crown;
-                    _this.fish_map.forEach(function (fish, key, item) {
-                        fish.need = 0;
-                        fish.jewel = 0;
-                        fish.left = fish.total();
-                    });
-                    _this.collect_all();
-                    _this.gen_results_table();
-                    _this.dialogFormVisible = false;
+                    var fishes = JSON.parse(text);
+                    if (fishes.length > 0) {
+                        // update
+                        var url = "../db/update_record.php?table_name=kxszx_fish&primary_key=name&key_val=" + _this.edit_fish.name + "&cnt=" + _this.edit_fish.cnt + "&crown_cnt=" + _this.edit_fish.crown;
+                        do_ajax(url, function (text) {
+                            _this.closeConfirm();
+                        });
+                    }
+                    else {
+                        // insert
+                        var url = "../db/insert_record.php?table_name=kxszx_fish&name=" + _this.edit_fish.name + "&cnt=" + _this.edit_fish.cnt + "&crown_cnt=" + _this.edit_fish.crown;
+                        do_ajax(url, function (text) {
+                            _this.closeConfirm();
+                        });
+                    }
                 });
+
+            },
+            closeConfirm: function() {
+                var _this = this;
+                var fish = _this.get_fish(_this.edit_fish.name);
+                fish.cnt = _this.edit_fish.cnt;
+                fish.crown = _this.edit_fish.crown;
+                _this.fish_map.forEach(function (fish, key, item) {
+                    fish.need = 0;
+                    fish.jewel = 0;
+                    fish.left = fish.total();
+                });
+                _this.collect_all();
+                _this.gen_results_table();
+                _this.dialogFormVisible = false;
             },
             handleCurrentChange: function (currentPage) {
                 this.currentPage = currentPage;

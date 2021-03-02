@@ -26,7 +26,9 @@
                     $result = eval("return $formula;");
                     if($result >= 20 || $result <= 0)
                         continue;
-                    if($result<10 && strlen($formula) == 3)
+                    if($result<10 && (strlen($formula) == 3 || strlen($formula) == 5))
+                        continue;
+                    if($result>=10 && strlen($formula) == 4)
                         continue;
                     //echo "$result,$formula|";
                     $list[] = $formula;

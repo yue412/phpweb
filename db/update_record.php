@@ -28,11 +28,14 @@
             $value = 'NULL';
         else
             $value = '\''.$value.'\'';
-        $list[] = '`'.$key.'` = '.$value;
+        $list[] = '`'.$key.'` = '.urldecode($value);
     }
     $s_list = implode(',', $list);
     $sql = 'UPDATE `'.$table_name.'` SET '.$s_list.' WHERE '.$where;
     //var_dump($sql);
-    $db->query($sql);
+    if(!$db->query($sql))
+    {
+        echo $db->error;
+    }
     $db->close();
 ?>

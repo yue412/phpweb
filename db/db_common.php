@@ -8,7 +8,7 @@
             if(!($value == '' || $value == "NULL"))
             {
                 $keys[] = $key;
-                $values[] = '\''.$value.'\'';
+                $values[] = '\''.urldecode($value).'\'';
             }
         }
         //$keys = array_keys($fields);

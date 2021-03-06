@@ -1,4 +1,4 @@
-function do_ajax(url, cfunc) {
+/*export */function do_ajax(url, cfunc) {
     var xmlhttp;
     if (window.XMLHttpRequest) {
         // IE7+, Firefox, Chrome, Opera, Safari 浏览器执行代码
@@ -74,6 +74,14 @@ function build_url_params(arr) {
     return list.join("&");
 }
 
+function obj_to_array(obj) {
+    var arr = [];
+    for (var key in obj) {
+        arr.push([key, obj[key]]);
+    }
+    return arr;
+}
+
 function GetQueryString(name) {
     var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)");
     var url = decodeURIComponent(window.location.search);
@@ -98,4 +106,10 @@ function post(URL, PARAMS) {
     document.body.appendChild(temp);
     temp.submit();
     return temp;
+}
+
+function padding(num, length) {
+    //这里用slice和substr均可
+    var r = '' + num;
+    return r.length < length ? Array(length - r.length).join("0") + num : r;
 }

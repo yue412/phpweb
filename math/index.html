@@ -58,6 +58,25 @@
             return result;
         }
 
+        function select_formula2(count, data)
+        {
+            // if(count == data.length)
+            // {
+            //     var result = data.slice(0);
+            //     data.length = 0;
+            //     return result;
+            // }
+            var result = [];
+            //var set = new Set();
+            while(result.length < count)
+            {
+                var index = Math.floor(Math.random()*data.length);
+                result.push(data[index]);
+                data.splice(index, 1);
+            }
+            return result;
+        }
+
         function generate_formulas()
         {
             var params = [];
@@ -76,9 +95,13 @@
                 var page_cnt = document.getElementById("page_cnt").value;
                 var s = "";
                 for (let i = 0; i < page_cnt; i++) {
-                    s += output_formulas(3, select_formula(count, f_cnt, data));
+                    if(data.length < count)
+                        data = JSON.parse(text);
+                    s += output_formulas(3, select_formula2(count, data));
                     s += "<hr />";
-                    s += output_formulas(3, select_formula(count, f_cnt, data));
+                    if(data.length < count)
+                        data = JSON.parse(text);
+                    s += output_formulas(3, select_formula2(count, data));
                     s += "<div class='pagebreak'/>";
                 }
                 var e =document.getElementById("main");

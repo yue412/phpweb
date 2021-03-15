@@ -2,7 +2,8 @@ var app = new Vue(
     {
         el: '#gfc',
         data: {
-
+            active_index: 0,
+            component_list: ['gfc-element-type', 'gfc-element-type', 'gfc-enums']
         },
         created: function () {
 
@@ -16,14 +17,8 @@ var app = new Vue(
 
         },
         methods: {
-            load_data: function () {
-                var _this = this;
-                do_ajax("../db/get_records.php?table_name=kxszx_fish", function (text) {
-                    var my_fishes = JSON.parse(text);
-                });
-            },
             handleSelect: function(key, keyPath) {
-
+                this.active_index = parseInt(key);
             },
         },
     }

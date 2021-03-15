@@ -30,14 +30,21 @@ Vue.component('gfc-element-type', {
         load_child(row, treeNode, resolve) {
             //row.treeNode = treeNode;
             //row.resolve = resolve;
+            var _this = this;
             var speciality_id = row.speciality_id;
             var pid = row.element_type_id;
             do_ajax("get_element_type.php?speciality_id=" + speciality_id + "&element_type_pid=" + pid, function (text) {
                 var data = JSON.parse(text);
                 //* */
                 row.children = data;
+                _this.init_parent(data, row);
                 resolve(data);
             });
+        },
+        init_parent(list, parent){
+            for (let i = 0; i < list.length; i++) {
+                list[i].parent = parent;
+            }
         },
         get_type(tree, id) {
             for (let i = 0; i < tree.length; i++) {
@@ -95,6 +102,7 @@ Vue.component('gfc-element-type', {
                     // ui添加
                     do_ajax("get_element_type.php?" + build_url_params([['element_type_id', id]]), function (text) {
                         var child = JSON.parse(text);
+                        _this.init_parent(child, parent);
                         if (parent) {
                             ++parent.child_cnt;
                             if (parent.children)
@@ -135,7 +143,6 @@ Vue.component('gfc-element-type', {
                     }
                     if(bUpdateCode)
                     {
-                        _this.update_whole_code(type);
                         _this.update_child_code(type);
                     }
                     _this.dialogVisible = false;
@@ -179,34 +186,28 @@ Vue.component('gfc-element-type', {
             return false;
         },
         update_child_code(type){
+            this.update_whole_code(type);
             if(type.children)
             {
-                var arr = type.whole_code.split('.');
-                arr.length = type.level;
                 for (let i = 0; i < type.children.length; i++) {
                     const child = type.children[i];
-                    var temp = arr.slice(0); // 拷贝一下
-                    temp.push(padding(child.code, 2));
-                    for (let j = 0; j < 3-child.level; j++) {
-                        temp.push('00');
-                    }
-                    child.whole_code = temp.join('.');
                     this.update_child_code(child);
                 }
             }
         },
         update_whole_code(type)
         {
-            var index = type.whole_code.indexOf('-');
-            var pre = type.whole_code.slice(0, index+1);
-            var left = type.whole_code.slice(index+1);
-            var arr = left.split('.');
-            arr.length = type.level-1;
-            arr.push(padding(type.code, 2));
-            for (let i = 0; i < 3-type.level; i++) {
+            var arr = [];
+            var parent = type;
+            while (parent) {
+                arr.push(padding(parent.code, 2));
+                parent = parent.parent;
+            }
+            arr.reverse();
+            for (let i = arr.length; i < 3; i++) {
                 arr.push('00');
             }
-            type.whole_code = pre+arr.join('.');
+            type.whole_code = '14-'+arr.join('.');
         },
     },
     template: '<div>\

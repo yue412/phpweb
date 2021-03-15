@@ -34,15 +34,15 @@
         <el-container>
             <el-header>
                 <!--<div id="titles">GFC数据标准</div>-->
-                <el-menu default-active="1" mode="horizontal" background-color="#545c64" text-color="#fff"
+                <el-menu default-active="0" mode="horizontal" background-color="#545c64" text-color="#fff"
                     active-text-color="#ffd04b" @select="handleSelect">
-                    <el-menu-item index="1">构件分类</el-menu-item>
-                    <el-menu-item index="2">属性管理</el-menu-item>
-                    <el-menu-item index="3">单位字典</el-menu-item>
+                    <el-menu-item index="0">构件分类</el-menu-item>
+                    <el-menu-item index="1">属性管理</el-menu-item>
+                    <el-menu-item index="2">单位字典</el-menu-item>
                 </el-menu>
             </el-header>
             <el-main>
-                <component is="gfc-element-type"></component>
+                <component :is="component_list[active_index]"></component>
             </el-main>
         </el-container>
     </div>
@@ -51,6 +51,9 @@
 <script src="https://unpkg.zhimg.com/element-ui/lib/index.js"></script>
 <script src="../common.js"></script>
 <script src="speciality_select.js"></script>
+<script src="enum_list.js"></script>
+<script src="enum_table.js"></script>
+<script src="enums.js"></script>
 <script src="element_type.js"></script>
 <script type="text/javascript" src="main.js"></script>
 

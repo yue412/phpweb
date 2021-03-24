@@ -1,3 +1,7 @@
+import './speciality_select.js';
+import './props_table.js';
+import './qty_table.js';
+
 Vue.component('gfc-property-dict', {
     // 在 JavaScript 中是 camelCase 的
     data: function () {

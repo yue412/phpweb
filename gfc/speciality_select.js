@@ -1,5 +1,4 @@
 //import {do_ajax} from '../common';
-
 Vue.component('gfc-speciality-select', {
     // 在 JavaScript 中是 camelCase 的
     props: ['login-ref'],

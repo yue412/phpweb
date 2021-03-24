@@ -1,3 +1,5 @@
+import './speciality_select.js';
+
 Vue.component('gfc-element-type', {
     // 在 JavaScript 中是 camelCase 的
     data: function () {

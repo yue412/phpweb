@@ -1,3 +1,7 @@
+import './element_type.js';
+import './property_dict.js';
+import './enums.js';
+
 var app = new Vue(
     {
         el: '#gfc',

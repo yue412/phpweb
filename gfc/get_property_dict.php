@@ -4,7 +4,7 @@
 
     unset($_GET["t"]);
     $where = generate_where_code($_GET);
-    $sql="SELECT gfc_property.*, gfc_enum.name as pick_list_name FROM gfc_property left join gfc_enum on gfc_property.pick_list = gfc_enum.enum_id $where";
+    $sql="SELECT * FROM gfc_property order by code";
     $list = get_records($db, $sql);
     for($i = 0; $i < count($list); ++$i)        
     {

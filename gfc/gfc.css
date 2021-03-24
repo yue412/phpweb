@@ -154,6 +154,7 @@ body {
     height: 85px;
 }
 
+/*
 #titles {
     font-size: 150%;
     color: white;
@@ -163,6 +164,41 @@ body {
     margin-bottom: 26px;
     vertical-align: middle;
     float: left;
+}
+*/
+#titles {
+    font-size: 150%;
+    color: white;
+    vertical-align: middle;
+    height: 60px;
+    line-height: 60px;
+    padding-left: 20px;
+    background-color: rgb(84, 92, 100);
+}
+
+#login {
+    height: 60px;
+    line-height: 60px;
+    background-color: rgb(84, 92, 100);
+    text-align: right;
+    padding-right: 20px;
+    color: white;
+}
+
+#login .el-link {
+    color: white;
+}
+
+#login .el-link:hover {
+    color: rgb(255, 208, 75);
+}
+
+#login .el-button {
+    color: white;
+}
+
+#login .el-button:hover {
+    color: rgb(255, 208, 75);
 }
 
 .link_tree_node
@@ -239,8 +275,41 @@ body {
     background-color: #545c64;
 }
 */
-.li {
-    margin-top: 10px;
-    margin-bottom: 10px;
-    
+
+.el-main {
+    padding: 4px 20px;
+}
+
+.gfc-panel {
+    margin-right: 8px;
+}
+
+.el-dialog__body {
+    padding: 10px 20px;
+}
+
+.el-table .group-row {
+    background: oldlace;
+}
+
+.el-table td, .el-table th {
+    padding: 6px 0;
+}
+
+.is-current>.el-tree-node__content{
+    background: #F4F6F8;
+    position: relative;
+}
+.is-current>.el-tree-node__content::before{
+    content: "";
+    position: absolute;
+    width: 3px;
+    height: 100%;
+    background: #1989FA;
+    top: 0;
+    left: 0;;
+}
+
+#element_type_tree {
+    margin-top: 4px;
 }

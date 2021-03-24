@@ -9,6 +9,7 @@ Vue.component('gfc-enums', {
             },
             dialogVisible: false,
             handleConfirm: function () { },
+            old_code: 0,
         };
     },
     created: function () {
@@ -90,10 +91,11 @@ Vue.component('gfc-enums', {
             var _this = this;
             //var suggest_code = this.get_suggest_code(parent);
             this.edit_type = {
-                code: 0,
+                code: this.old_code + 1,
                 name: '',
             };
             this.handleConfirm = function () {
+                _this.old_code = _this.edit_type.code;
                 var arr = obj_to_array(_this.edit_type);
                 arr.push(['table_name', 'gfc_enum_items']);
                 arr.push(['enum_id', parent.enum_id]);
@@ -212,14 +214,14 @@ Vue.component('gfc-enums', {
         },
     },
     template: '<div>\
-        <el-button type="primary" @click="add">添加枚举</el-button>\
+        <el-button type="primary" @click="add" v-if="this.$root.can_edit">添加枚举</el-button>\
         <el-table :data="enums" style="width: 100%;margin-left: 0%;" row-key="id" lazy :load="load_child"\
             :tree-props="{children: \'children\', hasChildren: \'child_cnt\'}">\
             <el-table-column prop="d_code" label="编码" width="250">\
             </el-table-column>\
             <el-table-column prop="name" label="名称">\
             </el-table-column>\
-            <el-table-column fixed="right" label="操作" width="400">\
+            <el-table-column fixed="right" label="操作" width="400" v-if="this.$root.can_edit">\
             <template slot-scope="scope">\
                 <div v-if="\'child_cnt\' in scope.row">\
                     <el-button @click="add" type="text">添加枚举</el-button>\

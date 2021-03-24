@@ -11,6 +11,7 @@ Vue.component('gfc-element-type', {
             },
             dialogVisible: false,
             handleConfirm: function () { },
+            //can_edit: false,
             speciality_id: -1,
         };
     },
@@ -18,6 +19,10 @@ Vue.component('gfc-element-type', {
     },
     mounted() {
         //this.load_data();
+        //var _this = this;
+        //this.$root.eventHub.$on('enable_edit', (enabled) => {
+        //    _this.can_edit = enabled;
+        //});
     },
     methods: {
         load_data(speciality_id) {
@@ -41,7 +46,7 @@ Vue.component('gfc-element-type', {
                 resolve(data);
             });
         },
-        init_parent(list, parent){
+        init_parent(list, parent) {
             for (let i = 0; i < list.length; i++) {
                 list[i].parent = parent;
             }
@@ -141,8 +146,7 @@ Vue.component('gfc-element-type', {
                     for (const key in _this.edit_type) {
                         type[key] = _this.edit_type[key];
                     }
-                    if(bUpdateCode)
-                    {
+                    if (bUpdateCode) {
                         _this.update_child_code(type);
                     }
                     _this.dialogVisible = false;
@@ -185,18 +189,16 @@ Vue.component('gfc-element-type', {
             }
             return false;
         },
-        update_child_code(type){
+        update_child_code(type) {
             this.update_whole_code(type);
-            if(type.children)
-            {
+            if (type.children) {
                 for (let i = 0; i < type.children.length; i++) {
                     const child = type.children[i];
                     this.update_child_code(child);
                 }
             }
         },
-        update_whole_code(type)
-        {
+        update_whole_code(type) {
             var arr = [];
             var parent = type;
             while (parent) {
@@ -207,12 +209,12 @@ Vue.component('gfc-element-type', {
             for (let i = arr.length; i < 3; i++) {
                 arr.push('00');
             }
-            type.whole_code = '14-'+arr.join('.');
+            type.whole_code = '14-' + arr.join('.');
         },
     },
     template: '<div>\
         <gfc-speciality-select @speciality-change="load_data"></gfc-speciality-select>\
-        <el-button type="primary" @click="add">添加构件类型</el-button>\
+        <el-button type="primary" @click="add" v-if="this.$root.can_edit">添加构件类型</el-button>\
         <el-table :data="types" style="width: 100%" row-key="element_type_id" lazy :load="load_child"\
             :tree-props="{children: \'children\', hasChildren: \'child_cnt\'}">\
             <el-table-column prop="whole_code" label="编码" width="180">\
@@ -226,7 +228,7 @@ Vue.component('gfc-element-type', {
                     <i class="el-icon-check" v-if="scope.row.is_unit"></i>\
                 </template>\
             </el-table-column>\
-            <el-table-column fixed="right" label="操作" width="250">\
+            <el-table-column fixed="right" label="操作" width="250" v-if="this.$root.can_edit">\
                 <template slot-scope="scope">\
                     <el-button @click="add(scope.row)" type="text">添加</el-button>\
                     | <el-button @click="add_child(scope.row)" type="text" :disabled="scope.row.level >= 3">添加下一级</el-button>\

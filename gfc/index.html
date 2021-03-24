@@ -6,40 +6,31 @@
     <title>
         GFC标准
     </title>
-    <link rel="stylesheet" href="https://unpkg.zhimg.com/element-ui/lib/theme-chalk/index.css">
+    <link rel="stylesheet" type="text/css" href="https://unpkg.zhimg.com/element-ui/lib/theme-chalk/index.css">
     <link rel="stylesheet" type="text/css" href="gfc.css" />
 </head>
 
 <body>
-    <!--
-    <div id="header">
-    <div id="titles">GFC数据标准</div>
-    <div id= "tabs" class="header-tab">
-        <span class="header-tab-item" onclick="change_tab(0)">专业</span>
-        <span class="selected-header-tab-item" onclick="change_tab(1)">构件分类</span>
-        <span class="header-tab-item" onclick="change_tab(2)">属性管理</span>
-        <span class="header-tab-item" onclick="change_tab(3)">单位字典</span>
-    </div>
-    </div>
-    <div id="main"></div>
-    <script type="text/javascript">
-        compile_schema(g_element_types_schema);
-        display_element_type();
-    </script>
-    <script>
-
-    </script>
-    -->
     <div id="gfc">
         <el-container>
             <el-header>
                 <!--<div id="titles">GFC数据标准</div>-->
-                <el-menu default-active="0" mode="horizontal" background-color="#545c64" text-color="#fff"
-                    active-text-color="#ffd04b" @select="handleSelect">
-                    <el-menu-item index="0">构件分类</el-menu-item>
-                    <el-menu-item index="1">属性管理</el-menu-item>
-                    <el-menu-item index="2">单位字典</el-menu-item>
-                </el-menu>
+                <el-row>
+                    <el-col :span="4">
+                        <div id="titles">GFC数据标准</div>
+                    </el-col>
+                    <el-col :span="16">
+                        <el-menu default-active="0" mode="horizontal" background-color="#545c64" text-color="#fff"
+                            active-text-color="#ffd04b" @select="handleSelect">
+                            <el-menu-item index="0">构件分类</el-menu-item>
+                            <el-menu-item index="1">属性管理</el-menu-item>
+                            <el-menu-item index="2">单位字典</el-menu-item>
+                        </el-menu>
+                    </el-col>
+                    <el-col :span="4">
+                        <login-panel login-ref="..\login.html" @give-user="load_user_right" id="login"></login-panel>
+                    </el-col>
+                </el-row>
             </el-header>
             <el-main>
                 <component :is="component_list[active_index]"></component>
@@ -50,11 +41,15 @@
 <script src="https://unpkg.zhimg.com/vue/dist/vue.js"></script>
 <script src="https://unpkg.zhimg.com/element-ui/lib/index.js"></script>
 <script src="../common.js"></script>
+<script src="../login_panel.js"></script>
 <script src="speciality_select.js"></script>
 <!--<script src="enum_list.js"></script>
 <script src="enum_table.js"></script>-->
 <script src="enums.js"></script>
 <script src="element_type.js"></script>
+<script src="props_table.js"></script>
+<script src="qty_table.js"></script>
+<script src="property_dict.js"></script>
 <script type="text/javascript" src="main.js"></script>
 
 </html>

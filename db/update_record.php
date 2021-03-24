@@ -1,11 +1,12 @@
 <?php
     include_once("db_connect.php");
-    include_once("../common.php")
+    include_once("../common.php");
+    include_once("db_common.php");
 ?>
 <?php
     $table_name = $_GET['table_name'];
-    $primary_key = $_GET['primary_key'];
-    $key_val = $_GET['key_val'];
+    $primary_key = urldecode($_GET['primary_key']);
+    $key_val = urldecode($_GET['key_val']);
     $primary_key_list = explode("|", $primary_key);
     $key_val_list = explode("|", $key_val);
     $list = array();
@@ -26,13 +27,15 @@
     {
         if($value == '' || strcasecmp($value,'NULL') == 0)
             $value = 'NULL';
-        else
+        else {
+            adjust_bool_value($value);
             $value = '\''.$value.'\'';
+        }
         $list[] = '`'.$key.'` = '.urldecode($value);
     }
     $s_list = implode(',', $list);
     $sql = 'UPDATE `'.$table_name.'` SET '.$s_list.' WHERE '.$where;
-    //var_dump($sql);
+    //echo $sql;
     if(!$db->query($sql))
     {
         echo $db->error;

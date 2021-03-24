@@ -111,5 +111,12 @@ function post(URL, PARAMS) {
 function padding(num, length) {
     //这里用slice和substr均可
     var r = '' + num;
-    return r.length < length ? Array(length - r.length).join("0") + num : r;
+    return r.length < length ? Array(length - r.length + 1).join("0") + num : r;
+}
+
+function del_from_array(arr, obj) {
+    var index = arr.indexOf(obj);
+    if (index >= 0) {
+        arr.splice(index, 1);
+    }
 }

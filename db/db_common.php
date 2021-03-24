@@ -1,12 +1,20 @@
 <?php
+    function adjust_bool_value(&$value)
+    {
+        if($value=="true")
+            $value=1;
+        else if($value=="false")
+            $value=0;
+    }
     function insert_record($db, $table_name, &$fields)
     {
         $keys = array();
         $values = array();
         foreach($fields as $key => &$value)
         {
-            if(!($value == '' || $value == "NULL"))
+            if(!($value == '' || strtolower($value) == "null"))
             {
+                adjust_bool_value($value);
                 $keys[] = $key;
                 $values[] = '\''.urldecode($value).'\'';
             }
@@ -16,7 +24,7 @@
         $s_fields = '`'.implode('`, `', $keys).'`';
         $s_values = implode(', ', $values);
         $sql = 'INSERT INTO `'.$table_name.'` ('.$s_fields.') VALUES ('.$s_values.')';
-        //var_dump($sql);
+        //echo $sql;
         if (!$db->query($sql))
         {
             exit($db->error);

@@ -33,9 +33,14 @@
         .chef-emphasize {
             background-color: #CCFFCC;
         }
-    
+
         .emphasize-font {
             color: red;
+        }
+
+        .el-input--mini .el-input__inner {
+            height: 40px;
+            line-height: 40px;
         }
     </style>
 </head>
@@ -48,10 +53,14 @@
 
         <el-row>
             <el-col :span="8">
-                <el-input v-model="search" size="mini" placeholder="输入关键字搜索" />
+                <el-input v-model="search" size="mini" placeholder="输入关键字搜索"/>
             </el-col>
             <el-col :span="8">
-                <el-input size="mini" placeholder="装备测试" v-model="selected_equip" />
+                <!--<el-input size="mini" placeholder="装备测试" v-model="selected_equip" />-->
+                <el-select v-model="selected_equip" filterable placeholder="装备测试">
+                    <el-option v-for="item in equips" :key="item.equipId" :label="item.galleryId + item.name" :value="item.name">
+                    </el-option>
+                </el-select>
             </el-col>
         </el-row>
         <el-table :data="filter_chefs.slice((currentPage-1)*pageSize,currentPage*pageSize)" style="width: 100%"
@@ -60,9 +69,9 @@
             </el-table-column>
             <el-table-column prop="name" label="名称" width="100" sortable>
             </el-table-column>
-            <el-table-column prop="level" label="级别"  width="80" sortable>
+            <el-table-column prop="level" label="级别" width="80" sortable>
             </el-table-column>
-            <el-table-column prop="rarity" label="稀有度"  width="100" sortable
+            <el-table-column prop="rarity" label="稀有度" width="100" sortable
                 :filters="[{ text: '5', value: 5 }, { text: '4', value: 4 }, { text: '3', value: 3 }, { text: '2', value: 2 }, { text: '1', value: 1 }]"
                 column-key='rarity'>
             </el-table-column>
@@ -86,23 +95,31 @@
             </el-table-column>
             <el-table-column prop="meat" label="肉" :width="p_width" sortable>
             </el-table-column>
-            <el-table-column label="技能" >
+            <el-table-column label="技能">
                 <template slot-scope="scope">{{ scope.row.skill_name() }}</template>
             </el-table-column>
-            <el-table-column label="终极技能" >
+            <el-table-column label="终极技能">
                 <template slot-scope="scope">
                     <div style="white-space: pre-wrap;"
                         v-bind:class="{'chef-emphasize':(scope.row.ultimate_skill == null) && (scope.row.ultimate_skill_conditions.length>=3), 'emphasize-font':(scope.row.ultimate_skill == null) && (scope.row.ultimate_skill_conditions.length<3) && (scope.row.ultimate_skill_conditions2 != null) && scope.row.ultimate_skill_conditions2.length>=3}">{{scope.row.ultimate_skill_name()}}</div>
                 </template>
             </el-table-column>
-            <el-table-column label="装备" >
+            <el-table-column label="装备">
                 <template slot-scope="scope">{{ scope.row.equip_name() }}</template>
             </el-table-column>
             <el-table-column fixed="right" label="编辑" width="100">
                 <template slot-scope="scope">
-                    <div><el-button @click="edit_chef(scope.row)" type="text" style="padding: 0px;">修改</el-button></div>
-                    <div><el-button v-if="scope.row.level<3" @click="set_max_level(scope.row)" type="text"style="padding: 0px;">满级</el-button></div>
-                    <div><el-button v-if="scope.row.ultimate_skill == null" @click="set_ultimate_skill(scope.row)" type="text"style="padding: 0px;">终极技能</el-button></div>
+                    <div>
+                        <el-button @click="edit_chef(scope.row)" type="text" style="padding: 0px;">修改</el-button>
+                    </div>
+                    <div>
+                        <el-button v-if="scope.row.level<3" @click="set_max_level(scope.row)" type="text"
+                            style="padding: 0px;">满级</el-button>
+                    </div>
+                    <div>
+                        <el-button v-if="scope.row.ultimate_skill == null" @click="set_ultimate_skill(scope.row)"
+                            type="text" style="padding: 0px;">终极技能</el-button>
+                    </div>
                 </template>
             </el-table-column>
         </el-table>
@@ -178,6 +195,7 @@
                     recipes: null,
                     sorter: null,
                     selected_equip: "",
+                    equips: g_bcjh_data.equips,
 
                     currentPage: 1,
                     pageSize: 10,
@@ -217,28 +235,25 @@
                     },
                 },
                 methods: {
-                    gen_filter_chefs: function()
-                    {
+                    gen_filter_chefs: function () {
                         if (this.search == '' && this.type_filter.length == 0)
                             this.filter_chefs = this.chefs;
                         else {
                             this.filter_chefs = [];
                             for (let i = 0; i < this.chefs.length; i++) {
                                 const chef = this.chefs[i];
-                                if(this.search != '' && chef.name.indexOf(this.search) == -1)
+                                if (this.search != '' && chef.name.indexOf(this.search) == -1)
                                     continue;
-                                if(this.type_filter.length > 0)
-                                {
+                                if (this.type_filter.length > 0) {
                                     var bFilter = false;
                                     for (let j = 0; j < this.type_filter.length; j++) {
                                         const val = this.type_filter[j];
-                                        if(chef.rarity == val)
-                                        {
+                                        if (chef.rarity == val) {
                                             bFilter = true;
                                             break;
                                         }
                                     }
-                                    if(!bFilter)
+                                    if (!bFilter)
                                         continue;
                                 }
                                 this.filter_chefs.push(chef);
@@ -268,7 +283,8 @@
                         });
                     },
                     get_ultimate_skill_conditions: function (chef, new_recipes) {
-                        var cook = this.get_chef_max_cook(chef);
+                        var origin = this.get_origin_chef_by_id(chef.id);
+                        var cook = this.get_chef_max_cook(origin);
                         var list = [];
                         for (let j = 0; j < new_recipes.length; j++) {
                             const recipe = new_recipes[j];
@@ -289,6 +305,14 @@
                             var list = this.get_ultimate_skill_conditions(chef, new_recipes);
                             chef.ultimate_skill_conditions = list;
                         }
+                    },
+                    get_origin_chef_by_id: function (id) {
+                        for (let i = 0; i < g_bcjh_data.chefs.length; i++) {
+                            const chef = g_bcjh_data.chefs[i];
+                            if (chef.chefId == id)
+                                return chef;
+                        }
+                        return null;
                     },
                     get_chef_max_cook: function (chef) {
                         var cook = g_cook_types[0];
@@ -468,7 +492,7 @@
                             this.sort_arg = arg;
                             //let sortTableData = cloneDeep(this.tableData);
                             if (arg.order === 'descending') {
-                                if ( arg.prop == null || arg.prop === 'name') {
+                                if (arg.prop == null || arg.prop === 'name') {
                                     this.filter_chefs.sort(this.sortByName(arg.prop, true));
                                 } else {
                                     this.filter_chefs.sort(this.sortByProp(arg.prop, true));

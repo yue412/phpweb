@@ -1,3 +1,4 @@
+import {g_qmxq_data} from './data.js'
 
 var app = new Vue(
     {
@@ -15,6 +16,7 @@ var app = new Vue(
             for (let i = 0; i < this.employees.length; i++) {
                 var e = this.employees[i];
                 e.enable = getCookie(e.name) == 'true';
+                e.index = i;
             }
             for (let i = 0; i < this.factory.length; i++) {
                 const f = this.factory[i];
@@ -47,6 +49,7 @@ var app = new Vue(
                 var objective_function = new Object();
                 objective_function.is_max = false;
                 objective_function.items = [];
+                var limit_cnt = 0;
                 // 约束函数
                 var constraint_list = [];
                 var props = ['skill', 'affinity', 'power', 'intelligence'];
@@ -56,6 +59,8 @@ var app = new Vue(
                 }
                 for (let i = 0; i < this.factory.length; i++) {
                     const f = this.factory[i];
+                    if(!f.enable)
+                        continue;
                     var constraint_cnt = new Object();
                     constraint_cnt.opr_type = -1;
                     constraint_cnt.value = f.employeesCount;
@@ -69,14 +74,19 @@ var app = new Vue(
                             constraint.opr_type = 1;
                             constraint.value = rank[prop];
                             constraint.items = []; //[1, var_name]
-                            for (let k = 0; k < this.employees.length; k++) {
+                            this.employees.sort((a, b) => {
+                                return b[prop] - a[prop];
+                            });
+                            limit_cnt = 0;
+                            for (let k = 0; k < this.employees.length && limit_cnt < 10; k++) {
                                 const e = this.employees[k];
                                 if (e.enable && (e[prop] > 10)) {
-                                    var var_name = 'X_' + i + '_' + k;
+                                    var var_name = 'X_' + i + '_' + e.index;//k;
                                     var_set.add(var_name);
-                                    arr_var_set[k].add(var_name);
+                                    arr_var_set[e.index/*k*/].add(var_name);
                                     constraint.items.push([e[prop], var_name]);
-                                    arr_factor[k] += e[prop];
+                                    arr_factor[e.index/*k*/] += e[prop];
+                                    ++limit_cnt;
                                     //objective_function.items.push([e[prop], var_name]);
                                 }
                             }
@@ -97,6 +107,8 @@ var app = new Vue(
                         }
                     }
                 }
+                // 恢复顺序
+                this.employees.sort((a, b) => { return a.index - b.index; });
                 for (let i = 0; i < arr_var_set.length; i++) {
                     var set = arr_var_set[i];
                     if (set.size > 0) {

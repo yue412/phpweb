@@ -6,6 +6,7 @@ function Fish(name, type, dict) {
     this.crown = 0;
     this.jewel = 0;
     this.need = 0;
+    this.need_crown = 0;
     this.left = 0;
     this.dict = dict ? dict : null;
     this.create_crown_fish = [];
@@ -157,6 +158,7 @@ var app = new Vue(
             },
             collect: function (fish, cnt) {
                 var f = this.get_fish(fish);
+                f.need_crown += cnt;
                 cnt = cnt - f.left;
                 if (cnt <= 0) {
                     f.left = -cnt;
@@ -178,8 +180,12 @@ var app = new Vue(
                     this.collect(c.dest, 1);
                 }
                 this.fish_map.forEach(function (fish, key, item) {
-                    if ((fish.type == 1 || fish.type == 2) && fish.left == 0)
-                        fish.need += 1;
+                    if (fish.type == 1 || fish.type == 2) {
+                        fish.need_crown += 1;
+                        if (fish.left == 0)
+                            fish.need += 1;
+                    }
+                    fish.need_crown = fish.need_crown < fish.crown ? 0 : fish.need_crown - fish.crown;
                 });
                 this.collect_jewel();
             },
@@ -252,13 +258,14 @@ var app = new Vue(
                 });
 
             },
-            closeConfirm: function() {
+            closeConfirm: function () {
                 var _this = this;
                 var fish = _this.get_fish(_this.edit_fish.name);
                 fish.cnt = _this.edit_fish.cnt;
                 fish.crown = _this.edit_fish.crown;
                 _this.fish_map.forEach(function (fish, key, item) {
                     fish.need = 0;
+                    fish.need_crown = 0;
                     fish.jewel = 0;
                     fish.left = fish.total();
                 });

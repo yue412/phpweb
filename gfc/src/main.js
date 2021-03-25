@@ -43,5 +43,31 @@ var app = new Vue(
                 });
             },
         },
+        template: '\
+        <el-container>\
+            <el-header>\
+                <!--<div id="titles">GFC数据标准</div>-->\
+                <el-row>\
+                    <el-col :span="4">\
+                        <div id="titles">GFC数据标准</div>\
+                    </el-col>\
+                    <el-col :span="16">\
+                        <el-menu default-active="0" mode="horizontal" background-color="#545c64" text-color="#fff"\
+                            active-text-color="#ffd04b" @select="handleSelect">\
+                            <el-menu-item index="0">构件分类</el-menu-item>\
+                            <el-menu-item index="1">属性管理</el-menu-item>\
+                            <el-menu-item index="2">单位字典</el-menu-item>\
+                        </el-menu>\
+                    </el-col>\
+                    <el-col :span="4">\
+                        <login-panel login-ref="..\login.html" @give-user="load_user_right" id="login"></login-panel>\
+                    </el-col>\
+                </el-row>\
+            </el-header>\
+            <el-main>\
+                <component :is="component_list[active_index]"></component>\
+            </el-main>\
+        </el-container>\
+        ',
     }
 );

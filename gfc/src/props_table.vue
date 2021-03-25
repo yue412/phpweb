@@ -1,4 +1,180 @@
-Vue.component('gfc-props-table', {
+<template>
+    <div>
+        <el-button
+            type="primary"
+            @click="add(null)"
+            size="medium"
+            v-if="this.$root.can_edit"
+            >添加属性</el-button
+        >
+        <el-table
+            :data="type_props"
+            style="width: 100%"
+            row-key="property_id"
+            default-expand-all
+            :tree-props="{ children: 'children' }"
+            :row-class-name="tableRowClassName"
+        >
+            <el-table-column type="index" label="序号" width="50">
+            </el-table-column>
+            <el-table-column prop="name" label="名称"> </el-table-column>
+            <el-table-column prop="code" label="代码" width="200">
+            </el-table-column>
+            <el-table-column prop="unit" label="单位" width="50">
+            </el-table-column>
+            <el-table-column label="数据类型" width="100">
+                <template slot-scope="scope">
+                    <span>{{ data_types[scope.row.data_type] }}</span>
+                </template>
+            </el-table-column>
+            <el-table-column
+                prop="pick_list_name"
+                label="可用值列表"
+                width="100"
+            >
+            </el-table-column>
+            <el-table-column prop="default" label="缺省值" width="100">
+            </el-table-column>
+            <el-table-column :width="bool_field_width" label="规格属性">
+                <template slot-scope="scope">
+                    <i class="el-icon-check" v-if="scope.row.is_spec"></i>
+                </template>
+            </el-table-column>
+            <el-table-column :width="bool_field_width" label="清单属性">
+                <template slot-scope="scope">
+                    <i class="el-icon-check" v-if="scope.row.is_bq"></i>
+                </template>
+            </el-table-column>
+            <el-table-column :width="bool_field_width" label="算量属性">
+                <template slot-scope="scope">
+                    <i class="el-icon-check" v-if="scope.row.is_qty"></i>
+                </template>
+            </el-table-column>
+            <el-table-column :width="bool_field_width" label="提量属性">
+                <template slot-scope="scope">
+                    <i class="el-icon-check" v-if="scope.row.is_collect"></i>
+                </template>
+            </el-table-column>
+            <el-table-column label="来源" width="50">
+                <template slot-scope="scope">
+                    <span>{{ source_list[scope.row.source] }}</span>
+                </template>
+            </el-table-column>
+            <el-table-column
+                fixed="right"
+                label="操作"
+                width="200"
+                v-if="this.$root.can_edit"
+            >
+                <template slot-scope="scope">
+                    <el-button @click="add(scope.row)" type="text">添加</el-button>
+                    | <el-button @click="edit(scope.row)" type="text">编辑</el-button>
+                    | <el-button @click="del(scope.row)" type="text">删除</el-button>
+                </template>
+            </el-table-column>
+        </el-table>
+        <el-dialog title="编辑" :visible.sync="dialogVisible">
+            <el-form :model="edit_prop" label-width="120px">
+                <el-form-item label="编码">
+                    <el-input v-model="edit_prop.code"></el-input>
+                </el-form-item>
+                <el-form-item label="名称">
+                    <el-input v-model="edit_prop.name"></el-input>
+                </el-form-item>
+                <el-form-item label="单位">
+                    <el-input v-model="edit_prop.unit"></el-input>
+                </el-form-item>
+                <el-form-item label="数据类型">
+                    <el-select
+                        v-model="edit_prop.data_type"
+                        placeholder="请选择"
+                    >
+                        <el-option
+                            v-for="(item, index) in data_types"
+                            :key="index"
+                            :label="item"
+                            :value="index"
+                        >
+                        </el-option>
+                    </el-select>
+                </el-form-item>
+                <el-form-item label="可用值列表">
+                    <el-select
+                        v-model="edit_prop.pick_list"
+                        placeholder="请选择"
+                    >
+                        <el-option
+                            v-for="item in enum_list"
+                            :key="item.enum_id"
+                            :label="
+                                item.code
+                                    ? 'B.' + item.code + ' ' + item.name
+                                    : item.name
+                            "
+                            :value="item.enum_id"
+                        >
+                        </el-option>
+                    </el-select>
+                </el-form-item>
+                <el-form-item label="缺省值">
+                    <el-input v-model="edit_prop.default"></el-input>
+                </el-form-item>
+                <el-form-item label="属性特征">
+                    <el-checkbox
+                        label="规格"
+                        v-model="edit_prop.is_spec"
+                    ></el-checkbox>
+                    <el-checkbox
+                        label="清单"
+                        v-model="edit_prop.is_bq"
+                    ></el-checkbox>
+                    <el-checkbox
+                        label="算量"
+                        v-model="edit_prop.is_qty"
+                    ></el-checkbox>
+                    <el-checkbox
+                        label="提量"
+                        v-model="edit_prop.is_collect"
+                    ></el-checkbox>
+                </el-form-item>
+                <el-form-item label="属性分类">
+                    <el-select
+                        v-model="edit_prop.classification"
+                        placeholder="请选择"
+                    >
+                        <el-option
+                            v-for="(item, index) in classification_list"
+                            :key="index"
+                            :label="item"
+                            :value="index"
+                        >
+                        </el-option>
+                    </el-select>
+                </el-form-item>
+                <el-form-item label="属性来源">
+                    <el-select v-model="edit_prop.source" placeholder="请选择">
+                        <el-option
+                            v-for="(item, index) in source_list"
+                            :key="index"
+                            :label="item"
+                            :value="index"
+                        >
+                        </el-option>
+                    </el-select>
+                </el-form-item>
+            </el-form>
+            <div slot="footer" class="dialog-footer">
+                <el-button @click="dialogVisible = false">取 消</el-button>
+                <el-button type="primary" @click="handleConfirm"
+                    >确 定</el-button
+                >
+            </div>
+        </el-dialog>
+    </div>
+</template>
+
+<script>
+export default {
     // 在 JavaScript 中是 camelCase 的
     props: ['element-type-id'],
     data: function () {
@@ -244,125 +420,5 @@ Vue.component('gfc-props-table', {
             return '';
         },
     },
-    template: '<div>\
-        <el-button type="primary" @click="add(null)" size="medium" v-if="this.$root.can_edit">添加属性</el-button>\
-        <el-table :data="type_props" style="width: 100%" row-key="property_id" default-expand-all\
-            :tree-props="{children: \'children\'}" :row-class-name="tableRowClassName">\
-            <el-table-column type="index" label="序号" width="50">\
-            </el-table-column>\
-            <el-table-column prop="name" label="名称">\
-            </el-table-column>\
-            <el-table-column prop="code" label="代码" width="200">\
-            </el-table-column>\
-            <el-table-column prop="unit" label="单位"  width="50">\
-            </el-table-column>\
-            <el-table-column label="数据类型"  width="100">\
-                <template slot-scope="scope">\
-                    <span>{{data_types[scope.row.data_type]}}</span>\
-                </template>\
-            </el-table-column>\
-            <el-table-column prop="pick_list_name" label="可用值列表" width="100">\
-            </el-table-column>\
-            <el-table-column prop="default" label="缺省值" width="100">\
-            </el-table-column>\
-            <el-table-column :width="bool_field_width" label="规格属性">\
-                <template slot-scope="scope">\
-                    <i class="el-icon-check" v-if="scope.row.is_spec"></i>\
-                </template>\
-            </el-table-column>\
-            <el-table-column :width="bool_field_width" label="清单属性">\
-                <template slot-scope="scope">\
-                    <i class="el-icon-check" v-if="scope.row.is_bq"></i>\
-                </template>\
-            </el-table-column>\
-            <el-table-column :width="bool_field_width" label="算量属性">\
-                <template slot-scope="scope">\
-                    <i class="el-icon-check" v-if="scope.row.is_qty"></i>\
-                </template>\
-            </el-table-column>\
-            <el-table-column :width="bool_field_width" label="提量属性">\
-                <template slot-scope="scope">\
-                    <i class="el-icon-check" v-if="scope.row.is_collect"></i>\
-                </template>\
-            </el-table-column>\
-            <el-table-column label="来源" width="50">\
-                <template slot-scope="scope">\
-                    <span>{{source_list[scope.row.source]}}</span>\
-                </template>\
-            </el-table-column>\
-            <el-table-column fixed="right" label="操作"  width="200" v-if="this.$root.can_edit">\
-                <template slot-scope="scope">\
-                    <el-button @click="add(scope.row)" type="text">添加</el-button>\
-                    | <el-button @click="edit(scope.row)" type="text">编辑</el-button>\
-                    | <el-button @click="del(scope.row)" type="text">删除</el-button>\
-                </template>\
-            </el-table-column>\
-        </el-table>\
-        <el-dialog title="编辑" :visible.sync="dialogVisible">\
-            <el-form :model="edit_prop" label-width="120px">\
-                <el-form-item label="编码">\
-                    <el-input v-model="edit_prop.code"></el-input>\
-                </el-form-item>\
-                <el-form-item label="名称">\
-                    <el-input v-model="edit_prop.name"></el-input>\
-                </el-form-item>\
-                <el-form-item label="单位" >\
-                    <el-input v-model="edit_prop.unit"></el-input>\
-                </el-form-item>\
-                <el-form-item label="数据类型" >\
-                    <el-select v-model="edit_prop.data_type" placeholder="请选择">\
-                        <el-option\
-                            v-for="(item, index) in data_types"\
-                            :key="index"\
-                            :label="item"\
-                            :value="index">\
-                        </el-option>\
-                    </el-select>\
-                </el-form-item>\
-                <el-form-item label="可用值列表" >\
-                    <el-select v-model="edit_prop.pick_list" placeholder="请选择">\
-                        <el-option\
-                            v-for="item in enum_list"\
-                            :key="item.enum_id"\
-                            :label="item.code ? \'B.\' + item.code + \' \' + item.name : item.name"\
-                            :value="item.enum_id">\
-                        </el-option>\
-                    </el-select>\
-                </el-form-item>\
-                <el-form-item label="缺省值" >\
-                    <el-input v-model="edit_prop.default"></el-input>\
-                </el-form-item>\
-                <el-form-item label="属性特征" >\
-                    <el-checkbox label="规格" v-model="edit_prop.is_spec"></el-checkbox>\
-                    <el-checkbox label="清单" v-model="edit_prop.is_bq"></el-checkbox>\
-                    <el-checkbox label="算量" v-model="edit_prop.is_qty"></el-checkbox>\
-                    <el-checkbox label="提量" v-model="edit_prop.is_collect"></el-checkbox>\
-                </el-form-item>\
-                <el-form-item label="属性分类" >\
-                    <el-select v-model="edit_prop.classification" placeholder="请选择">\
-                        <el-option\
-                            v-for="(item, index) in classification_list"\
-                            :key="index"\
-                            :label="item"\
-                            :value="index">\
-                        </el-option>\
-                    </el-select>\
-                </el-form-item>\
-                <el-form-item label="属性来源" >\
-                    <el-select v-model="edit_prop.source" placeholder="请选择">\
-                        <el-option\
-                            v-for="(item, index) in source_list"\
-                            :key="index"\
-                            :label="item"\
-                            :value="index">\
-                        </el-option>\
-                    </el-select>\
-                </el-form-item>\
-            </el-form>\
-            <div slot="footer" class="dialog-footer">\
-                <el-button @click="dialogVisible = false">取 消</el-button>\
-                <el-button type="primary" @click="handleConfirm">确 定</el-button>\
-            </div>\
-        </el-dialog>\
-    </div>',
-})
+};
+</script>

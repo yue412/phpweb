@@ -1,6 +1,55 @@
-import './speciality_select.js';
+<template>
+    <div>
+        <gfc-speciality-select @speciality-change="load_data"></gfc-speciality-select>
+        <el-button type="primary" @click="add" v-if="this.$root.can_edit">添加构件类型</el-button>
+        <el-table :data="types" style="width: 100%" row-key="element_type_id" lazy :load="load_child"
+            :tree-props="{children: 'children', hasChildren: 'child_cnt'}">
+            <el-table-column prop="whole_code" label="编码" width="180">
+            </el-table-column>
+            <el-table-column prop="name" label="名称"  width="240">
+            </el-table-column>
+            <el-table-column prop="description" label="英文描述">
+            </el-table-column>
+            <el-table-column width="180" label="构件单元">
+                <template slot-scope="scope">
+                    <i class="el-icon-check" v-if="scope.row.is_unit"></i>
+                </template>
+            </el-table-column>
+            <el-table-column fixed="right" label="操作" width="250" v-if="this.$root.can_edit">
+                <template slot-scope="scope">
+                    <el-button @click="add(scope.row)" type="text">添加</el-button>
+                    | <el-button @click="add_child(scope.row)" type="text" :disabled="scope.row.level >= 3">添加下一级</el-button>
+                    | <el-button @click="edit(scope.row)" type="text">编辑</el-button>
+                    | <el-button @click="del(scope.row)" type="text">删除</el-button>
+                </template>
+            </el-table-column>
+        </el-table>
+        <el-dialog title="编辑" :visible.sync="dialogVisible">
+            <el-form :model="edit_type" label-width="120px">
+                <el-form-item label="编码">
+                    <el-input-number v-model="edit_type.code"></el-input-number>
+                </el-form-item>
+                <el-form-item label="名称">
+                    <el-input v-model="edit_type.name"></el-input>
+                </el-form-item>
+                <el-form-item label="英文描述" >
+                    <el-input v-model="edit_type.description"></el-input>
+                </el-form-item>
+                <el-form-item label="构件单元" >
+                    <el-checkbox v-model="edit_type.is_unit"></el-checkbox>
+                </el-form-item>
+            </el-form>
+            <div slot="footer" class="dialog-footer">
+                <el-button @click="dialogVisible = false">取 消</el-button>
+                <el-button type="primary" @click="handleConfirm">确 定</el-button>
+            </div>
+        </el-dialog>
+    </div>    
+</template>
+<script>
+import GfcSpecialitySelect from './speciality_select.vue';
 
-Vue.component('gfc-element-type', {
+export default {
     // 在 JavaScript 中是 camelCase 的
     data: function () {
         return {
@@ -214,50 +263,8 @@ Vue.component('gfc-element-type', {
             type.whole_code = '14-' + arr.join('.');
         },
     },
-    template: '<div>\
-        <gfc-speciality-select @speciality-change="load_data"></gfc-speciality-select>\
-        <el-button type="primary" @click="add" v-if="this.$root.can_edit">添加构件类型</el-button>\
-        <el-table :data="types" style="width: 100%" row-key="element_type_id" lazy :load="load_child"\
-            :tree-props="{children: \'children\', hasChildren: \'child_cnt\'}">\
-            <el-table-column prop="whole_code" label="编码" width="180">\
-            </el-table-column>\
-            <el-table-column prop="name" label="名称"  width="240">\
-            </el-table-column>\
-            <el-table-column prop="description" label="英文描述">\
-            </el-table-column>\
-            <el-table-column width="180" label="构件单元">\
-                <template slot-scope="scope">\
-                    <i class="el-icon-check" v-if="scope.row.is_unit"></i>\
-                </template>\
-            </el-table-column>\
-            <el-table-column fixed="right" label="操作" width="250" v-if="this.$root.can_edit">\
-                <template slot-scope="scope">\
-                    <el-button @click="add(scope.row)" type="text">添加</el-button>\
-                    | <el-button @click="add_child(scope.row)" type="text" :disabled="scope.row.level >= 3">添加下一级</el-button>\
-                    | <el-button @click="edit(scope.row)" type="text">编辑</el-button>\
-                    | <el-button @click="del(scope.row)" type="text">删除</el-button>\
-                </template>\
-            </el-table-column>\
-        </el-table>\
-        <el-dialog title="编辑" :visible.sync="dialogVisible">\
-            <el-form :model="edit_type" label-width="120px">\
-                <el-form-item label="编码">\
-                    <el-input-number v-model="edit_type.code"></el-input-number>\
-                </el-form-item>\
-                <el-form-item label="名称">\
-                    <el-input v-model="edit_type.name"></el-input>\
-                </el-form-item>\
-                <el-form-item label="英文描述" >\
-                    <el-input v-model="edit_type.description"></el-input>\
-                </el-form-item>\
-                <el-form-item label="构件单元" >\
-                    <el-checkbox v-model="edit_type.is_unit"></el-checkbox>\
-                </el-form-item>\
-            </el-form>\
-            <div slot="footer" class="dialog-footer">\
-                <el-button @click="dialogVisible = false">取 消</el-button>\
-                <el-button type="primary" @click="handleConfirm">确 定</el-button>\
-            </div>\
-        </el-dialog>\
-    </div>',
-})
+    components: {
+        GfcSpecialitySelect,
+    },
+}
+</script>

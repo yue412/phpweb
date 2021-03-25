@@ -1,4 +1,46 @@
-Vue.component('gfc-enums', {
+<template>
+    <div>
+        <el-button type="primary" @click="add" v-if="this.$root.can_edit">添加枚举</el-button>
+        <el-table :data="enums" style="width: 100%;margin-left: 0%;" row-key="id" lazy :load="load_child"
+            :tree-props="{children: 'children', hasChildren: 'child_cnt'}">
+            <el-table-column prop="d_code" label="编码" width="250">
+            </el-table-column>
+            <el-table-column prop="name" label="名称">
+            </el-table-column>
+            <el-table-column fixed="right" label="操作" width="400" v-if="this.$root.can_edit">
+            <template slot-scope="scope">
+                <div v-if="'child_cnt' in scope.row">
+                    <el-button @click="add" type="text">添加枚举</el-button>
+                    | <el-button @click="add_child(scope.row)" type="text">添加枚举值</el-button>
+                    | <el-button @click="edit(scope.row)" type="text">编辑</el-button>
+                    | <el-button @click="del(scope.row)" type="text">删除</el-button>
+                </div>
+                <div v-else>
+                    <el-button @click="add_child(scope.row.parent)" type="text">添加枚举值</el-button>
+                    | <el-button @click="edit_item(scope.row)" type="text">编辑</el-button>
+                    | <el-button @click="del_item(scope.row)" type="text">删除</el-button>
+                </div>
+            </template>
+            </el-table-column>
+        </el-table>
+        <el-dialog title="编辑" :visible.sync="dialogVisible">
+            <el-form :model="edit_type" label-width="120px">
+                <el-form-item label="编码">
+                    <el-input-number v-model="edit_type.code"></el-input-number>
+                </el-form-item>
+                <el-form-item label="名称">
+                    <el-input v-model="edit_type.name"></el-input>
+                </el-form-item>
+            </el-form>
+            <div slot="footer" class="dialog-footer">
+                <el-button @click="dialogVisible = false">取 消</el-button>
+                <el-button type="primary" @click="handleConfirm">确 定</el-button>
+            </div>
+        </el-dialog>
+    </div>    
+</template>
+<script>
+export default {
     // 在 JavaScript 中是 camelCase 的
     data: function () {
         return {
@@ -213,43 +255,5 @@ Vue.component('gfc-enums', {
             }
         },
     },
-    template: '<div>\
-        <el-button type="primary" @click="add" v-if="this.$root.can_edit">添加枚举</el-button>\
-        <el-table :data="enums" style="width: 100%;margin-left: 0%;" row-key="id" lazy :load="load_child"\
-            :tree-props="{children: \'children\', hasChildren: \'child_cnt\'}">\
-            <el-table-column prop="d_code" label="编码" width="250">\
-            </el-table-column>\
-            <el-table-column prop="name" label="名称">\
-            </el-table-column>\
-            <el-table-column fixed="right" label="操作" width="400" v-if="this.$root.can_edit">\
-            <template slot-scope="scope">\
-                <div v-if="\'child_cnt\' in scope.row">\
-                    <el-button @click="add" type="text">添加枚举</el-button>\
-                    | <el-button @click="add_child(scope.row)" type="text">添加枚举值</el-button>\
-                    | <el-button @click="edit(scope.row)" type="text">编辑</el-button>\
-                    | <el-button @click="del(scope.row)" type="text">删除</el-button>\
-                </div>\
-                <div v-else>\
-                    <el-button @click="add_child(scope.row.parent)" type="text">添加枚举值</el-button>\
-                    | <el-button @click="edit_item(scope.row)" type="text">编辑</el-button>\
-                    | <el-button @click="del_item(scope.row)" type="text">删除</el-button>\
-                </div>\
-            </template>\
-            </el-table-column>\
-        </el-table>\
-        <el-dialog title="编辑" :visible.sync="dialogVisible">\
-            <el-form :model="edit_type" label-width="120px">\
-                <el-form-item label="编码">\
-                    <el-input-number v-model="edit_type.code"></el-input-number>\
-                </el-form-item>\
-                <el-form-item label="名称">\
-                    <el-input v-model="edit_type.name"></el-input>\
-                </el-form-item>\
-            </el-form>\
-            <div slot="footer" class="dialog-footer">\
-                <el-button @click="dialogVisible = false">取 消</el-button>\
-                <el-button type="primary" @click="handleConfirm">确 定</el-button>\
-            </div>\
-        </el-dialog>\
-    </div>',
-})
+}
+</script>

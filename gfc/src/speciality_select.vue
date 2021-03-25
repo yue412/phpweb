@@ -1,7 +1,16 @@
-//import {do_ajax} from '../common';
-Vue.component('gfc-speciality-select', {
+<template>
+    <el-select v-model="selected" placeholder="请选择">
+        <el-option
+            v-for="item in speciality_dict"
+            :key="item.speciality_id"
+            :label="item.name"
+            :value="item.speciality_id">
+        </el-option>
+    </el-select>
+</template>
+<script>
+export default {
     // 在 JavaScript 中是 camelCase 的
-    props: ['login-ref'],
     data: function () {
         return {
             speciality_dict: null,
@@ -34,12 +43,5 @@ Vue.component('gfc-speciality-select', {
             });
         },
     },
-    template: '<el-select v-model="selected" placeholder="请选择">\
-        <el-option\
-            v-for="item in speciality_dict"\
-            :key="item.speciality_id"\
-            :label="item.name"\
-            :value="item.speciality_id">\
-        </el-option>\
-    </el-select>',
-})
+}
+</script>

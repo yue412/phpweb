@@ -3,7 +3,7 @@ function effect_chef_default(chef, owner)
 
 }
 
-function calc_price_default(recipe)
+function calc_price_default(chef, owner, recipe)
 {
     return 0;
 }
@@ -36,8 +36,10 @@ function effect_chef_percent(chef, owner)
     chef[type] += Math.floor(this.value / 100 * chef[type+"_raw"]) ;
 }
 
-function calc_price_percent(recipe)
+function calc_price_percent(chef, owner, recipe)
 {
+    if(this.condition == "Self" && chef != owner)
+        return 0;
     var type = adjust_type(this.type.substr(3));
     if (recipe[type] > 0)
         return this.value / 100 * recipe.calc_price();
@@ -45,12 +47,12 @@ function calc_price_percent(recipe)
         return 0;
 }
 
-function calc_price_gold_gain(recipe)
+function calc_price_gold_gain(chef, owner, recipe)
 {
     return this.value / 100 * recipe.calc_price();
 }
 
-function calc_price_use_all(recipe)
+function calc_price_use_all(chef, owner, recipe)
 {
     if(recipe.rarity == this.rarity)
         return this.value / 100 * recipe.calc_price();

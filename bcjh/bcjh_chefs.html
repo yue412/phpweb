@@ -13,7 +13,7 @@
     <!--script src="https://cdn.jsdelivr.net/npm/vue@2.6.12"></script>
 
     <link rel="stylesheet" href="bcjh.css" /-->
-    <script src="https://ajax.aspnetcdn.com/ajax/jQuery/jquery-3.5.1.js"></script>
+    <script src="../jquery/jquery-3.5.1.min.js"></script>
     <script src="../layer/layer.js"></script>
     <script type="text/javascript" src="../common.js">
     </script>
@@ -49,16 +49,20 @@
     <div id="bcjh">
         <el-button @click="add_chef()" type="text">添加厨师</el-button>
         <el-link type="primary" :underline="false" href="index.html">返回</el-link>
-        <login-panel login-ref="..\login.html" v-on:give-user="load_chefs"></login-panel>
+        <login-panel login-ref="../login.html" v-on:give-user="load_chefs"></login-panel>
 
         <el-row>
-            <el-col :span="8">
-                <el-input v-model="search" size="mini" placeholder="输入关键字搜索"/>
+            <el-col :span="4">
+                <el-input v-model="search" size="mini" placeholder="输入关键字搜索" />
             </el-col>
-            <el-col :span="8">
+            <el-col :span="4">
+                <el-input v-model="search_tech" size="mini" placeholder="搜索技能" />
+            </el-col>
+            <el-col :span="4">
                 <!--<el-input size="mini" placeholder="装备测试" v-model="selected_equip" />-->
                 <el-select v-model="selected_equip" filterable placeholder="装备测试">
-                    <el-option v-for="item in equips" :key="item.equipId" :label="item.galleryId + item.name" :value="item.name">
+                    <el-option v-for="item in equips" :key="item.equipId" :label="item.galleryId + item.name"
+                        :value="item.name">
                     </el-option>
                 </el-select>
             </el-col>
@@ -200,6 +204,7 @@
                     currentPage: 1,
                     pageSize: 10,
                     search: '',
+                    search_tech: '',
                     type_filter: [],
                     sort_arg: null,
                     p_width: 60,
@@ -233,16 +238,25 @@
                             this.gen_filter_chefs();
                         }
                     },
+                    search_tech: function (newValue, oldValue) {
+                        if (newValue != oldValue) {
+                            this.gen_filter_chefs();
+                        }
+                    },
                 },
                 methods: {
                     gen_filter_chefs: function () {
-                        if (this.search == '' && this.type_filter.length == 0)
+                        if (this.search == '' && this.type_filter.length == 0 && this.search_tech == '')
                             this.filter_chefs = this.chefs;
                         else {
                             this.filter_chefs = [];
                             for (let i = 0; i < this.chefs.length; i++) {
                                 const chef = this.chefs[i];
                                 if (this.search != '' && chef.name.indexOf(this.search) == -1)
+                                    continue;
+                                let ultimate_skill_name = chef.ultimate_skill_name();
+                                let skill_name = chef.skill_name();
+                                if (this.search_tech != '' && ultimate_skill_name.indexOf(this.search_tech) == -1 && skill_name.indexOf(this.search_tech) == -1)
                                     continue;
                                 if (this.type_filter.length > 0) {
                                     var bFilter = false;

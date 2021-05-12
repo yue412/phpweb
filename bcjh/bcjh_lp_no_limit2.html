@@ -397,7 +397,7 @@
 <body>
     <div id="lp">
         <a href="index.html">返回</a>
-        <login-panel login-ref="..\login.html" v-on:give-user="load_recipes"></login-panel>
+        <login-panel login-ref="../login.html" v-on:give-user="load_recipes"></login-panel>
         <el-input type="textarea" :rows="7" placeholder="请输入菜谱过滤条件" v-model="recipe_filter"></el-input>
         阈值：<el-input-number v-model="calc_limit"></el-input-number>
         <el-button @click="display_price()">非整数计算</el-button>
@@ -487,7 +487,7 @@
                             const recipe = new_recipes[k];
                             if (!this.filter_recipe(recipe))
                                 continue;
-                            var best = get_best_chefs(recipe, filter_chefs, 0);
+                            var best = get_best_chefs(recipe, filter_chefs, 0, null, this.chefs);
                             if (best[1].length == 0)
                                 continue;
                             best_recipe_map.set(recipe.recipeId, best);

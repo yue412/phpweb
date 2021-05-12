@@ -395,7 +395,7 @@
                 var rule_effect = rule.RecipeEffect[recipe.recipeId];
                 if (rule_effect == null)
                     rule_effect = 0;
-                var best = get_best_chefs(recipe, filter_chefs, rule_effect*100);
+                var best = get_best_chefs(recipe, filter_chefs, rule_effect*100, null, my_chefs);
                 if(best[1].length == 0)
                     continue;
                 best_recipe_map.set(recipe.recipeId, best);
@@ -443,7 +443,7 @@
                     var rule_effect = rule.RecipeEffect[recipe.recipeId];
                     if (rule_effect == null)
                         rule_effect = 0;
-                    var best = get_best_chefs(recipe, select_chefs, rule_effect*100);
+                    var best = get_best_chefs(recipe, select_chefs, rule_effect*100, null, my_chefs);
                     if(best[1].length == 0)
                         continue;
                     best_recipe_map.set(recipe.recipeId, best);

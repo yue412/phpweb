@@ -29641,6 +29641,32 @@ var g_bcjh_data = {
 		"bitter": 0,
 		"tasty": 0
 	}, {
+		"chefId": 1038,
+		"galleryId": "1038",
+		"name": "丝香",
+		"rarity": 5,
+		"stirfry": 208,
+		"bake": 0,
+		"boil": 0,
+		"steam": 87,
+		"fry": 522,
+		"knife": 278,
+		"skill": 461,
+		"meat": 0,
+		"fish": 7,
+		"veg": 8,
+		"creation": 0,
+		"ultimateGoal": [3042, 3005, 3080],
+		"ultimateSkill": 671,
+		"origin": "限时礼包",
+		"tags": [2],
+		"sweet": 0,
+		"sour": 0,
+		"spicy": 0,
+		"salty": 0,
+		"bitter": 133,
+		"tasty": 0
+	}, {
 		"chefId": 1041,
 		"galleryId": "1041",
 		"name": "燕归",
@@ -57359,6 +57385,35 @@ var g_bcjh_data = {
 			"value": 80,
 			"condition": "Self",
 			"cal": "Abs"
+		}]
+	}, {
+		"skillId": 671,
+		"desc": "擅长技法各+100炸技售价+10%",
+		"effect": [{
+			"type": "Steam",
+			"value": 100,
+			"condition": "Self",
+			"cal": "Abs"
+		}, {
+			"type": "Stirfry",
+			"value": 100,
+			"condition": "Self",
+			"cal": "Abs"
+		}, {
+			"type": "Fry",
+			"value": 100,
+			"condition": "Self",
+			"cal": "Abs"
+		}, {
+			"type": "Knife",
+			"value": 100,
+			"condition": "Self",
+			"cal": "Abs"
+		}, {
+			"type": "UseFry",
+			"value": 10,
+			"condition": "Self",
+			"cal": "Percent"
 		}]
 	}, {
 		"skillId": 672,

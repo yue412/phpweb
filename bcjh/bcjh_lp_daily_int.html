@@ -129,7 +129,7 @@
     <div id="lp_daily">
         <div>
             <a href="index.html">返回</a>
-            <login-panel login-ref="..\login.html" v-on:give-user="load_recipes"></login-panel>
+            <login-panel login-ref="../login.html" v-on:give-user="load_recipes"></login-panel>
         </div>
         <div>
             餐桌加成：<input type="number" v-model="price_add" />%
@@ -417,7 +417,7 @@
                         var best_recipe_map = new Map();
                         for (let k = 0; k < new_recipes.length; k++) {
                             const recipe = new_recipes[k];
-                            var best = get_best_chefs(recipe, filter_chefs, this.price_add);
+                            var best = get_best_chefs(recipe, filter_chefs, this.price_add, null, this.chefs);
                             if (best[1].length == 0)
                                 continue;
                             best_recipe_map.set(recipe.recipeId, best);

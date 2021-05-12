@@ -56,7 +56,7 @@ g_first_guest_name = "";
 function calc_price2(recipe, chef, chefs, price_add, ChefTagEffect)
 {
     var temp = price_add;
-    if (ChefTagEffect) {
+    if (ChefTagEffect && chef.tags) {
         for (let i = 0; i < chef.tags.length; i++) {
             const tag = chef.tags[i];
             temp += ChefTagEffect[tag] * 100;
@@ -66,11 +66,11 @@ function calc_price2(recipe, chef, chefs, price_add, ChefTagEffect)
     return price;
 }
 
-function get_best_chefs(recipe, chefs, price_add, ChefTagEffect) {
+function get_best_chefs(recipe, chefs, price_add, ChefTagEffect, all_chefs) {
     var result = [0, []];
     for (let i = 0; i < chefs.length; i++) {
         const chef = chefs[i];
-        var price = calc_price2(recipe, chef, chefs, price_add, ChefTagEffect);
+        var price = calc_price2(recipe, chef, all_chefs, price_add, ChefTagEffect);
         if (price > result[0]) {
             result[0] = price;
             result[1].length = 0;
@@ -217,6 +217,16 @@ function display_first_guests(recipe_chefs, recipe) {
     return arr.join("<br>");
 }
 
+function display_left_first_guests(recipe) {
+    var rate = Math.max(recipe.rate, 1);
+    var arr = [];
+    for (let i = rate - 1; i < recipe.guests.length; i++) {
+        const guest = recipe.guests[i];
+        var s = g_Rate_names[i + 2] + ":" + guest.guest;
+        arr.push(s);
+    }
+    return arr.join("\n");
+}
 
 function load_combox() {
     var e = document.getElementById("skill_id_");
@@ -513,6 +523,7 @@ function build_recipes(recipes, my_recipes, my_chefs) {
                 return get_chef_names(chefs);
             }
             recipes[i].first_guests = display_first_guests(recipe_chefs, recipes[i]);
+            recipes[i].left_first_guests = display_left_first_guests(recipes[i]);
             recipes[i].guests_like = display_guests_like(g_bcjh_data.guests, recipes[i]);
             for (let i = 0; i < g_material_types.length; i++) {
                 const type = g_material_types[i];
@@ -526,7 +537,7 @@ function build_recipes(recipes, my_recipes, my_chefs) {
                     recipes[i][type] = 1;
                 //;
             }
-            var best = get_best_chefs(recipes[i], my_chefs, 0);
+            var best = get_best_chefs(recipes[i], my_chefs, 0, null, my_chefs);
             recipes[i].best_price = best[0];
             recipes[i].best_chefs = best[1].join(",");
             ++i;
@@ -555,13 +566,13 @@ function calc_price(recipe, chef, chefs, price_add) {
     delta += (g_rate_factor[rate] - 1) * price;
     if (chef.skill) {
         chef.skill.effect.forEach(e => {
-            delta += e.calc_price(recipe);
+            delta += e.calc_price(chef, chef, recipe);
         });
     }
     if (chef.equip_skills) {
         chef.equip_skills.forEach(e_skill => {
             e_skill.effect.forEach(e => {
-                delta += e.calc_price(recipe);
+                delta += e.calc_price(chef, chef, recipe);
             });
         });
     }
@@ -571,7 +582,7 @@ function calc_price(recipe, chef, chefs, price_add) {
         const c = chefs[i];
         if (c.ultimate_skill) {
             c.ultimate_skill.effect.forEach(e => {
-                delta += e.calc_price(recipe);
+                delta += e.calc_price(chef, c, recipe);
             });
         }
     }
@@ -631,6 +642,7 @@ function filter_recipes_by_name(recipes) {
     return new_recipes;
 }
 
+/*
 function filter_recipes_by_first_guest_name(recipes, chefs) {
     if (g_first_guest_name == "")
         return recipes;
@@ -644,6 +656,7 @@ function filter_recipes_by_first_guest_name(recipes, chefs) {
     }
     return new_recipes;
 }
+*/
 
 function display_time(time) {
     var hour = parseInt(time / 3600);

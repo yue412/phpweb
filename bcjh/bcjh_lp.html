@@ -28,6 +28,29 @@
             }
             return null;
         }
+        function get_rule_effect(rule, recipe) {
+            if(rule.RecipeEffect)
+            {
+                return rule.RecipeEffect[recipe.recipeId];
+            }
+            else if(rule.MaterialsEffect)
+            {
+                let effect = 0;
+                for (let i = 0; i < recipe.materials.length; i++) {
+                    const m = recipe.materials[i];
+                    for (let j = 0; j < rule.MaterialsEffect.length; j++) {
+                        const me = rule.MaterialsEffect[j];
+                        if(me.MaterialID == m.material)
+                        {
+                            effect += me.Effect;
+                            break;
+                        }
+                    }
+                }
+                return effect; 
+            }
+            return null;
+        }
 
         function filter_recipes(recipes, chefs, comb) {
             var chef_recipe = [];
@@ -529,7 +552,7 @@
                     var k = arr[2];
                     var chef = final_comb[k];
                     var recipe = get_recipe_by_id(recipes, id);
-                    var rule_effect = rule.RecipeEffect[recipe.recipeId];
+                    var rule_effect = get_rule_effect(rule, recipe);//rule.RecipeEffect[recipe.recipeId];
                     if (rule_effect == null)
                         continue;//rule_effect = 0;
                     if (rule.ChefTagEffect) {
@@ -704,7 +727,7 @@
 <body>
     <div id="lp">
         <a href="index.html">返回</a>
-        <login-panel login-ref="..\login.html" v-on:give-user="load_recipes"></login-panel>
+        <login-panel login-ref="../login.html" v-on:give-user="load_recipes"></login-panel>
         <br>
         规则地址：<input type="text" id="rule_address" onchange="setCookie('rule_address', this.value, 14)" /><input
             type="button" value="加载" onclick="load_rule()" />
@@ -809,10 +832,10 @@
                         var new_recipes = this.recipes;
                         for (let k = 0; k < new_recipes.length; k++) {
                             const recipe = new_recipes[k];
-                            var rule_effect = rule.RecipeEffect[recipe.recipeId];
+                            var rule_effect = get_rule_effect(rule, recipe);// rule.RecipeEffect[recipe.recipeId];
                             if (rule_effect == null)
                                 continue;//rule_effect = 0;
-                            var best = get_best_chefs(recipe, filter_chefs, rule_effect * 100, rule.ChefTagEffect);
+                            var best = get_best_chefs(recipe, filter_chefs, rule_effect * 100, rule.ChefTagEffect, this.chefs);
                             if (best[1].length == 0)
                                 continue;
                             best_recipe_map.set(recipe.recipeId, best);
@@ -869,7 +892,7 @@
                         for (let i = 0; i < this.recipes.length; i++) {
                             const recipe = this.recipes[i];
                             // price count
-                            var rule_effect = rule.RecipeEffect[recipe.recipeId];
+                            var rule_effect = get_rule_effect(rule, recipe);//rule.RecipeEffect[recipe.recipeId];
                             if (rule_effect == null)
                                 continue;//rule_effect = 0;
                             var price = calc_price2(recipe, chef, this.chefs, rule_effect * 100, rule.ChefTagEffect);
@@ -907,10 +930,10 @@
                             var best_recipe_map = new Map();
                             for (let k = 0; k < new_recipes.length; k++) {
                                 const recipe = new_recipes[k];
-                                var rule_effect = rule.RecipeEffect[recipe.recipeId];
+                                var rule_effect = get_rule_effect(rule, recipe);//rule.RecipeEffect[recipe.recipeId];
                                 if (rule_effect == null)
                                     continue;//rule_effect = 0;
-                                var best = get_best_chefs(recipe, select_chefs, rule_effect * 100, rule.ChefTagEffect);
+                                var best = get_best_chefs(recipe, select_chefs, rule_effect * 100, rule.ChefTagEffect, this.chefs);
                                 if (best[1].length == 0)
                                     continue;
                                 best_recipe_map.set(recipe.recipeId, best);
@@ -986,7 +1009,7 @@
                             for (let i = 0; i <= index; i++) {
                                 const r = list[i];
                                 var recipe = r[0];
-                                var rule_effect = rule.RecipeEffect[recipe.recipeId];
+                                var rule_effect = get_rule_effect(rule, recipe);//rule.RecipeEffect[recipe.recipeId];
                                 if (rule_effect == null)
                                     continue;//rule_effect = 0;
                                 for (let j = 0; j < select_chefs.length; j++) {

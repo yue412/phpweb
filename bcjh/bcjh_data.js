@@ -19507,7 +19507,7 @@ var g_bcjh_data = {
 		"condiment": "Spicy"
 	}, {
 		"recipeId": 5001,
-		"galleryId": "572",
+		"galleryId": "573",
 		"name": "快乐桶",
 		"rarity": 5,
 		"unlock": "-",
@@ -19546,7 +19546,7 @@ var g_bcjh_data = {
 		"condiment": "Spicy"
 	}, {
 		"recipeId": 5002,
-		"galleryId": "573",
+		"galleryId": "574",
 		"name": "蒸汽海鲜",
 		"rarity": 5,
 		"unlock": "-",
@@ -19585,7 +19585,7 @@ var g_bcjh_data = {
 		"condiment": "Tasty"
 	}, {
 		"recipeId": 5003,
-		"galleryId": "574",
+		"galleryId": "575",
 		"name": "蛋包饭定食",
 		"rarity": 3,
 		"unlock": "-",
@@ -19624,7 +19624,7 @@ var g_bcjh_data = {
 		"condiment": "Sour"
 	}, {
 		"recipeId": 5004,
-		"galleryId": "575",
+		"galleryId": "576",
 		"name": "港式早茶",
 		"rarity": 4,
 		"unlock": "-",
@@ -19663,7 +19663,7 @@ var g_bcjh_data = {
 		"condiment": "Sweet"
 	}, {
 		"recipeId": 5005,
-		"galleryId": "576",
+		"galleryId": "577",
 		"name": "鸳鸯火锅",
 		"rarity": 4,
 		"unlock": "-",
@@ -19702,7 +19702,7 @@ var g_bcjh_data = {
 		"condiment": "Spicy"
 	}, {
 		"recipeId": 5006,
-		"galleryId": "577",
+		"galleryId": "578",
 		"name": "BBQ烧烤",
 		"rarity": 4,
 		"unlock": "-",
@@ -19741,7 +19741,7 @@ var g_bcjh_data = {
 		"condiment": "Salty"
 	}, {
 		"recipeId": 5007,
-		"galleryId": "578",
+		"galleryId": "579",
 		"name": "全套菜饭",
 		"rarity": 3,
 		"unlock": "-",
@@ -19780,7 +19780,7 @@ var g_bcjh_data = {
 		"condiment": "Salty"
 	}, {
 		"recipeId": 5008,
-		"galleryId": "579",
+		"galleryId": "580",
 		"name": "沙县轻食",
 		"rarity": 3,
 		"unlock": "-",
@@ -29251,6 +29251,32 @@ var g_bcjh_data = {
 		"bitter": 52,
 		"tasty": 0
 	}, {
+		"chefId": 990,
+		"galleryId": "990",
+		"name": "波特尔",
+		"rarity": 4,
+		"stirfry": 0,
+		"bake": 249,
+		"boil": 373,
+		"steam": 0,
+		"fry": 62,
+		"knife": 124,
+		"skill": 262,
+		"meat": 4,
+		"fish": 0,
+		"veg": 3,
+		"creation": 0,
+		"ultimateGoal": [3041, 3010, 3066],
+		"ultimateSkill": 678,
+		"origin": "限时礼包",
+		"tags": [1],
+		"sweet": 106,
+		"sour": 0,
+		"spicy": 0,
+		"salty": 0,
+		"bitter": 0,
+		"tasty": 0
+	}, {
 		"chefId": 993,
 		"galleryId": "993",
 		"name": "狰喵喵",
@@ -29688,6 +29714,32 @@ var g_bcjh_data = {
 		"tags": [1],
 		"sweet": 0,
 		"sour": 77,
+		"spicy": 0,
+		"salty": 0,
+		"bitter": 0,
+		"tasty": 0
+	}, {
+		"chefId": 1044,
+		"galleryId": "1044",
+		"name": "金牛牛",
+		"rarity": 5,
+		"stirfry": 0,
+		"bake": 153,
+		"boil": 306,
+		"steam": 459,
+		"fry": 153,
+		"knife": 0,
+		"skill": 679,
+		"meat": 8,
+		"fish": 0,
+		"veg": 0,
+		"creation": 6,
+		"ultimateGoal": [3040, 3002, 3080],
+		"ultimateSkill": 319,
+		"origin": "限时礼包",
+		"tags": [2],
+		"sweet": 0,
+		"sour": 148,
 		"spicy": 0,
 		"salty": 0,
 		"bitter": 0,
@@ -52448,135 +52500,6 @@ var g_bcjh_data = {
 			"rank": 4,
 			"num": 45
 		}]
-	}, {
-		"questId": 9324,
-		"questIdDisp": 1,
-		"type": "思乡之情",
-		"goal": "累计开业15个小时",
-		"rewards": [{
-			"name": "金币",
-			"quantity": "20000"
-		}]
-	}, {
-		"questId": 9325,
-		"questIdDisp": 2,
-		"type": "思乡之情",
-		"goal": "制作使用葱的特级料理450份",
-		"rewards": [{
-			"name": "玉璧",
-			"quantity": "378"
-		}],
-		"conditions": [{
-			"rank": 3,
-			"materialId": 18
-		}]
-	}, {
-		"questId": 9326,
-		"questIdDisp": 3,
-		"type": "思乡之情",
-		"goal": "使用任意食材1800个",
-		"rewards": [{
-			"name": "金币",
-			"quantity": "50000"
-		}],
-		"conditions": [{
-			"materialEff": true
-		}]
-	}, {
-		"questId": 9327,
-		"questIdDisp": 4,
-		"type": "思乡之情",
-		"goal": "制作稀有度至少为2星且使用黄瓜的料理460份",
-		"rewards": [{
-			"name": "千年煮鳖",
-			"quantity": "2"
-		}, {
-			"name": "香烤鱼排",
-			"quantity": "2"
-		}],
-		"conditions": [{
-			"rarity": 2,
-			"materialId": 31
-		}]
-	}, {
-		"questId": 9328,
-		"questIdDisp": 5,
-		"type": "思乡之情",
-		"goal": "遇见任意特殊客人12次",
-		"rewards": [{
-			"name": "玉璧",
-			"quantity": "378"
-		}],
-		"conditions": [{
-			"anyGuest": true
-		}]
-	}, {
-		"questId": 9329,
-		"questIdDisp": 6,
-		"type": "思乡之情",
-		"goal": "制作切技特级料理500份",
-		"rewards": [{
-			"name": "五星炒果",
-			"quantity": "2"
-		}, {
-			"name": "恐怖利刃",
-			"quantity": "2"
-		}],
-		"conditions": [{
-			"skill": "knife",
-			"rank": 3
-		}]
-	}, {
-		"questId": 9330,
-		"questIdDisp": 7,
-		"type": "思乡之情",
-		"goal": "制作使用大米的神级料理600份",
-		"rewards": [{
-			"name": "玉璧",
-			"quantity": "378"
-		}],
-		"conditions": [{
-			"rank": 4,
-			"materialId": 21
-		}]
-	}, {
-		"questId": 9331,
-		"questIdDisp": 8,
-		"type": "思乡之情",
-		"goal": "制作稀有度至少为3星的特级鱼类料理350份",
-		"rewards": [{
-			"name": "鼓风机",
-			"quantity": "2"
-		}, {
-			"name": "蒸馏杯",
-			"quantity": "2"
-		}],
-		"conditions": [{
-			"rarity": 3,
-			"rank": 3,
-			"category": "fish"
-		}]
-	}, {
-		"questId": 9332,
-		"questIdDisp": 9,
-		"type": "思乡之情",
-		"goal": "制作稀有度为5星的任意料理270份",
-		"rewards": [{
-			"name": "玉璧",
-			"quantity": "378"
-		}],
-		"conditions": [{
-			"rarity": 5
-		}]
-	}, {
-		"questId": 9333,
-		"questIdDisp": 10,
-		"type": "思乡之情",
-		"goal": "制作江浙料理和鲜味料理会有额外加分，避免制作使用辣椒或是辣味的料理。",
-		"rewards": [{
-			"name": "菜谱-榆钱饭",
-			"quantity": ""
-		}]
 	}],
 	"skills": [{
 		"skillId": 1,
@@ -57469,6 +57392,60 @@ var g_bcjh_data = {
 			"condition": "Self",
 			"cal": "Percent"
 		}]
+	}, {
+		"skillId": 678,
+		"desc": "全体男厨师全技法+3",
+		"effect": [{
+			"type": "Stirfry",
+			"value": 3,
+			"condition": "Global",
+			"cal": "Abs",
+			"tag": 1
+		}, {
+			"type": "Steam",
+			"value": 3,
+			"condition": "Global",
+			"cal": "Abs",
+			"tag": 1
+		}, {
+			"type": "Fry",
+			"value": 3,
+			"condition": "Global",
+			"cal": "Abs",
+			"tag": 1
+		}, {
+			"type": "Boil",
+			"value": 3,
+			"condition": "Global",
+			"cal": "Abs",
+			"tag": 1
+		}, {
+			"type": "Knife",
+			"value": 3,
+			"condition": "Global",
+			"cal": "Abs",
+			"tag": 1
+		}, {
+			"type": "Bake",
+			"value": 3,
+			"condition": "Global",
+			"cal": "Abs",
+			"tag": 1
+		}]
+	}, {
+		"skillId": 679,
+		"desc": "煮类和蒸类料理售价+25%",
+		"effect": [{
+			"type": "UseBoil",
+			"value": 25,
+			"condition": "Self",
+			"cal": "Percent"
+		}, {
+			"type": "UseSteam",
+			"value": 25,
+			"condition": "Self",
+			"cal": "Percent"
+		}]
 	}],
 	"maps": [{
 		"name": "牧场",
@@ -59478,10 +59455,7 @@ var g_bcjh_data = {
 			"Effect": -1
 		}]
 	}],
-	"activities": [{
-		"id": 9324,
-		"name": "思乡之情"
-	}],
+	"activities": [],
 	"history": [{
 		"date": "2021/03/31",
 		"content": "江南烟雨池相关更新"

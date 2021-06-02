@@ -67,6 +67,11 @@
                 </el-select>
             </el-col>
         </el-row>
+        <el-row>
+            <el-checkbox-group v-model="selectedPartialChefs" :max="2">
+                <el-checkbox v-for="chef in partialChefs" :label="chef">{{chef.name}}</el-checkbox>
+            </el-checkbox-group>
+        </el-row>
         <el-table :data="filter_chefs.slice((currentPage-1)*pageSize,currentPage*pageSize)" style="width: 100%"
             :default-sort="{prop: 'id', order: 'ascending'}" @sort-change="sortChange" @filter-change="filterChange">
             <el-table-column prop="id" label="序号" width="80" sortable>
@@ -200,6 +205,8 @@
                     sorter: null,
                     selected_equip: "",
                     equips: g_bcjh_data.equips,
+                    selectedPartialChefs: [],
+                    partialChefs:[],
 
                     currentPage: 1,
                     pageSize: 10,
@@ -213,24 +220,15 @@
                 },
                 watch: {
                     selected_equip: function (val) {
-                        var equip = get_equip_by_name(val);
-                        if (equip == null) {
-                            for (let i = 0; i < this.chefs.length; i++) {
-                                const chef = this.chefs[i];
-                                chef.ultimate_skill_conditions2 = null;
-                            }
-                            return;
-                        }
-                        var new_chefs = JSON.parse(JSON.stringify(this.chefs));
-                        for (let i = 0; i < new_chefs.length; i++) {
-                            const chef = new_chefs[i];
-                            chef.equip_id = equip.equipId;
-                        }
-                        init_chefs(new_chefs);
-                        for (let i = 0; i < this.chefs.length; i++) {
-                            const chef = this.chefs[i];
-                            var list = this.get_ultimate_skill_conditions(new_chefs[i], this.recipes);
-                            chef.ultimate_skill_conditions2 = list;
+                        this.refresh_ultimate_skill_conditions2();
+                    },
+                    selectedPartialChefs: {
+                        deep: true,
+                        immediate: true,
+                        handler: function (val, oldVal) {
+                            if(val && oldVal && val.length == oldVal.length)
+                                return;
+                            this.refresh_ultimate_skill_conditions2();
                         }
                     },
                     search: function (newValue, oldValue) {
@@ -245,6 +243,48 @@
                     },
                 },
                 methods: {
+                    /*get_selected_partial_chefs(){
+                        let result = [];
+                        this.selectedPartialChefs.forEach(name => {
+                            let chef = find_chef(name);
+                            if(chef)
+                                result.push(chef);
+                        });
+                        return result;
+                    },*/
+                    refresh_ultimate_skill_conditions2() {
+                        let equip_name = this.selected_equip;
+                        var equip = get_equip_by_name(equip_name);
+                        var new_chefs = JSON.parse(JSON.stringify(this.chefs));
+                        for (let i = 0; i < new_chefs.length; i++) {
+                            const chef = new_chefs[i];
+                            if(equip)
+                                chef.equip_id = equip.equipId;
+                            for (let j = 0; j < g_cook_types.length; j++) {
+                                const type = g_cook_types[j];
+                                chef[type] = chef[type + "_raw"];
+                            }
+                            for (let j = 0; j < g_material_types.length; j++) {
+                                const type = g_material_types[j];
+                                chef[type] = chef[type + "_raw"];
+                            }
+                        }
+                        //let selected_partial_chefs = this.get_selected_partial_chefs();
+                        init_chefs(new_chefs, this.selectedPartialChefs);
+                        for (let i = 0; i < this.chefs.length; i++) {
+                            const chef = this.chefs[i];
+                            var list = this.get_ultimate_skill_conditions(new_chefs[i], this.recipes);
+                            chef.ultimate_skill_conditions2 = list;
+                            for (let j = 0; j < g_cook_types.length; j++) {
+                                const type = g_cook_types[j];
+                                chef[type] = new_chefs[i][type];
+                            }
+                            for (let j = 0; j < g_material_types.length; j++) {
+                                const type = g_material_types[j];
+                                chef[type] = new_chefs[i][type];
+                            }
+                        }
+                    },
                     gen_filter_chefs: function () {
                         if (this.search == '' && this.type_filter.length == 0 && this.search_tech == '')
                             this.filter_chefs = this.chefs;
@@ -286,6 +326,7 @@
                             var my_chefs = JSON.parse(text);
                             init_skills(g_bcjh_data.skills);
                             init_chefs(my_chefs);
+                            that.partialChefs = get_partial_chefs(my_chefs);
                             do_ajax("../db/get_records.php?table_name=bcjh_recipes&user_id=" + user_id, function (text) {
                                 var my_recipes = JSON.parse(text);
                                 var new_recipes = build_recipes(g_bcjh_data.recipes, my_recipes, my_chefs);

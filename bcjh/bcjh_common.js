@@ -176,7 +176,14 @@ function get_recipe_chefs(recipe, chefs) {
     for (let i = 0; i < chefs.length; i++) {
         const chef = chefs[i];
         var rate = calc_rate(recipe, chef);
+        chef.temp_price = calc_price(recipe, chef, chefs, 0);
         arr[rate].push(chef);
+    }
+    for (let chefs of arr) {
+        chefs.sort(function (a, b) {
+            let val = a.temp_price - b.temp_price;
+            return val == 0 ? a.name.localeCompare(b.name) : -val;
+        });
     }
     return arr;
 }
@@ -337,7 +344,7 @@ function get_tags(id) {
     return [];
 }
 
-function init_chefs(chefs) {
+function init_chefs(chefs, partial_chefs) {
     for (let i = 0; i < chefs.length; i++) {
         var chef = chefs[i];
         for (let j = 0; j < g_cook_types.length; j++) {
@@ -400,10 +407,25 @@ function init_chefs(chefs) {
                     const c = chefs[j];
                     e.effect_chef(c, chef);
                 }
-
             });
         }
-
+    }
+    if(partial_chefs)
+    {
+        for (const partial_chef of partial_chefs) {
+            if(partial_chef.ultimate_skill)
+            {
+                partial_chef.ultimate_skill.effect.forEach(e => {
+                    if(e.condition == "Partial")
+                    {
+                        for (let j = 0; j < chefs.length; j++) {
+                            const c = chefs[j];
+                            e.effect_chef(c, chef, true);
+                        }
+                    }
+                });
+            }
+        }
     }
 }
 
@@ -515,16 +537,6 @@ function build_recipes(recipes, my_recipes, my_chefs) {
             recipes[i].gift_name = function () {
                 return this.rate >= 4 ? "-" : this.gift;
             }
-            var recipe_chefs = get_recipe_chefs(recipes[i], my_chefs);
-            recipes[i].recipe_chefs = display_recipe_chefs(recipe_chefs, recipes[i].rate);
-            recipes[i].recipe_chefs_arr = recipe_chefs;
-            recipes[i].get_recipe_chefs_name = function (index) {
-                var chefs = index <= this.rate || this.recipe_chefs_arr2 == null || this.recipe_chefs_arr[index].length > 0 ? this.recipe_chefs_arr[index] : this.recipe_chefs_arr2[index];
-                return get_chef_names(chefs);
-            }
-            recipes[i].first_guests = display_first_guests(recipe_chefs, recipes[i]);
-            recipes[i].left_first_guests = display_left_first_guests(recipes[i]);
-            recipes[i].guests_like = display_guests_like(g_bcjh_data.guests, recipes[i]);
             for (let i = 0; i < g_material_types.length; i++) {
                 const type = g_material_types[i];
                 recipes[i].type = 0;
@@ -537,6 +549,17 @@ function build_recipes(recipes, my_recipes, my_chefs) {
                     recipes[i][type] = 1;
                 //;
             }
+            var recipe_chefs = get_recipe_chefs(recipes[i], my_chefs);
+            recipes[i].recipe_chefs = display_recipe_chefs(recipe_chefs, recipes[i].rate);
+            recipes[i].recipe_chefs_arr = recipe_chefs;
+            recipes[i].get_recipe_chefs_name = function (index) {
+//                var chefs = index <= this.rate || this.recipe_chefs_arr2 == null || this.recipe_chefs_arr[index].length > 0 ? this.recipe_chefs_arr[index] : this.recipe_chefs_arr2[index];
+                var chefs = this.recipe_chefs_arr2 == null ? this.recipe_chefs_arr[index] : this.recipe_chefs_arr2[index];
+                return get_chef_names(chefs);
+            }
+            recipes[i].first_guests = display_first_guests(recipe_chefs, recipes[i]);
+            recipes[i].left_first_guests = display_left_first_guests(recipes[i]);
+            recipes[i].guests_like = display_guests_like(g_bcjh_data.guests, recipes[i]);
             var best = get_best_chefs(recipes[i], my_chefs, 0, null, my_chefs);
             recipes[i].best_price = best[0];
             recipes[i].best_chefs = best[1].join(",");
@@ -682,4 +705,22 @@ function recipe_by_id(id) {
         }
     }
     return null;
+}
+
+function get_partial_chefs(chefs){
+    let result = [];
+    for (let i = 0; i < chefs.length; i++) {
+        const chef = chefs[i];
+        if(chef.ultimate_skill)
+        {
+            for (const e of chef.ultimate_skill.effect) {
+                if(e.condition == "Partial")
+                {
+                    result.push(chef);
+                    break;
+                }
+            }
+        }
+    }
+    return result;
 }

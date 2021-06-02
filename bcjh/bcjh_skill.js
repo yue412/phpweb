@@ -1,4 +1,4 @@
-function effect_chef_default(chef, owner)
+function effect_chef_default(chef, owner, partial)
 {
 
 }
@@ -17,9 +17,11 @@ function adjust_type(type)
     return type == "vegetable" ? "veg" : type;
 }
 
-function effect_chef_abs(chef, owner)
+function effect_chef_abs(chef, owner, partial)
 {
     if(this.condition == "Self" && chef != owner)
+        return;
+    if(this.condition == "Partial" && !partial)
         return;
     if("tag" in this && chef.tags.indexOf(this.tag) == -1 )
         return;
@@ -49,6 +51,8 @@ function calc_price_percent(chef, owner, recipe)
 
 function calc_price_gold_gain(chef, owner, recipe)
 {
+    if(this.condition == "Self" && chef != owner)
+        return 0;
     return this.value / 100 * recipe.calc_price();
 }
 

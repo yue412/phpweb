@@ -171,6 +171,21 @@ function calc_rate(recipe, chef) {
     return n;
 }
 
+function calc_rate_diff(recipe, chef, rate)
+{
+    var result = [];
+    for (let i = 0; i < g_cook_types.length; i++) {
+        const type = g_cook_types[i];
+        if (recipe[type] > 0)
+        {
+            let diff = chef[type] - recipe[type] * rate;
+            if (diff < 0)
+                result.push({"type":type,"diff":-diff});
+        }
+    }
+    return result;
+}
+
 function get_recipe_chefs(recipe, chefs) {
     var arr = [new Array(), new Array(), new Array(), new Array(), new Array(), new Array()];
     for (let i = 0; i < chefs.length; i++) {
@@ -370,10 +385,31 @@ function init_chefs(chefs, partial_chefs) {
             if (this.ultimate_skill != null)
                 return this.ultimate_skill.desc;
             else {
-                if (this.ultimate_skill_conditions.length >= 3)
-                    return this.ultimate_skill_conditions.join("\n");
-                else if (this.ultimate_skill_conditions2 && this.ultimate_skill_conditions2.length >= 3)
+                //if (this.ultimate_skill_conditions.length >= 3)
+                if (this.ultimate_skill_conditions2)
                     return this.ultimate_skill_conditions2.join("\n");
+                else
+                    return this.ultimate_skill_conditions.join("\n");
+            }
+            return "";
+        }
+        chef.ultimate_skill_name3 = function () {
+            if (this.ultimate_skill == null)
+            {
+                if (this.ultimate_skill_conditions.length < 3 && (!this.ultimate_skill_conditions2 || this.ultimate_skill_conditions2.length < 3))
+                {
+                    let result = [];
+                    this.ultimate_skill_conditions3.forEach(element => {
+                        let arr = [];
+                        element.diffs.forEach(d => {
+                            let index = g_cook_types.indexOf(d.type);
+                            arr.push(g_cook_type_names[index]+":"+d.diff);
+                        });
+                        result.push(element.recipe + "("+arr.join(",")+")");
+                    });
+                    
+                    return result.join("\n");
+                }
             }
             return "";
         }

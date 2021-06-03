@@ -113,6 +113,11 @@
                         v-bind:class="{'chef-emphasize':(scope.row.ultimate_skill == null) && (scope.row.ultimate_skill_conditions.length>=3), 'emphasize-font':(scope.row.ultimate_skill == null) && (scope.row.ultimate_skill_conditions.length<3) && (scope.row.ultimate_skill_conditions2 != null) && scope.row.ultimate_skill_conditions2.length>=3}">{{scope.row.ultimate_skill_name()}}</div>
                 </template>
             </el-table-column>
+            <el-table-column label="终极技能差距">
+                <template slot-scope="scope">
+                    <div style="white-space: pre-wrap;">{{scope.row.ultimate_skill_name3()}}</div>
+                </template>
+            </el-table-column>
             <el-table-column label="装备">
                 <template slot-scope="scope">{{ scope.row.equip_name() }}</template>
             </el-table-column>
@@ -274,7 +279,8 @@
                         for (let i = 0; i < this.chefs.length; i++) {
                             const chef = this.chefs[i];
                             var list = this.get_ultimate_skill_conditions(new_chefs[i], this.recipes);
-                            chef.ultimate_skill_conditions2 = list;
+                            chef.ultimate_skill_conditions2 = list[0];
+                            chef.ultimate_skill_conditions3 = list[1];
                             for (let j = 0; j < g_cook_types.length; j++) {
                                 const type = g_cook_types[j];
                                 chef[type] = new_chefs[i][type];
@@ -337,28 +343,60 @@
                             });
                         });
                     },
+                    get_quest(quest_id){
+                        for (const quest of g_bcjh_data.quests) {
+                            if(quest.questId == quest_id)
+                                return quest;
+                        }
+                        return null;
+                    },
                     get_ultimate_skill_conditions: function (chef, new_recipes) {
                         var origin = this.get_origin_chef_by_id(chef.id);
-                        var cook = this.get_chef_max_cook(origin);
+                        let quest_id = origin.ultimateGoal[0];
+                        let quest = this.get_quest(quest_id);
+                        if(quest == null)
+                            return;
+                        var cook = quest.conditions[0].skill;
+                        let rarity = quest.conditions[0].rarity;
                         var list = [];
+                        let ulist = [];
                         for (let j = 0; j < new_recipes.length; j++) {
                             const recipe = new_recipes[j];
-                            if (recipe.rarity == chef.rarity && recipe[cook] > 0) {
-                                var rate = calc_rate(recipe, chef);
-                                if (rate >= 4) {
+                            if (recipe.rarity == rarity && recipe[cook] > 0) {
+                                let diffs = calc_rate_diff(recipe, chef, 4);
+                                if(diffs.length == 0)
+                                {
                                     list.push(recipe.name);
                                     if (list.length >= 3)
                                         break;
                                 }
+                                else
+                                {
+                                    let total = 0;
+                                    diffs.forEach(diff => {
+                                        total += diff.diff;
+                                    });
+                                    ulist.push({"recipe":recipe.name,"diffs":diffs, "total":total});
+                                }
+                                // var rate = calc_rate(recipe, chef);
+                                // if (rate >= 4) {
+                                //     list.push(recipe.name);
+                                //     if (list.length >= 3)
+                                //         break;
+                                // }
                             }
                         }
-                        return list;
+                        ulist.sort((a,b)=>{
+                            return a.total - b.total;
+                        });
+                        return [list, ulist.slice(0,3)];
                     },
                     init_ultimate_skill_conditions: function (new_recipes) {
                         for (let i = 0; i < this.chefs.length; i++) {
                             const chef = this.chefs[i];
                             var list = this.get_ultimate_skill_conditions(chef, new_recipes);
-                            chef.ultimate_skill_conditions = list;
+                            chef.ultimate_skill_conditions = list[0];
+                            chef.ultimate_skill_conditions3 = list[1];
                         }
                     },
                     get_origin_chef_by_id: function (id) {
@@ -369,6 +407,7 @@
                         }
                         return null;
                     },
+                    /*
                     get_chef_max_cook: function (chef) {
                         var cook = g_cook_types[0];
                         for (let i = 1; i < g_cook_types.length; i++) {
@@ -379,6 +418,7 @@
                         }
                         return cook;
                     },
+                    */
                     set_max_level: function (chef) {
                         var that = this;
                         do_ajax('../db/update_record.php?table_name=bcjh_chefs&primary_key=id|user_id&key_val=' + chef.id + "|" + that.user_id + "&" + this._build_chef_params(chef.name), function (text) {

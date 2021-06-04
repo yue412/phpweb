@@ -66,6 +66,10 @@
                     </el-option>
                 </el-select>
             </el-col>
+            <el-col :span="4">
+                <el-button @click="statistic_recipes()">推荐池</el-button>
+                <el-button @click="statistic_recipes5()">5星池</el-button>
+            </el-col>
         </el-row>
         <el-row>
             <el-checkbox-group v-model="selectedPartialChefs" :max="2">
@@ -113,9 +117,14 @@
                         v-bind:class="{'chef-emphasize':(scope.row.ultimate_skill == null) && (scope.row.ultimate_skill_conditions.length>=3), 'emphasize-font':(scope.row.ultimate_skill == null) && (scope.row.ultimate_skill_conditions.length<3) && (scope.row.ultimate_skill_conditions2 != null) && scope.row.ultimate_skill_conditions2.length>=3}">{{scope.row.ultimate_skill_name()}}</div>
                 </template>
             </el-table-column>
-            <el-table-column label="终极技能差距">
+            <el-table-column label="技能差距">
                 <template slot-scope="scope">
                     <div style="white-space: pre-wrap;">{{scope.row.ultimate_skill_name3()}}</div>
+                </template>
+            </el-table-column>
+            <el-table-column label="备选池">
+                <template slot-scope="scope">
+                    <div style="white-space: pre-wrap;">{{ultimate_skill_name4(scope.row)}}</div>
                 </template>
             </el-table-column>
             <el-table-column label="装备">
@@ -211,7 +220,7 @@
                     selected_equip: "",
                     equips: g_bcjh_data.equips,
                     selectedPartialChefs: [],
-                    partialChefs:[],
+                    partialChefs: [],
 
                     currentPage: 1,
                     pageSize: 10,
@@ -231,7 +240,7 @@
                         deep: true,
                         immediate: true,
                         handler: function (val, oldVal) {
-                            if(val && oldVal && val.length == oldVal.length)
+                            if (val && oldVal && val.length == oldVal.length)
                                 return;
                             this.refresh_ultimate_skill_conditions2();
                         }
@@ -263,7 +272,7 @@
                         var new_chefs = JSON.parse(JSON.stringify(this.chefs));
                         for (let i = 0; i < new_chefs.length; i++) {
                             const chef = new_chefs[i];
-                            if(equip)
+                            if (equip)
                                 chef.equip_id = equip.equipId;
                             for (let j = 0; j < g_cook_types.length; j++) {
                                 const type = g_cook_types[j];
@@ -281,6 +290,9 @@
                             var list = this.get_ultimate_skill_conditions(new_chefs[i], this.recipes);
                             chef.ultimate_skill_conditions2 = list[0];
                             chef.ultimate_skill_conditions3 = list[1];
+                            let list2 = this.get_ultimate_skill_conditions(new_chefs[i], g_bcjh_data.recipes, true);
+                            this.drop_repeat_recipe(list2[2], list[0]);
+                            chef.ultimate_skill_conditions4 = list2[2];
                             for (let j = 0; j < g_cook_types.length; j++) {
                                 const type = g_cook_types[j];
                                 chef[type] = new_chefs[i][type];
@@ -343,40 +355,40 @@
                             });
                         });
                     },
-                    get_quest(quest_id){
+                    get_quest(quest_id) {
                         for (const quest of g_bcjh_data.quests) {
-                            if(quest.questId == quest_id)
+                            if (quest.questId == quest_id)
                                 return quest;
                         }
                         return null;
                     },
-                    get_ultimate_skill_conditions: function (chef, new_recipes) {
+                    get_ultimate_skill_conditions: function (chef, new_recipes, check_all) {
                         var origin = this.get_origin_chef_by_id(chef.id);
                         let quest_id = origin.ultimateGoal[0];
                         let quest = this.get_quest(quest_id);
-                        if(quest == null)
+                        if (quest == null)
                             return;
                         var cook = quest.conditions[0].skill;
                         let rarity = quest.conditions[0].rarity;
                         var list = [];
                         let ulist = [];
+                        let nlist = [];
                         for (let j = 0; j < new_recipes.length; j++) {
                             const recipe = new_recipes[j];
                             if (recipe.rarity == rarity && recipe[cook] > 0) {
                                 let diffs = calc_rate_diff(recipe, chef, 4);
-                                if(diffs.length == 0)
-                                {
+                                if (diffs.length == 0) {
                                     list.push(recipe.name);
-                                    if (list.length >= 3)
+                                    nlist.push({name:recipe.name, origin: recipe.origin});
+                                    if (!check_all && list.length >= 3)
                                         break;
                                 }
-                                else
-                                {
+                                else {
                                     let total = 0;
                                     diffs.forEach(diff => {
                                         total += diff.diff;
                                     });
-                                    ulist.push({"recipe":recipe.name,"diffs":diffs, "total":total});
+                                    ulist.push({ "recipe": recipe.name, "diffs": diffs, "total": total });
                                 }
                                 // var rate = calc_rate(recipe, chef);
                                 // if (rate >= 4) {
@@ -386,10 +398,10 @@
                                 // }
                             }
                         }
-                        ulist.sort((a,b)=>{
+                        ulist.sort((a, b) => {
                             return a.total - b.total;
                         });
-                        return [list, ulist.slice(0,3)];
+                        return [list, ulist.slice(0, 3), nlist];
                     },
                     init_ultimate_skill_conditions: function (new_recipes) {
                         for (let i = 0; i < this.chefs.length; i++) {
@@ -397,7 +409,92 @@
                             var list = this.get_ultimate_skill_conditions(chef, new_recipes);
                             chef.ultimate_skill_conditions = list[0];
                             chef.ultimate_skill_conditions3 = list[1];
+                            let list2 = this.get_ultimate_skill_conditions(chef, g_bcjh_data.recipes, true);
+                            this.drop_repeat_recipe(list2[2], list[0]);
+                            chef.ultimate_skill_conditions4 = list2[2];
                         }
+                    },
+                    drop_repeat_recipe(recipes, drops) {
+                        for (const name of drops) {
+                            for (let i = 0; i < recipes.length; i++) {
+                                const r = recipes[i];
+                                if (r.name == name) {
+                                    recipes.splice(i, 1);
+                                    break;
+                                }
+                            }
+                        }
+                    },
+                    ultimate_skill_name4(chef) {
+                        if (chef.ultimate_skill == null) {
+                            if (chef.ultimate_skill_conditions.length < 3 && (!chef.ultimate_skill_conditions2 || chef.ultimate_skill_conditions2.length < 3)) {
+                                let result = [];
+                                chef.ultimate_skill_conditions4.forEach(recipe => {
+                                    result.push(recipe.name + "(" + recipe.origin + ")");
+                                });
+
+                                return result.join("\n");
+                            }
+                        }
+                        return "";
+                    },
+                    statistic_recipes() {
+                        let recipe_map = new Map;
+                        for (const chef of this.chefs) {
+                            if (chef.ultimate_skill == null) {
+                                if (chef.ultimate_skill_conditions.length < 3 && (!chef.ultimate_skill_conditions2 || chef.ultimate_skill_conditions2.length < 3)) {
+                                    chef.ultimate_skill_conditions4.forEach(recipe => {
+                                        let slist = recipe.origin.split("<br>");
+                                        slist.forEach(str => {
+                                            let cnt = recipe_map.has(str) ? recipe_map.get(str) : 0;
+                                            recipe_map.set(str, cnt + 1);
+                                        });
+                                    });
+                                }
+                            }
+                        }
+                        var arr = [];
+                        var sarr = Array.from(recipe_map);
+                        sarr.sort((a, b) => { return b[1] - a[1]; });
+                        sarr.forEach(item => {
+                            arr.push(item[0] + "(" + item[1] + ")");
+                        });
+                        this.$alert(arr.join("<br>"), '推荐池', {
+                            confirmButtonText: '确定',
+                            dangerouslyUseHTMLString: true,
+                        });
+                    },
+                    statistic_recipes5() {
+                        let recipe_map = new Map;
+                        for (const chef of this.chefs) {
+                            if (chef.ultimate_skill == null) {
+                                let ochef = find_chef(chef.name);
+                                if(ochef && ochef.ultimateGoal[2] == 3080) {
+                                    for (const recipe of g_bcjh_data.recipes) {
+                                        if (recipe.rarity == 5) {
+                                            var rate = calc_rate(recipe, chef);
+                                            if (rate >= 4) {
+                                                //let slist = recipe.origin.split("<br>");
+                                                let str = recipe.name;
+                                                let cnt = recipe_map.has(str) ? recipe_map.get(str).cnt : 0;
+                                                recipe_map.set(str, {origin: recipe.origin, cnt:cnt + 1});
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        var arr = [];
+                        var sarr = Array.from(recipe_map);
+                        sarr.sort((a, b) => { return b[1].cnt - a[1].cnt; });
+                        sarr.forEach(item => {
+                            arr.push(item[0] + "(" + item[1].cnt + "):"+item[1].origin);
+                        });
+                        this.$alert(arr.join("<br>"), '推荐池', {
+                            confirmButtonText: '确定',
+                            dangerouslyUseHTMLString: true,
+                        });
+
                     },
                     get_origin_chef_by_id: function (id) {
                         for (let i = 0; i < g_bcjh_data.chefs.length; i++) {

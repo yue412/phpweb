@@ -19506,8 +19506,569 @@ var g_bcjh_data = {
 		"gift": "油火虫",
 		"condiment": "Spicy"
 	}, {
-		"recipeId": 5001,
+		"recipeId": 573,
 		"galleryId": "573",
+		"name": "库斯库斯",
+		"rarity": 4,
+		"unlock": "-",
+		"stirfry": 42,
+		"boil": 0,
+		"knife": 0,
+		"fry": 0,
+		"bake": 68,
+		"steam": 0,
+		"materials": [{
+			"material": 21,
+			"quantity": 5
+		}, {
+			"material": 33,
+			"quantity": 3
+		}, {
+			"material": 19,
+			"quantity": 2
+		}, {
+			"material": 8,
+			"quantity": 1
+		}],
+		"price": 626,
+		"exPrice": 32,
+		"time": 237,
+		"limit": 20,
+		"origin": "众生之门池",
+		"guests": [{
+			"guest": "王子"
+		}, {
+			"guest": "公主"
+		}, {
+			"guest": "公主"
+		}],
+		"gift": "焦虫",
+		"condiment": "Salty"
+	}, {
+		"recipeId": 574,
+		"galleryId": "574",
+		"name": "番茄鱼片",
+		"rarity": 3,
+		"unlock": "-",
+		"stirfry": 0,
+		"boil": 35,
+		"knife": 35,
+		"fry": 0,
+		"bake": 0,
+		"steam": 0,
+		"materials": [{
+			"material": 10,
+			"quantity": 2
+		}, {
+			"material": 2,
+			"quantity": 4
+		}, {
+			"material": 18,
+			"quantity": 1
+		}],
+		"price": 647,
+		"exPrice": 33,
+		"time": 277,
+		"limit": 25,
+		"origin": "众生之门池",
+		"guests": [{
+			"guest": "吕布"
+		}, {
+			"guest": "潇洒李白"
+		}, {
+			"guest": "木优"
+		}],
+		"gift": "刀嘴鹦鹉",
+		"condiment": "Sour"
+	}, {
+		"recipeId": 575,
+		"galleryId": "575",
+		"name": "烩蔬菜",
+		"rarity": 3,
+		"unlock": "-",
+		"stirfry": 0,
+		"boil": 0,
+		"knife": 0,
+		"fry": 0,
+		"bake": 51,
+		"steam": 28,
+		"materials": [{
+			"material": 19,
+			"quantity": 3
+		}, {
+			"material": 10,
+			"quantity": 3
+		}, {
+			"material": 31,
+			"quantity": 2
+		}, {
+			"material": 12,
+			"quantity": 2
+		}],
+		"price": 367,
+		"exPrice": 19,
+		"time": 319,
+		"limit": 25,
+		"origin": "众生之门池",
+		"guests": [{
+			"guest": "富太太"
+		}, {
+			"guest": "木良"
+		}, {
+			"guest": "富太太"
+		}],
+		"gift": "蒸汽宝石",
+		"condiment": "Tasty"
+	}, {
+		"recipeId": 578,
+		"galleryId": "578",
+		"name": "帕斯提拉",
+		"rarity": 2,
+		"unlock": "-",
+		"stirfry": 0,
+		"boil": 0,
+		"knife": 27,
+		"fry": 0,
+		"bake": 43,
+		"steam": 0,
+		"materials": [{
+			"material": 22,
+			"quantity": 4
+		}, {
+			"material": 7,
+			"quantity": 3
+		}, {
+			"material": 11,
+			"quantity": 3
+		}, {
+			"material": 33,
+			"quantity": 2
+		}],
+		"price": 488,
+		"exPrice": 25,
+		"time": 529,
+		"limit": 30,
+		"origin": "众生之门池",
+		"guests": [{
+			"guest": "官爷"
+		}, {
+			"guest": "富二代"
+		}, {
+			"guest": "大内侍卫"
+		}],
+		"gift": "剪刀蟹",
+		"condiment": "Tasty"
+	}, {
+		"recipeId": 579,
+		"galleryId": "579",
+		"name": "秋葵虾仁",
+		"rarity": 3,
+		"unlock": "-",
+		"stirfry": 0,
+		"boil": 0,
+		"knife": 0,
+		"fry": 22,
+		"bake": 0,
+		"steam": 46,
+		"materials": [{
+			"material": 32,
+			"quantity": 3
+		}, {
+			"material": 31,
+			"quantity": 4
+		}, {
+			"material": 16,
+			"quantity": 2
+		}, {
+			"material": 34,
+			"quantity": 1
+		}],
+		"price": 758,
+		"exPrice": 38,
+		"time": 341,
+		"limit": 25,
+		"origin": "众生之门池",
+		"guests": [{
+			"guest": "貂蝉"
+		}, {
+			"guest": "富人"
+		}, {
+			"guest": "吕布"
+		}],
+		"gift": "一昧真火",
+		"condiment": "Bitter"
+	}, {
+		"recipeId": 580,
+		"galleryId": "580",
+		"name": "清凉一夏",
+		"rarity": 4,
+		"unlock": "-",
+		"stirfry": 0,
+		"boil": 95,
+		"knife": 0,
+		"fry": 0,
+		"bake": 0,
+		"steam": 12,
+		"materials": [{
+			"material": 12,
+			"quantity": 2
+		}, {
+			"material": 9,
+			"quantity": 1
+		}, {
+			"material": 36,
+			"quantity": 4
+		}],
+		"price": 574,
+		"exPrice": 29,
+		"time": 227,
+		"limit": 20,
+		"origin": "限时商店",
+		"guests": [{
+			"guest": "公主"
+		}, {
+			"guest": "苏轼"
+		}, {
+			"guest": "唐伯虎"
+		}],
+		"gift": "蒸汽宝石",
+		"condiment": "Sour"
+	}, {
+		"recipeId": 581,
+		"galleryId": "581",
+		"name": "生蚝盛和",
+		"rarity": 2,
+		"unlock": "-",
+		"stirfry": 66,
+		"boil": 0,
+		"knife": 0,
+		"fry": 0,
+		"bake": 77,
+		"steam": 0,
+		"materials": [{
+			"material": 42,
+			"quantity": 5
+		}, {
+			"material": 36,
+			"quantity": 3
+		}, {
+			"material": 46,
+			"quantity": 2
+		}],
+		"price": 1205,
+		"exPrice": 61,
+		"time": 1272,
+		"limit": 30,
+		"origin": "众生之门池",
+		"guests": [{
+			"guest": "木优"
+		}, {
+			"guest": "大明湖畔的美女"
+		}, {
+			"guest": "富太太"
+		}],
+		"gift": "焦虫",
+		"condiment": "Tasty"
+	}, {
+		"recipeId": 582,
+		"galleryId": "582",
+		"name": "旋转烤肉",
+		"rarity": 4,
+		"unlock": "-",
+		"stirfry": 0,
+		"boil": 0,
+		"knife": 98,
+		"fry": 0,
+		"bake": 148,
+		"steam": 0,
+		"materials": [{
+			"material": 9,
+			"quantity": 4
+		}, {
+			"material": 28,
+			"quantity": 4
+		}, {
+			"material": 23,
+			"quantity": 4
+		}, {
+			"material": 25,
+			"quantity": 3
+		}],
+		"price": 1511,
+		"exPrice": 76,
+		"time": 993,
+		"limit": 20,
+		"origin": "众生之门池",
+		"guests": [{
+			"guest": "如来"
+		}, {
+			"guest": "如来"
+		}, {
+			"guest": "苏轼"
+		}],
+		"gift": "刀嘴鹦鹉",
+		"condiment": "Salty"
+	}, {
+		"recipeId": 583,
+		"galleryId": "583",
+		"name": "回复药剂",
+		"rarity": 1,
+		"unlock": "-",
+		"stirfry": 20,
+		"boil": 0,
+		"knife": 0,
+		"fry": 30,
+		"bake": 0,
+		"steam": 0,
+		"materials": [{
+			"material": 13,
+			"quantity": 1
+		}, {
+			"material": 10,
+			"quantity": 1
+		}, {
+			"material": 45,
+			"quantity": 1
+		}],
+		"price": 191,
+		"exPrice": 10,
+		"time": 285,
+		"limit": 40,
+		"origin": "限时商店",
+		"guests": [{
+			"guest": "大胃王"
+		}, {
+			"guest": "大胃王"
+		}, {
+			"guest": "屠夫老王"
+		}],
+		"gift": "油火虫",
+		"condiment": "Sweet"
+	}, {
+		"recipeId": 584,
+		"galleryId": "584",
+		"name": "勇士大餐",
+		"rarity": 5,
+		"unlock": "-",
+		"stirfry": 0,
+		"boil": 0,
+		"knife": 0,
+		"fry": 0,
+		"bake": 110,
+		"steam": 100,
+		"materials": [{
+			"material": 13,
+			"quantity": 3
+		}, {
+			"material": 28,
+			"quantity": 5
+		}, {
+			"material": 5,
+			"quantity": 5
+		}],
+		"price": 1550,
+		"exPrice": 78,
+		"time": 379,
+		"limit": 15,
+		"origin": "众生之门池",
+		"guests": [{
+			"guest": "皇后"
+		}, {
+			"guest": "皇帝"
+		}, {
+			"guest": "皇后"
+		}],
+		"gift": "蒸馏杯",
+		"condiment": "Salty"
+	}, {
+		"recipeId": 585,
+		"galleryId": "585",
+		"name": "薄荷茶",
+		"rarity": 3,
+		"unlock": "-",
+		"stirfry": 34,
+		"boil": 58,
+		"knife": 0,
+		"fry": 0,
+		"bake": 0,
+		"steam": 0,
+		"materials": [{
+			"material": 46,
+			"quantity": 3
+		}, {
+			"material": 31,
+			"quantity": 3
+		}, {
+			"material": 6,
+			"quantity": 8
+		}],
+		"price": 573,
+		"exPrice": 29,
+		"time": 472,
+		"limit": 25,
+		"origin": "众生之门池",
+		"guests": [{
+			"guest": "迷弟杜甫"
+		}, {
+			"guest": "木良"
+		}, {
+			"guest": "木良"
+		}],
+		"gift": "耐煮的水草",
+		"condiment": "Spicy"
+	}, {
+		"recipeId": 586,
+		"galleryId": "586",
+		"name": "豆乳芝士蛋饼",
+		"rarity": 5,
+		"unlock": "-",
+		"stirfry": 0,
+		"boil": 0,
+		"knife": 0,
+		"fry": 0,
+		"bake": 88,
+		"steam": 88,
+		"materials": [{
+			"material": 12,
+			"quantity": 5
+		}, {
+			"material": 44,
+			"quantity": 2
+		}, {
+			"material": 36,
+			"quantity": 3
+		}, {
+			"material": 17,
+			"quantity": 6
+		}],
+		"price": 1455,
+		"exPrice": 73,
+		"time": 247,
+		"limit": 15,
+		"origin": "限时商店",
+		"guests": [{
+			"guest": "皇帝"
+		}, {
+			"guest": "皇后"
+		}, {
+			"guest": "皇帝"
+		}],
+		"gift": "蒸馏杯",
+		"condiment": "Sweet"
+	}, {
+		"recipeId": 587,
+		"galleryId": "587",
+		"name": "南瓜烤肉",
+		"rarity": 2,
+		"unlock": "-",
+		"stirfry": 35,
+		"boil": 0,
+		"knife": 0,
+		"fry": 0,
+		"bake": 65,
+		"steam": 0,
+		"materials": [{
+			"material": 45,
+			"quantity": 2
+		}, {
+			"material": 27,
+			"quantity": 2
+		}, {
+			"material": 21,
+			"quantity": 4
+		}, {
+			"material": 36,
+			"quantity": 2
+		}],
+		"price": 588,
+		"exPrice": 30,
+		"time": 747,
+		"limit": 30,
+		"origin": "众生之门池",
+		"guests": [{
+			"guest": "大内侍卫"
+		}, {
+			"guest": "丐帮帮主"
+		}, {
+			"guest": "官爷"
+		}],
+		"gift": "烤焦的菊花",
+		"condiment": "Salty"
+	}, {
+		"recipeId": 588,
+		"galleryId": "588",
+		"name": "茄子蘸酱",
+		"rarity": 1,
+		"unlock": "-",
+		"stirfry": 0,
+		"boil": 0,
+		"knife": 0,
+		"fry": 0,
+		"bake": 22,
+		"steam": 42,
+		"materials": [{
+			"material": 19,
+			"quantity": 3
+		}, {
+			"material": 11,
+			"quantity": 1
+		}, {
+			"material": 12,
+			"quantity": 1
+		}],
+		"price": 180,
+		"exPrice": 9,
+		"time": 515,
+		"limit": 40,
+		"origin": "众生之门池",
+		"guests": [{
+			"guest": "迷思吹法师"
+		}, {
+			"guest": "屠夫老王"
+		}, {
+			"guest": "白富美"
+		}],
+		"gift": "蒸汽耳环",
+		"condiment": "Sour"
+	}, {
+		"recipeId": 589,
+		"galleryId": "589",
+		"name": "凉拌仙人掌",
+		"rarity": 3,
+		"unlock": "-",
+		"stirfry": 0,
+		"boil": 0,
+		"knife": 74,
+		"fry": 0,
+		"bake": 0,
+		"steam": 36,
+		"materials": [{
+			"material": 12,
+			"quantity": 4
+		}, {
+			"material": 6,
+			"quantity": 6
+		}, {
+			"material": 31,
+			"quantity": 2
+		}],
+		"price": 298,
+		"exPrice": 15,
+		"time": 288,
+		"limit": 25,
+		"origin": "众生之门池",
+		"guests": [{
+			"guest": "木优"
+		}, {
+			"guest": "潇洒李白"
+		}, {
+			"guest": "吕布"
+		}],
+		"gift": "刀嘴鹦鹉",
+		"condiment": "Bitter"
+	}, {
+		"recipeId": 5001,
+		"galleryId": "590",
 		"name": "快乐桶",
 		"rarity": 5,
 		"unlock": "-",
@@ -19546,7 +20107,7 @@ var g_bcjh_data = {
 		"condiment": "Spicy"
 	}, {
 		"recipeId": 5002,
-		"galleryId": "574",
+		"galleryId": "591",
 		"name": "蒸汽海鲜",
 		"rarity": 5,
 		"unlock": "-",
@@ -19579,13 +20140,13 @@ var g_bcjh_data = {
 		}, {
 			"guest": "皇后"
 		}, {
-			"guest": ""
+			"guest": "皇帝"
 		}],
-		"gift": "未知",
+		"gift": "蒸馏杯",
 		"condiment": "Tasty"
 	}, {
 		"recipeId": 5003,
-		"galleryId": "575",
+		"galleryId": "592",
 		"name": "蛋包饭定食",
 		"rarity": 3,
 		"unlock": "-",
@@ -19624,7 +20185,7 @@ var g_bcjh_data = {
 		"condiment": "Sour"
 	}, {
 		"recipeId": 5004,
-		"galleryId": "576",
+		"galleryId": "593",
 		"name": "港式早茶",
 		"rarity": 4,
 		"unlock": "-",
@@ -19663,7 +20224,7 @@ var g_bcjh_data = {
 		"condiment": "Sweet"
 	}, {
 		"recipeId": 5005,
-		"galleryId": "577",
+		"galleryId": "594",
 		"name": "鸳鸯火锅",
 		"rarity": 4,
 		"unlock": "-",
@@ -19702,7 +20263,7 @@ var g_bcjh_data = {
 		"condiment": "Spicy"
 	}, {
 		"recipeId": 5006,
-		"galleryId": "578",
+		"galleryId": "595",
 		"name": "BBQ烧烤",
 		"rarity": 4,
 		"unlock": "-",
@@ -19741,7 +20302,7 @@ var g_bcjh_data = {
 		"condiment": "Salty"
 	}, {
 		"recipeId": 5007,
-		"galleryId": "579",
+		"galleryId": "596",
 		"name": "全套菜饭",
 		"rarity": 3,
 		"unlock": "-",
@@ -19780,7 +20341,7 @@ var g_bcjh_data = {
 		"condiment": "Salty"
 	}, {
 		"recipeId": 5008,
-		"galleryId": "580",
+		"galleryId": "597",
 		"name": "沙县轻食",
 		"rarity": 3,
 		"unlock": "-",
@@ -20249,6 +20810,9 @@ var g_bcjh_data = {
 		}, {
 			"recipe": "红咖喱鸭胸",
 			"antique": "暖石"
+		}, {
+			"recipe": "勇士大餐",
+			"antique": "香烤鱼排"
 		}]
 	}, {
 		"name": "关羽",
@@ -20261,6 +20825,9 @@ var g_bcjh_data = {
 		}, {
 			"recipe": "水煮鱼",
 			"antique": "耐煮的水草"
+		}, {
+			"recipe": "旋转烤肉",
+			"antique": "焦虫"
 		}]
 	}, {
 		"name": "刘备",
@@ -20603,6 +21170,9 @@ var g_bcjh_data = {
 		}, {
 			"recipe": "日出鸡尾酒",
 			"antique": "刀嘴鹦鹉"
+		}, {
+			"recipe": "薄荷茶",
+			"antique": "耐煮的水草"
 		}]
 	}, {
 		"name": "武松",
@@ -20695,6 +21265,9 @@ var g_bcjh_data = {
 			"antique": "千年煮鳖"
 		}, {
 			"recipe": "南瓜鱼翅盅",
+			"antique": "蒸馏杯"
+		}, {
+			"recipe": "豆乳芝士蛋饼",
 			"antique": "蒸馏杯"
 		}]
 	}, {
@@ -27189,7 +27762,7 @@ var g_bcjh_data = {
 		"creation": 0,
 		"ultimateGoal": [3041, 3010, 3062],
 		"ultimateSkill": 131,
-		"origin": "两周年邮件<br>三周年邮件",
+		"origin": "两周年邮件<br>三周年邮件<br>限时商店",
 		"tags": [1],
 		"sweet": 0,
 		"sour": 0,
@@ -29740,6 +30313,292 @@ var g_bcjh_data = {
 		"tags": [2],
 		"sweet": 0,
 		"sour": 148,
+		"spicy": 0,
+		"salty": 0,
+		"bitter": 0,
+		"tasty": 0
+	}, {
+		"chefId": 1047,
+		"galleryId": "1047",
+		"name": "三叔",
+		"rarity": 1,
+		"stirfry": 102,
+		"bake": 34,
+		"boil": 0,
+		"steam": 0,
+		"fry": 34,
+		"knife": 68,
+		"skill": 123,
+		"meat": 8,
+		"fish": 0,
+		"veg": 0,
+		"creation": 6,
+		"ultimateGoal": [3055, 3025, 3065],
+		"ultimateSkill": 330,
+		"origin": "众生之门池",
+		"tags": [1],
+		"sweet": 32,
+		"sour": 0,
+		"spicy": 0,
+		"salty": 0,
+		"bitter": 0,
+		"tasty": 0
+	}, {
+		"chefId": 1050,
+		"galleryId": "1050",
+		"name": "白发小黑",
+		"rarity": 5,
+		"stirfry": 0,
+		"bake": 154,
+		"boil": 77,
+		"steam": 0,
+		"fry": 278,
+		"knife": 464,
+		"skill": 229,
+		"meat": 8,
+		"fish": 6,
+		"veg": 0,
+		"creation": 0,
+		"ultimateGoal": [3091, 3006, 3080],
+		"ultimateSkill": 494,
+		"origin": "限时礼包",
+		"tags": [1],
+		"sweet": 0,
+		"sour": 0,
+		"spicy": 133,
+		"salty": 0,
+		"bitter": 0,
+		"tasty": 0
+	}, {
+		"chefId": 1053,
+		"galleryId": "1053",
+		"name": "蟹老板",
+		"rarity": 5,
+		"stirfry": 449,
+		"bake": 299,
+		"boil": 0,
+		"steam": 74,
+		"fry": 149,
+		"knife": 0,
+		"skill": 460,
+		"meat": 8,
+		"fish": 0,
+		"veg": 0,
+		"creation": 6,
+		"ultimateGoal": [3092, 3001, 3080],
+		"ultimateSkill": 683,
+		"origin": "众生之门池",
+		"tags": [2],
+		"sweet": 0,
+		"sour": 0,
+		"spicy": 0,
+		"salty": 0,
+		"bitter": 0,
+		"tasty": 137
+	}, {
+		"chefId": 1056,
+		"galleryId": "1056",
+		"name": "阿根哥哥",
+		"rarity": 4,
+		"stirfry": 118,
+		"bake": 0,
+		"boil": 212,
+		"steam": 0,
+		"fry": 35,
+		"knife": 354,
+		"skill": 680,
+		"meat": 0,
+		"fish": 7,
+		"veg": 0,
+		"creation": 6,
+		"ultimateGoal": [3037, 3012, 3080],
+		"ultimateSkill": 114,
+		"origin": "限时商店",
+		"tags": [1],
+		"sweet": 0,
+		"sour": 0,
+		"spicy": 0,
+		"salty": 99,
+		"bitter": 0,
+		"tasty": 0
+	}, {
+		"chefId": 1059,
+		"galleryId": "1059",
+		"name": "卡里",
+		"rarity": 2,
+		"stirfry": 27,
+		"bake": 55,
+		"boil": 166,
+		"steam": 0,
+		"fry": 0,
+		"knife": 110,
+		"skill": 247,
+		"meat": 0,
+		"fish": 0,
+		"veg": 3,
+		"creation": 3,
+		"ultimateGoal": [3052, 3022, 3064],
+		"ultimateSkill": 113,
+		"origin": "众生之门池",
+		"tags": [1],
+		"sweet": 0,
+		"sour": 0,
+		"spicy": 0,
+		"salty": 0,
+		"bitter": 52,
+		"tasty": 0
+	}, {
+		"chefId": 1062,
+		"galleryId": "1062",
+		"name": "小白",
+		"rarity": 4,
+		"stirfry": 212,
+		"bake": 118,
+		"boil": 0,
+		"steam": 354,
+		"fry": 0,
+		"knife": 35,
+		"skill": 130,
+		"meat": 0,
+		"fish": 6,
+		"veg": 8,
+		"creation": 0,
+		"ultimateGoal": [3040, 3008, 3062],
+		"ultimateSkill": 682,
+		"origin": "众生之门池",
+		"tags": [2],
+		"sweet": 0,
+		"sour": 99,
+		"spicy": 0,
+		"salty": 0,
+		"bitter": 0,
+		"tasty": 0
+	}, {
+		"chefId": 1065,
+		"galleryId": "1065",
+		"name": "山新新",
+		"rarity": 3,
+		"stirfry": 122,
+		"bake": 122,
+		"boil": 122,
+		"steam": 122,
+		"fry": 122,
+		"knife": 122,
+		"skill": 65,
+		"meat": 0,
+		"fish": 0,
+		"veg": 4,
+		"creation": 6,
+		"ultimateGoal": [3048, 3017, 3063],
+		"ultimateSkill": 454,
+		"origin": "限时商店",
+		"tags": [2],
+		"sweet": 0,
+		"sour": 0,
+		"spicy": 0,
+		"salty": 0,
+		"bitter": 0,
+		"tasty": 216
+	}, {
+		"chefId": 1068,
+		"galleryId": "1068",
+		"name": "木落仙人",
+		"rarity": 2,
+		"stirfry": 0,
+		"bake": 55,
+		"boil": 27,
+		"steam": 110,
+		"fry": 166,
+		"knife": 0,
+		"skill": 147,
+		"meat": 1,
+		"fish": 0,
+		"veg": 9,
+		"creation": 0,
+		"ultimateGoal": [3053, 3023, 3066],
+		"ultimateSkill": 340,
+		"origin": "限时任务",
+		"tags": [1],
+		"sweet": 52,
+		"sour": 0,
+		"spicy": 0,
+		"salty": 0,
+		"bitter": 0,
+		"tasty": 0
+	}, {
+		"chefId": 1071,
+		"galleryId": "1071",
+		"name": "虎子",
+		"rarity": 3,
+		"stirfry": 159,
+		"bake": 239,
+		"boil": 79,
+		"steam": 0,
+		"fry": 39,
+		"knife": 0,
+		"skill": 132,
+		"meat": 5,
+		"fish": 0,
+		"veg": 0,
+		"creation": 4,
+		"ultimateGoal": [3045, 3015, 3063],
+		"ultimateSkill": 343,
+		"origin": "众生之门池",
+		"tags": [1],
+		"sweet": 0,
+		"sour": 0,
+		"spicy": 77,
+		"salty": 0,
+		"bitter": 0,
+		"tasty": 0
+	}, {
+		"chefId": 1074,
+		"galleryId": "1074",
+		"name": "龙岩",
+		"rarity": 3,
+		"stirfry": 232,
+		"bake": 93,
+		"boil": 0,
+		"steam": 0,
+		"fry": 38,
+		"knife": 155,
+		"skill": 133,
+		"meat": 4,
+		"fish": 6,
+		"veg": 0,
+		"creation": 0,
+		"ultimateGoal": [3044, 3013, 3063],
+		"ultimateSkill": 342,
+		"origin": "众生之门池",
+		"tags": [1],
+		"sweet": 0,
+		"sour": 0,
+		"spicy": 0,
+		"salty": 80,
+		"bitter": 0,
+		"tasty": 0
+	}, {
+		"chefId": 1080,
+		"galleryId": "1080",
+		"name": "孟婆",
+		"rarity": 3,
+		"stirfry": 0,
+		"bake": 39,
+		"boil": 239,
+		"steam": 79,
+		"fry": 0,
+		"knife": 159,
+		"skill": 131,
+		"meat": 0,
+		"fish": 5,
+		"veg": 5,
+		"creation": 0,
+		"ultimateGoal": [3047, 3016, 3063],
+		"ultimateSkill": 345,
+		"origin": "众生之门池",
+		"tags": [2],
+		"sweet": 0,
+		"sour": 77,
 		"spicy": 0,
 		"salty": 0,
 		"bitter": 0,
@@ -34071,6 +34930,132 @@ var g_bcjh_data = {
 		"rarity": 1,
 		"skill": [610, 425],
 		"origin": "江南烟雨池"
+	}, {
+		"equipId": 630,
+		"galleryId": "630",
+		"name": "不求人棒槌",
+		"rarity": 3,
+		"skill": [544, 545],
+		"origin": "众生之门池"
+	}, {
+		"equipId": 631,
+		"galleryId": "631",
+		"name": "实木棒槌",
+		"rarity": 2,
+		"skill": [21, 22],
+		"origin": "众生之门池"
+	}, {
+		"equipId": 632,
+		"galleryId": "632",
+		"name": "充气棒槌",
+		"rarity": 1,
+		"skill": [9, 10],
+		"origin": "众生之门池"
+	}, {
+		"equipId": 633,
+		"galleryId": "633",
+		"name": "镀金甘蔗刀",
+		"rarity": 3,
+		"skill": [546, 544],
+		"origin": "众生之门池"
+	}, {
+		"equipId": 634,
+		"galleryId": "634",
+		"name": "锐利甘蔗刀",
+		"rarity": 2,
+		"skill": [23, 21],
+		"origin": "众生之门池"
+	}, {
+		"equipId": 635,
+		"galleryId": "635",
+		"name": "短刃甘蔗刀",
+		"rarity": 1,
+		"skill": [11, 9],
+		"origin": "众生之门池"
+	}, {
+		"equipId": 636,
+		"galleryId": "636",
+		"name": "传说中的魔镜",
+		"rarity": 3,
+		"skill": [542, 543],
+		"origin": "众生之门池"
+	}, {
+		"equipId": 637,
+		"galleryId": "637",
+		"name": "喵喵台镜",
+		"rarity": 2,
+		"skill": [19, 20],
+		"origin": "众生之门池"
+	}, {
+		"equipId": 638,
+		"galleryId": "638",
+		"name": "手镜",
+		"rarity": 1,
+		"skill": [7, 8],
+		"origin": "众生之门池"
+	}, {
+		"equipId": 639,
+		"galleryId": "639",
+		"name": "千机首饰盒",
+		"rarity": 3,
+		"skill": [545, 546],
+		"origin": "众生之门池"
+	}, {
+		"equipId": 640,
+		"galleryId": "640",
+		"name": "桦木首饰盒",
+		"rarity": 2,
+		"skill": [22, 23],
+		"origin": "众生之门池"
+	}, {
+		"equipId": 641,
+		"galleryId": "641",
+		"name": "破旧盒子",
+		"rarity": 1,
+		"skill": [10, 11],
+		"origin": "众生之门池"
+	}, {
+		"equipId": 642,
+		"galleryId": "642",
+		"name": "琵琶搓衣板",
+		"rarity": 3,
+		"skill": [547, 545],
+		"origin": "众生之门池"
+	}, {
+		"equipId": 643,
+		"galleryId": "643",
+		"name": "铁木搓衣板",
+		"rarity": 2,
+		"skill": [24, 22],
+		"origin": "众生之门池"
+	}, {
+		"equipId": 644,
+		"galleryId": "644",
+		"name": "塑料搓衣板",
+		"rarity": 1,
+		"skill": [12, 10],
+		"origin": "众生之门池"
+	}, {
+		"equipId": 645,
+		"galleryId": "645",
+		"name": "天然牡丹胭脂",
+		"rarity": 3,
+		"skill": [543, 547],
+		"origin": "众生之门池"
+	}, {
+		"equipId": 646,
+		"galleryId": "646",
+		"name": "桃花胭脂",
+		"rarity": 2,
+		"skill": [20, 24],
+		"origin": "众生之门池"
+	}, {
+		"equipId": 647,
+		"galleryId": "647",
+		"name": "印泥盒",
+		"rarity": 1,
+		"skill": [8, 12],
+		"origin": "众生之门池"
 	}],
 	"decorations": [{
 		"id": 1,
@@ -40972,6 +41957,198 @@ var g_bcjh_data = {
 		"suit": "江南烟雨套装",
 		"suitGold": 0.05,
 		"origin": "江南烟雨池"
+	}, {
+		"id": 576,
+		"icon": 576,
+		"name": "饮茶长桌",
+		"tipMin": 15,
+		"tipMax": 50,
+		"tipTime": 82800,
+		"gold": 0.04,
+		"position": "1大桌",
+		"suit": "众生之门套装",
+		"suitGold": 0.05,
+		"origin": "众生之门池"
+	}, {
+		"id": 577,
+		"icon": 576,
+		"name": "饮茶短桌",
+		"tipMin": 15,
+		"tipMax": 50,
+		"tipTime": 82800,
+		"gold": 0.04,
+		"position": "1小桌",
+		"suit": "众生之门套装",
+		"suitGold": 0.05,
+		"origin": "众生之门池"
+	}, {
+		"id": 578,
+		"icon": 578,
+		"name": "薄荷短桌",
+		"tipMin": 15,
+		"tipMax": 50,
+		"tipTime": 82800,
+		"gold": 0.04,
+		"position": "2小桌",
+		"suit": "众生之门套装",
+		"suitGold": 0.05,
+		"origin": "众生之门池"
+	}, {
+		"id": 579,
+		"icon": 578,
+		"name": "薄荷长桌",
+		"tipMin": 15,
+		"tipMax": 50,
+		"tipTime": 82800,
+		"gold": 0.04,
+		"position": "2大桌",
+		"suit": "众生之门套装",
+		"suitGold": 0.05,
+		"origin": "众生之门池"
+	}, {
+		"id": 580,
+		"icon": 580,
+		"name": "众生长桌",
+		"tipMin": 15,
+		"tipMax": 50,
+		"tipTime": 82800,
+		"gold": 0.04,
+		"position": "3大桌",
+		"suit": "众生之门套装",
+		"suitGold": 0.05,
+		"origin": "众生之门池"
+	}, {
+		"id": 581,
+		"icon": 580,
+		"name": "众生短桌",
+		"tipMin": 15,
+		"tipMax": 50,
+		"tipTime": 82800,
+		"gold": 0.04,
+		"position": "3小桌",
+		"suit": "众生之门套装",
+		"suitGold": 0.05,
+		"origin": "众生之门池"
+	}, {
+		"id": 582,
+		"icon": 582,
+		"name": "小型喷泉",
+		"tipMin": 0,
+		"tipMax": 0,
+		"tipTime": 0,
+		"gold": 0.05,
+		"position": "1门",
+		"suit": "众生之门套装",
+		"suitGold": 0.05,
+		"origin": "众生之门池"
+	}, {
+		"id": 583,
+		"icon": 583,
+		"name": "瓶瓶罐罐",
+		"tipMin": 0,
+		"tipMax": 0,
+		"tipTime": 0,
+		"gold": 0.03,
+		"position": "1装饰",
+		"suit": "众生之门套装",
+		"suitGold": 0.05,
+		"origin": "众生之门池"
+	}, {
+		"id": 584,
+		"icon": 584,
+		"name": "吊顶绿萝",
+		"tipMin": 0,
+		"tipMax": 0,
+		"tipTime": 0,
+		"gold": 0.04,
+		"position": "1灯",
+		"suit": "众生之门套装",
+		"suitGold": 0.05,
+		"origin": "众生之门池"
+	}, {
+		"id": 585,
+		"icon": 585,
+		"name": "异域市集",
+		"tipMin": 0,
+		"tipMax": 0,
+		"tipTime": 0,
+		"gold": 0.03,
+		"position": "1窗",
+		"suit": "众生之门套装",
+		"suitGold": 0.05,
+		"origin": "众生之门池"
+	}, {
+		"id": 586,
+		"icon": 586,
+		"name": "异域锣鼓",
+		"tipMin": 0,
+		"tipMax": 0,
+		"tipTime": 0,
+		"gold": 0.05,
+		"position": "2装饰",
+		"suit": "众生之门套装",
+		"suitGold": 0.05,
+		"origin": "众生之门池"
+	}, {
+		"id": 587,
+		"icon": 587,
+		"name": "民族风吊灯",
+		"tipMin": 0,
+		"tipMax": 0,
+		"tipTime": 0,
+		"gold": 0.02,
+		"position": "2屏风",
+		"suit": "众生之门套装",
+		"suitGold": 0.05,
+		"origin": "众生之门池"
+	}, {
+		"id": 588,
+		"icon": 588,
+		"name": "异域小憩",
+		"tipMin": 0,
+		"tipMax": 0,
+		"tipTime": 0,
+		"gold": 0.03,
+		"position": "2门",
+		"suit": "众生之门套装",
+		"suitGold": 0.05,
+		"origin": "众生之门池"
+	}, {
+		"id": 589,
+		"icon": 589,
+		"name": "异域厅堂",
+		"tipMin": 0,
+		"tipMax": 0,
+		"tipTime": 0,
+		"gold": 0.04,
+		"position": "2窗",
+		"suit": "众生之门套装",
+		"suitGold": 0.05,
+		"origin": "众生之门池"
+	}, {
+		"id": 590,
+		"icon": 590,
+		"name": "竹编灯",
+		"tipMin": 0,
+		"tipMax": 0,
+		"tipTime": 0,
+		"gold": 0.03,
+		"position": "3灯",
+		"suit": "众生之门套装",
+		"suitGold": 0.05,
+		"origin": "众生之门池"
+	}, {
+		"id": 591,
+		"icon": 591,
+		"name": "蛇神坛",
+		"tipMin": 0,
+		"tipMax": 0,
+		"tipTime": 0,
+		"gold": 0.07,
+		"position": "3包间",
+		"suit": "众生之门套装",
+		"suitGold": 0.05,
+		"origin": "众生之门池"
 	}],
 	"quests": [{
 		"questId": 1,
@@ -52500,6 +53677,694 @@ var g_bcjh_data = {
 			"rank": 4,
 			"num": 45
 		}]
+	}, {
+		"questId": 9158,
+		"questIdDisp": 1,
+		"type": "罗小黑战记联动",
+		"goal": "累计制作任意料理300份",
+		"rewards": [{
+			"name": "金币",
+			"quantity": "50000"
+		}, {
+			"name": "土豆",
+			"quantity": "50"
+		}],
+		"conditions": [{}]
+	}, {
+		"questId": 9194,
+		"questIdDisp": 1,
+		"type": "罗小黑大电影联动",
+		"goal": "累计开业时间达到23小时",
+		"rewards": [{
+			"name": "金币",
+			"quantity": "30000"
+		}]
+	}, {
+		"questId": 9204,
+		"questIdDisp": 1,
+		"type": "蓝溪镇联动",
+		"goal": "探索任意地图6次",
+		"rewards": [{
+			"name": "金币",
+			"quantity": "50000"
+		}]
+	}, {
+		"questId": 9334,
+		"questIdDisp": 1,
+		"type": "誓言录",
+		"goal": "探索任意菜园区地图5次",
+		"rewards": [{
+			"name": "玉璧",
+			"quantity": "378"
+		}, {
+			"name": "罗小黑货币",
+			"quantity": "30"
+		}]
+	}, {
+		"questId": 9159,
+		"questIdDisp": 2,
+		"type": "罗小黑战记联动",
+		"goal": "一次经营中制作使用大米的料理180份",
+		"rewards": [{
+			"name": "蒸馏杯",
+			"quantity": "3"
+		}, {
+			"name": "大米",
+			"quantity": "50"
+		}],
+		"conditions": [{
+			"materialId": 21,
+			"num": 180
+		}]
+	}, {
+		"questId": 9195,
+		"questIdDisp": 2,
+		"type": "罗小黑大电影联动",
+		"goal": "制作使用蔬菜类食材的料理250份",
+		"rewards": [{
+			"name": "厨具-神秘口诀",
+			"quantity": ""
+		}],
+		"conditions": [{
+			"category": "veg"
+		}]
+	}, {
+		"questId": 9205,
+		"questIdDisp": 2,
+		"type": "蓝溪镇联动",
+		"goal": "制作蔬菜类料理200份",
+		"rewards": [{
+			"name": "油火虫",
+			"quantity": "5"
+		}],
+		"conditions": [{
+			"category": "veg"
+		}]
+	}, {
+		"questId": 9335,
+		"questIdDisp": 2,
+		"type": "誓言录",
+		"goal": "让阿根哥哥成为一名一流的厨师。（将阿根哥哥升至三阶）",
+		"rewards": [{
+			"name": "金币",
+			"quantity": "50000"
+		}, {
+			"name": "罗小黑货币",
+			"quantity": "30"
+		}]
+	}, {
+		"questId": 9160,
+		"questIdDisp": 3,
+		"type": "罗小黑战记联动",
+		"goal": "探索任意地图10次",
+		"rewards": [{
+			"name": "鼓风机",
+			"quantity": "3"
+		}, {
+			"name": "鸭子",
+			"quantity": "50"
+		}]
+	}, {
+		"questId": 9196,
+		"questIdDisp": 3,
+		"type": "罗小黑大电影联动",
+		"goal": "制作使用鸡蛋的神级料理365份",
+		"rewards": [{
+			"name": "玉璧",
+			"quantity": "378"
+		}],
+		"conditions": [{
+			"rank": 4,
+			"materialId": 12
+		}]
+	}, {
+		"questId": 9206,
+		"questIdDisp": 3,
+		"type": "蓝溪镇联动",
+		"goal": "制作稀有度至少为2星以上的优级料理220份",
+		"rewards": [{
+			"name": "金币",
+			"quantity": "80000"
+		}],
+		"conditions": [{
+			"rarity": 2,
+			"rank": 2
+		}]
+	}, {
+		"questId": 9336,
+		"questIdDisp": 3,
+		"type": "誓言录",
+		"goal": "发现地点——市集，并在市集中进行4次探索。",
+		"rewards": [{
+			"name": "五星炒果",
+			"quantity": "2"
+		}, {
+			"name": "罗小黑货币",
+			"quantity": "30"
+		}]
+	}, {
+		"questId": 9161,
+		"questIdDisp": 4,
+		"type": "罗小黑战记联动",
+		"goal": "制作使用青椒的料理250份",
+		"rewards": [{
+			"name": "五星炒果",
+			"quantity": "3"
+		}, {
+			"name": "青椒",
+			"quantity": "50"
+		}],
+		"conditions": [{
+			"materialId": 23
+		}]
+	}, {
+		"questId": 9197,
+		"questIdDisp": 4,
+		"type": "罗小黑大电影联动",
+		"goal": "使用任意食材750个",
+		"rewards": [{
+			"name": "金币",
+			"quantity": "50000"
+		}],
+		"conditions": [{
+			"materialEff": true
+		}]
+	}, {
+		"questId": 9207,
+		"questIdDisp": 4,
+		"type": "蓝溪镇联动",
+		"goal": "制作使用豆腐的料理210份",
+		"rewards": [{
+			"name": "玉璧",
+			"quantity": "378"
+		}],
+		"conditions": [{
+			"materialId": 20
+		}]
+	}, {
+		"questId": 9337,
+		"questIdDisp": 4,
+		"type": "誓言录",
+		"goal": "在众生之门活动期间，累计开业时间达到144小时",
+		"rewards": [{
+			"name": "千年煮鳖",
+			"quantity": "2"
+		}, {
+			"name": "罗小黑货币",
+			"quantity": "30"
+		}]
+	}, {
+		"questId": 9162,
+		"questIdDisp": 5,
+		"type": "罗小黑战记联动",
+		"goal": "使用800个任意食材制作料理",
+		"rewards": [{
+			"name": "玉璧",
+			"quantity": "378"
+		}, {
+			"name": "茄子",
+			"quantity": "50"
+		}],
+		"conditions": [{
+			"materialEff": true
+		}]
+	}, {
+		"questId": 9198,
+		"questIdDisp": 5,
+		"type": "罗小黑大电影联动",
+		"goal": "遇见任意特殊客人12次",
+		"rewards": [{
+			"name": "厨具-欧气秘方",
+			"quantity": ""
+		}],
+		"conditions": [{
+			"anyGuest": true
+		}]
+	}, {
+		"questId": 9208,
+		"questIdDisp": 5,
+		"type": "蓝溪镇联动",
+		"goal": "遇见任意特殊客人3次",
+		"rewards": [{
+			"name": "厨具-时光之痕",
+			"quantity": ""
+		}],
+		"conditions": [{
+			"anyGuest": true
+		}]
+	}, {
+		"questId": 9338,
+		"questIdDisp": 5,
+		"type": "誓言录",
+		"goal": "制作肉类料理1500份",
+		"rewards": [{
+			"name": "玉璧",
+			"quantity": "378"
+		}, {
+			"name": "罗小黑货币",
+			"quantity": "30"
+		}],
+		"conditions": [{
+			"category": "meat"
+		}]
+	}, {
+		"questId": 9163,
+		"questIdDisp": 6,
+		"type": "罗小黑战记联动",
+		"goal": "制作3星炒技料理300份",
+		"rewards": [{
+			"name": "香烤鱼排",
+			"quantity": "3"
+		}, {
+			"name": "辣椒",
+			"quantity": "50"
+		}],
+		"conditions": [{
+			"skill": "stirfry",
+			"rarity": 3
+		}]
+	}, {
+		"questId": 9199,
+		"questIdDisp": 6,
+		"type": "罗小黑大电影联动",
+		"goal": "制作使用里脊肉的料理300份",
+		"rewards": [{
+			"name": "玉璧",
+			"quantity": "378"
+		}],
+		"conditions": [{
+			"materialId": 4
+		}]
+	}, {
+		"questId": 9209,
+		"questIdDisp": 6,
+		"type": "蓝溪镇联动",
+		"goal": "制作使用鸡胸肉的特级料理200份",
+		"rewards": [{
+			"name": "一昧真火",
+			"quantity": "5"
+		}],
+		"conditions": [{
+			"rank": 3,
+			"materialId": 7
+		}]
+	}, {
+		"questId": 9339,
+		"questIdDisp": 6,
+		"type": "誓言录",
+		"goal": "使用面粉5000个",
+		"rewards": [{
+			"name": "金币",
+			"quantity": "50000"
+		}, {
+			"name": "罗小黑货币",
+			"quantity": "30"
+		}],
+		"conditions": [{
+			"materialId": 11,
+			"materialEff": true
+		}]
+	}, {
+		"questId": 9164,
+		"questIdDisp": 7,
+		"type": "罗小黑战记联动",
+		"goal": "制作使用水果的料理200份",
+		"rewards": [{
+			"name": "恐怖利刃",
+			"quantity": "3"
+		}, {
+			"name": "水果",
+			"quantity": "50"
+		}],
+		"conditions": [{
+			"materialId": 36
+		}]
+	}, {
+		"questId": 9200,
+		"questIdDisp": 7,
+		"type": "罗小黑大电影联动",
+		"goal": "制作鱼类的特级料理150份",
+		"rewards": [{
+			"name": "厨具-霞姬霸捣药罐",
+			"quantity": ""
+		}],
+		"conditions": [{
+			"rank": 3,
+			"category": "fish"
+		}]
+	}, {
+		"questId": 9210,
+		"questIdDisp": 7,
+		"type": "蓝溪镇联动",
+		"goal": "制作任意神级料理250份",
+		"rewards": [{
+			"name": "厨具-乔丹之石",
+			"quantity": ""
+		}],
+		"conditions": [{
+			"rank": 4
+		}]
+	}, {
+		"questId": 9340,
+		"questIdDisp": 7,
+		"type": "誓言录",
+		"goal": "制作使用番茄的特级料理1200份",
+		"rewards": [{
+			"name": "鼓风机",
+			"quantity": "2"
+		}, {
+			"name": "罗小黑货币",
+			"quantity": "30"
+		}],
+		"conditions": [{
+			"rank": 3,
+			"materialId": 10
+		}]
+	}, {
+		"questId": 9165,
+		"questIdDisp": 8,
+		"type": "罗小黑战记联动",
+		"goal": "制作使用面粉的3星料理220份",
+		"rewards": [{
+			"name": "千年煮鳖",
+			"quantity": "3"
+		}, {
+			"name": "面粉",
+			"quantity": "50"
+		}],
+		"conditions": [{
+			"rarity": 3,
+			"materialId": 11
+		}]
+	}, {
+		"questId": 9201,
+		"questIdDisp": 8,
+		"type": "罗小黑大电影联动",
+		"goal": "制作稀有度至少为4星的料理350份",
+		"rewards": [{
+			"name": "玉璧",
+			"quantity": "378"
+		}],
+		"conditions": [{
+			"rarity": 4
+		}]
+	}, {
+		"questId": 9211,
+		"questIdDisp": 8,
+		"type": "蓝溪镇联动",
+		"goal": "战乱中的平民们最缺的食材就是大米和面粉，且并没有什么闲工夫享用海鲜。得分需要达到9000分",
+		"rewards": [{
+			"name": "厨师-山新",
+			"quantity": ""
+		}]
+	}, {
+		"questId": 9341,
+		"questIdDisp": 8,
+		"type": "誓言录",
+		"goal": "遇见任意特殊客人35次",
+		"rewards": [{
+			"name": "玉璧",
+			"quantity": "378"
+		}, {
+			"name": "罗小黑货币",
+			"quantity": "30"
+		}],
+		"conditions": [{
+			"anyGuest": true
+		}]
+	}, {
+		"questId": 9166,
+		"questIdDisp": 9,
+		"type": "罗小黑战记联动",
+		"goal": "制作稀有度至少为4星的特级鱼类料理120份",
+		"rewards": [{
+			"name": "玉璧",
+			"quantity": "378"
+		}, {
+			"name": "香菇",
+			"quantity": "50"
+		}],
+		"conditions": [{
+			"rarity": 4,
+			"rank": 3,
+			"category": "fish"
+		}]
+	}, {
+		"questId": 9202,
+		"questIdDisp": 9,
+		"type": "罗小黑大电影联动",
+		"goal": "制作稀有度至少为3星的神级料理400份",
+		"rewards": [{
+			"name": "厨具-传世秘籍",
+			"quantity": ""
+		}],
+		"conditions": [{
+			"rarity": 3,
+			"rank": 4
+		}]
+	}, {
+		"questId": 9342,
+		"questIdDisp": 9,
+		"type": "誓言录",
+		"goal": "探索获得任意食材80000个",
+		"rewards": [{
+			"name": "蒸馏杯",
+			"quantity": "2"
+		}, {
+			"name": "罗小黑货币",
+			"quantity": "30"
+		}]
+	}, {
+		"questId": 9167,
+		"questIdDisp": 10,
+		"type": "罗小黑战记联动",
+		"goal": "规则早有提示，在记忆中找寻获得高分的方法吧，得分需要达到32000分。",
+		"rewards": [{
+			"name": "厨师-罗小白",
+			"quantity": ""
+		}]
+	}, {
+		"questId": 9203,
+		"questIdDisp": 10,
+		"type": "罗小黑大电影联动",
+		"goal": "制作某人特别擅长的技法的料理可以获得大量加分，其余技法就……相当不好说了……",
+		"rewards": [{
+			"name": "厨师-洛竹",
+			"quantity": ""
+		}]
+	}, {
+		"questId": 9343,
+		"questIdDisp": 10,
+		"type": "誓言录",
+		"goal": "制作5星料理500份",
+		"rewards": [{
+			"name": "玉璧",
+			"quantity": "378"
+		}, {
+			"name": "罗小黑货币",
+			"quantity": "30"
+		}],
+		"conditions": [{
+			"rarity": 5
+		}]
+	}, {
+		"questId": 9344,
+		"questIdDisp": 11,
+		"type": "誓言录",
+		"goal": "制作炒技料理1300份",
+		"rewards": [{
+			"name": "恐怖利刃",
+			"quantity": "2"
+		}, {
+			"name": "罗小黑货币",
+			"quantity": "30"
+		}],
+		"conditions": [{
+			"skill": "stirfry"
+		}]
+	}, {
+		"questId": 9345,
+		"questIdDisp": 12,
+		"type": "誓言录",
+		"goal": "制作回复药剂800份",
+		"rewards": [{
+			"name": "香烤鱼排",
+			"quantity": "2"
+		}, {
+			"name": "罗小黑货币",
+			"quantity": "30"
+		}],
+		"conditions": [{
+			"recipeId": 583
+		}]
+	}, {
+		"questId": 9346,
+		"questIdDisp": 13,
+		"type": "誓言录",
+		"goal": "制作儿童喜欢的甜料理会有相应加分，辣与苦的料理会有相应扣分",
+		"rewards": [{
+			"name": "玉璧",
+			"quantity": "378"
+		}, {
+			"name": "罗小黑货币",
+			"quantity": "30"
+		}]
+	}, {
+		"questId": 9347,
+		"questIdDisp": 14,
+		"type": "誓言录",
+		"goal": "制作神级炒青菜3份",
+		"rewards": [{
+			"name": "厨师-木落仙人",
+			"quantity": ""
+		}, {
+			"name": "罗小黑货币",
+			"quantity": "30"
+		}],
+		"conditions": [{
+			"recipeId": 3,
+			"rank": 4
+		}]
+	}, {
+		"questId": 9348,
+		"questIdDisp": 15,
+		"type": "誓言录",
+		"goal": "累计制作任意料理880份",
+		"rewards": [{
+			"name": "罗小黑货币",
+			"quantity": "10"
+		}],
+		"conditions": [{}]
+	}, {
+		"questId": 9349,
+		"questIdDisp": 16,
+		"type": "誓言录",
+		"goal": "在市集中进行2次探索",
+		"rewards": [{
+			"name": "罗小黑货币",
+			"quantity": "10"
+		}]
+	}, {
+		"questId": 9350,
+		"questIdDisp": 17,
+		"type": "誓言录",
+		"goal": "制作特级肉类料理650份",
+		"rewards": [{
+			"name": "罗小黑货币",
+			"quantity": "10"
+		}],
+		"conditions": [{
+			"rank": 3,
+			"category": "meat"
+		}]
+	}, {
+		"questId": 9351,
+		"questIdDisp": 18,
+		"type": "誓言录",
+		"goal": "制作使用牛杂的神级料理680份",
+		"rewards": [{
+			"name": "罗小黑货币",
+			"quantity": "10"
+		}],
+		"conditions": [{
+			"rank": 4,
+			"materialId": 40
+		}]
+	}, {
+		"questId": 9352,
+		"questIdDisp": 19,
+		"type": "誓言录",
+		"goal": "制作回复药剂800份",
+		"rewards": [{
+			"name": "罗小黑货币",
+			"quantity": "10"
+		}],
+		"conditions": [{
+			"recipeId": 583
+		}]
+	}, {
+		"questId": 9353,
+		"questIdDisp": 20,
+		"type": "誓言录",
+		"goal": "制作3星蒸技法料理500份",
+		"rewards": [{
+			"name": "罗小黑货币",
+			"quantity": "10"
+		}],
+		"conditions": [{
+			"skill": "steam",
+			"rarity": 3
+		}]
+	}, {
+		"questId": 9354,
+		"questIdDisp": 21,
+		"type": "誓言录",
+		"goal": "遇见任意特殊客人12次",
+		"rewards": [{
+			"name": "罗小黑货币",
+			"quantity": "10"
+		}],
+		"conditions": [{
+			"anyGuest": true
+		}]
+	}, {
+		"questId": 9355,
+		"questIdDisp": 22,
+		"type": "誓言录",
+		"goal": "累计开业时间达到18小时",
+		"rewards": [{
+			"name": "罗小黑货币",
+			"quantity": "10"
+		}]
+	}, {
+		"questId": 9356,
+		"questIdDisp": 23,
+		"type": "誓言录",
+		"goal": "制作稀有度至少为4星的料理320份",
+		"rewards": [{
+			"name": "罗小黑货币",
+			"quantity": "10"
+		}],
+		"conditions": [{
+			"rarity": 4
+		}]
+	}, {
+		"questId": 9357,
+		"questIdDisp": 24,
+		"type": "誓言录",
+		"goal": "制作稀有度至少为3星的料理460份",
+		"rewards": [{
+			"name": "罗小黑货币",
+			"quantity": "10"
+		}],
+		"conditions": [{
+			"rarity": 3
+		}]
+	}, {
+		"questId": 9358,
+		"questIdDisp": 25,
+		"type": "誓言录",
+		"goal": "制作稀有度至少为5星的料理280份",
+		"rewards": [{
+			"name": "罗小黑货币",
+			"quantity": "10"
+		}],
+		"conditions": [{
+			"rarity": 5
+		}]
+	}, {
+		"questId": 9359,
+		"questIdDisp": 26,
+		"type": "誓言录",
+		"goal": "制作特级鱼类料理650份",
+		"rewards": [{
+			"name": "罗小黑货币",
+			"quantity": "10"
+		}],
+		"conditions": [{
+			"rank": 3,
+			"category": "fish"
+		}]
 	}],
 	"skills": [{
 		"skillId": 1,
@@ -53973,6 +55838,15 @@ var g_bcjh_data = {
 			"cal": "Percent"
 		}]
 	}, {
+		"skillId": 229,
+		"desc": "稀有客人出现概率+70%",
+		"effect": [{
+			"type": "GuestApearRate",
+			"value": 70,
+			"condition": "Self",
+			"cal": "Percent"
+		}]
+	}, {
 		"skillId": 230,
 		"desc": "稀有客人出现概率+80%",
 		"effect": [{
@@ -54041,6 +55915,15 @@ var g_bcjh_data = {
 		"effect": [{
 			"type": "Gold_Gain",
 			"value": 20,
+			"condition": "Self",
+			"cal": "Percent"
+		}]
+	}, {
+		"skillId": 247,
+		"desc": "金币获得+30%",
+		"effect": [{
+			"type": "Gold_Gain",
+			"value": 30,
 			"condition": "Self",
 			"cal": "Percent"
 		}]
@@ -57446,6 +59329,38 @@ var g_bcjh_data = {
 			"condition": "Self",
 			"cal": "Percent"
 		}]
+	}, {
+		"skillId": 680,
+		"desc": "切类和煮类料理售价+20%",
+		"effect": [{
+			"type": "UseKnife",
+			"value": 20,
+			"condition": "Self",
+			"cal": "Percent"
+		}, {
+			"type": "UseBoil",
+			"value": 20,
+			"condition": "Self",
+			"cal": "Percent"
+		}]
+	}, {
+		"skillId": 682,
+		"desc": "场上所有厨师蒸+55",
+		"effect": [{
+			"type": "Steam",
+			"value": 55,
+			"condition": "Partial",
+			"cal": "Abs"
+		}]
+	}, {
+		"skillId": 683,
+		"desc": "场上所有厨师炒+55",
+		"effect": [{
+			"type": "Stirfry",
+			"value": 55,
+			"condition": "Partial",
+			"cal": "Abs"
+		}]
 	}],
 	"maps": [{
 		"name": "牧场",
@@ -59455,8 +61370,23 @@ var g_bcjh_data = {
 			"Effect": -1
 		}]
 	}],
-	"activities": [],
+	"activities": [{
+		"id": 9158,
+		"name": "罗小黑战记联动"
+	}, {
+		"id": 9194,
+		"name": "罗小黑大电影联动"
+	}, {
+		"id": 9204,
+		"name": "蓝溪镇联动"
+	}, {
+		"id": 9334,
+		"name": "誓言录"
+	}],
 	"history": [{
+		"date": "2021/06/03",
+		"content": "众生之门池相关更新"
+	}, {
 		"date": "2021/03/31",
 		"content": "江南烟雨池相关更新"
 	}, {

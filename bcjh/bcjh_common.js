@@ -599,6 +599,8 @@ function build_recipes(recipes, my_recipes, my_chefs) {
             var best = get_best_chefs(recipes[i], my_chefs, 0, null, my_chefs);
             recipes[i].best_price = best[0];
             recipes[i].best_chefs = best[1].join(",");
+            recipes[i].tags = 0;
+            recipes[i].tag_cnt = 99;
             ++i;
             ++j;
         }

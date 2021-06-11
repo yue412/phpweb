@@ -74,6 +74,9 @@
             <el-checkbox-group v-model="selectedPartialChefs" :max="2">
                 <el-checkbox v-for="chef in partialChefs" :label="chef">{{chef.name}}</el-checkbox>
             </el-checkbox-group>
+            <el-button @click="addTag()" size="mini">标注</el-button>
+            <el-button @click="addTagCount()" size="mini">标注份数</el-button>
+            <el-button @click="clearTag()" size="mini">清空标注</el-button>
         </div>
         <div>菜谱数量:{{recipes.length}}</div>
         <table id="tb2">
@@ -119,6 +122,8 @@
                 <td v-bind:class="{'no-show': !recipes_schema[26].show}">{{recipe.guests_like}}</td>
                 <td v-bind:class="{'no-show': !recipes_schema[27].show}">{{recipe.gift_name()}}</td>
                 <td v-bind:class="{'no-show': !recipes_schema[28].show}">{{recipe.left_first_guests}}</td>
+                <td v-bind:class="{'no-show': !recipes_schema[29].show}">{{recipe.tags}}</td>
+                <td v-bind:class="{'no-show': !recipes_schema[30].show}">{{recipe.tag_cnt}}</td>
             </tr>
         </table>
     </div>
@@ -156,7 +161,9 @@
                         { "caption": "首次贵客", "show": false },
                         { "caption": "贵客喜欢", "show": false },
                         { "caption": "神级符文", "show": false },
-                        { "caption": "剩下贵客", "show": false }
+                        { "caption": "剩下贵客", "show": false },
+                        { "caption": "标注", "show": false },
+                        { "caption": "标注份数", "show": false },
                     ],
                     recipes: [],
                     recipes_bak: [],
@@ -431,7 +438,30 @@
                             item.show = val != "false";
                             item.old_show = item.show;
                         }
-                    }
+                    },
+                    addTag(){
+                        for (let recipe of this.recipes) {
+                            recipe.tags++;
+                        }
+                    },
+                    addTagCount(){
+                        var that = this;
+                        layer.prompt({ offset: '200px' },
+                            function (val, index) {
+                                //layer.msg('得到了' + val);
+                                var cnt = parseInt(val);
+                                for (let recipe of that.recipes) {
+                                    recipe.tag_cnt = Math.min(recipe.tag_cnt, cnt);
+                                }
+                                layer.close(index);
+                            });
+                    },
+                    clearTag(){
+                        for (let recipe of this.recipes_bak) {
+                            recipe.tags = 0;
+                            recipe.tag_cnt = 99;
+                        }
+                    },
                 }
             }
         );

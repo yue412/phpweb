@@ -1,0 +1,388 @@
+<html>
+
+<head>
+    <meta http-equiv="content-type" content="text/html;charset=utf-8">
+    <meta name="viewport"
+        content="width=device-width,initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>
+        爆炒江湖
+    </title>
+    <!--script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script-->
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.6.12"></script>
+    <script type="text/javascript" src="../common.js"></script>
+    <script type="text/javascript" src="bcjh_data.js"></script>
+    <script type="text/javascript" src="bcjh_common.js"></script>
+    <script type="text/javascript" src="bcjh_skill.js"></script>
+    <!--<script type="text/javascript" src="LP.js"></script>-->
+    <script type="text/javascript" src="../lp/LP.js"></script>
+    <script type="text/javascript" src="vue_components.js"></script>
+    <link rel="stylesheet" href="https://unpkg.zhimg.com/element-ui/lib/theme-chalk/index.css">
+    <script src="https://unpkg.zhimg.com/element-ui/lib/index.js"></script>
+
+    <script type="text/javascript">
+    </script>
+</head>
+
+<body>
+    <div id="lp2">
+        <a href="index.html">返回</a>
+        <login-panel login-ref="../login.html" v-on:give-user="load_recipes"></login-panel>
+        <el-row>
+            <el-checkbox v-model="is_use_material">是否是食材数量</el-checkbox>
+        </el-row>
+        <el-row>
+            <el-col :span="6">
+                <el-input placeholder="数量" v-model="recipe_cnt" />
+            </el-col>
+            <el-col :span="6">
+                <el-input placeholder="菜谱名称" v-model="recipe_name" />
+            </el-col>
+            <el-col :span="6">
+                <el-input placeholder="食材名称" v-model="material_name" />
+            </el-col>
+        </el-row>
+        <el-row>
+            <span>稀有度: </span>
+            <el-radio-group v-model="recipe_rarity">
+                <el-radio v-for="rarity in rarity_list" :label="rarity">{{rarity}}</el-radio>
+            </el-radio-group>
+        </el-row>
+        <el-row>
+            <span>技法: </span>
+            <el-checkbox-group v-model="recipe_cooks">
+                <el-checkbox v-for="(name, index) in cook_names" :label="cook_types[index]">{{name}}</el-checkbox>
+            </el-checkbox-group>
+        </el-row>
+        <el-row>
+            <span>级别: </span>
+            <el-radio-group v-model="recipe_rate">
+                <el-radio v-for="(name, index) in rate_names" :label="index">{{name}}</el-radio>
+            </el-radio-group>
+        </el-row>
+        <el-row>
+            <span>采集地: </span>
+            <el-checkbox-group v-model="material_origins">
+                <el-checkbox v-for="origin in material_source" :label="origin">{{origin}}</el-checkbox>
+            </el-checkbox-group>
+        </el-row>
+        <el-button @click="add_task()">添加任务</el-button>
+        <el-input type="textarea" :rows="8" placeholder="请输入内容" v-model="textarea">
+        </el-input>
+        <el-button @click="calc()">计算</el-button>
+        <el-checkbox v-model="no_use_mastery">不使用熟练菜谱</el-checkbox>
+        <el-table :data="calc_result" style="width: 100%" :default-sort="{prop: 'id', order: 'ascending'}">
+            <el-table-column prop="id" label="序号" width="80" sortable>
+            </el-table-column>
+            <el-table-column prop="name" label="名称" width="200" sortable>
+            </el-table-column>
+            <el-table-column prop="cnt" label="份数" width="100" sortable>
+            </el-table-column>
+            <el-table-column prop="time" label="时间" width="100" sortable>
+            </el-table-column>
+            <el-table-column prop="rarity" label="级别" width="100" sortable>
+            </el-table-column>
+            <el-table-column prop="materials_name" label="材料">
+            </el-table-column>
+            <el-table-column prop="cook_name" label="技能">
+            </el-table-column>
+        </el-table>
+        <div>累计时间(s)：{{total_time}}</div>
+        <div>calc time(ms): {{calc_time}}</div>
+    </div>
+    <script type="text/javascript">
+        var app = new Vue(
+            {
+                el: '#lp2',
+                data: {
+                    chefs: null,
+                    recipes: null,
+                    tasks: [],
+                    rarity_list: [0, 1, 2, 3, 4, 5],
+                    cook_names: g_cook_type_names,
+                    cook_types: g_cook_types,
+                    material_source: ['池塘', '作坊', '牧场', '鸡舍', '猪圈', '菜棚', '菜地', '森林'],
+                    rate_names: g_Rate_names,
+                    calc_time: 0,
+                    total_time: 0,
+                    calc_result: [],
+                    textarea: "",
+
+                    recipe_name: "",
+                    material_name: "",
+                    recipe_cnt: "",
+                    recipe_rarity: 0,
+                    recipe_cooks: [],
+                    material_origins: [],
+                    is_use_material: false,
+                    no_use_mastery: false,
+                    recipe_rate: 0,
+                },
+                created: function () {
+                    /*
+                    this.tasks.push({
+                        filter: "recipe.rarity >= 5",
+                        cnt: 500 - 465,
+                    });
+                    this.tasks.push({
+                        filter: "recipe.material_origin_in(['牧场','鸡舍','猪圈'])",
+                        cnt: 1500 - 839,
+                    });
+                    this.tasks.push({
+                        filter: "recipe.has_material(['番茄'])",
+                        cnt: 1200 - 1016,
+                    });
+                    this.tasks.push({
+                        use_material: "面粉",
+                        cnt: 5000 - 1467,
+                    });
+                    */
+                },
+                watch: {
+                },
+                methods: {
+                    add_task() {
+                        if (this.recipe_cnt == "") {
+                            this.$alert("任务数量必填", '推荐池', {
+                                confirmButtonText: '确定',
+                            });
+                            return;
+                        }
+                        if (this.is_use_material) {
+                            if (this.material_name == "") {
+                                this.$alert("材料必填", '推荐池', {
+                                    confirmButtonText: '确定',
+                                });
+                            }
+                            this.textarea += "use_material=" + this.material_name + "\\" + this.recipe_cnt + "\n";
+                        }
+                        else {
+                            let arr = [];
+                            if (this.recipe_name != "")
+                                arr.push("recipe.name == " + this.recipe_name);
+                            if (this.material_name != "")
+                                arr.push("recipe.has_material(['" + this.material_name + "'])");
+                            if (this.recipe_rarity > 0) {
+                                let arr1 = [];
+                                for (let i = this.recipe_rarity; i <= 5; i++) {
+                                    arr1.push("recipe.rarity == " + i);
+                                }
+                                arr.push("(" + arr1.join("||") + ")");
+                            }
+                            if (this.recipe_rate > 0) {
+                                let arr1 = [];
+                                for (let i = this.recipe_rate; i <= 5; i++) {
+                                    arr1.push("recipe.recipe_chefs_arr[" + i + "].length > 0");
+                                }
+                                arr.push("(" + arr1.join("||") + ")");
+                            }
+                            if (this.recipe_cooks.length > 0) {
+                                let arr1 = [];
+                                for (const cook_type of this.recipe_cooks) {
+                                    arr1.push("recipe." + cook_type + " > 0");
+                                }
+                                arr.push("(" + arr1.join("||") + ")");
+                            }
+                            if (this.material_origins.length > 0) {
+                                let origins = "'" + this.material_origins.join("','") + "'";
+                                arr.push("recipe.material_origin_in([" + origins + "])");
+                            }
+                            if (arr.length == 0) {
+                                this.$alert("无限制条件！", '推荐池', {
+                                    confirmButtonText: '确定',
+                                });
+                                return;
+                            }
+                            this.textarea += arr.join("&&") + "\\" + this.recipe_cnt + "\n";
+                        }
+                        this.clear_tasks();
+                    },
+                    clear_tasks() {
+                        this.recipe_name = "";
+                        this.material_name = "";
+                        this.recipe_cnt = "";
+                        this.recipe_rarity = 0;
+                        this.recipe_cooks = [];
+                        this.material_origins = [];
+                        this.is_use_material = false;
+                        this.recipe_rate = 0;
+                    },
+                    init_tasks(text) {
+                        this.tasks = [];
+                        let rows = text.split("\n");
+                        for (const row of rows) {
+                            let parts = row.split('\\');
+                            if (parts.length < 2)
+                                continue;
+                            let task = new Object;
+                            task.cnt = eval(parts[1]);
+                            if (parts[0].indexOf("use_material") >= 0) {
+                                task.use_material = parts[0].split("=")[1];
+                            }
+                            else {
+                                task.filter = parts[0];
+                            }
+                            this.tasks.push(task);
+                        }
+                    },
+                    init_recipes(recipes) {
+                        for (const recipe of recipes) {
+                            let set = new Set;
+                            for (const m of recipe.materials) {
+                                m.obj = material_by_id(m.material);
+                                set.add(m.obj.origin);
+                            }
+                            recipe.material_origin_set = set;
+                            recipe.material_origin_in = function (origins) {
+                                for (const origin of origins) {
+                                    if (this.material_origin_set.has(origin))
+                                        return true;
+                                }
+                                return false;
+                            };
+                            recipe.has_material = function (name) {
+                                return this.get_material(name) != null;
+                            };
+                            recipe.get_material = function (name) {
+                                for (const m of this.materials) {
+                                    if (m.obj.name == name)
+                                        return m;
+                                }
+                                return null;
+                            };
+                        }
+                    },
+                    load_recipes: function (user_id) {
+                        this.user_id = user_id;
+                        var that = this;
+                        do_ajax("../db/get_records.php?table_name=bcjh_recipes&user_id=" + user_id, function (text) {
+                            var my_recipes = JSON.parse(text);
+                            do_ajax("../db/get_records.php?table_name=bcjh_chefs&user_id=" + user_id, function (text) {
+                                // 菜谱
+                                init_skills(g_bcjh_data.skills);
+                                var my_chefs = JSON.parse(text);
+                                init_chefs(my_chefs);
+                                //var materials = g_bcjh_data.materials;
+                                var new_recipes = build_recipes(g_bcjh_data.recipes, my_recipes, my_chefs);
+                                that.init_recipes(new_recipes);
+                                ///////////////////
+                                that.chefs = my_chefs;
+                                that.recipes = new_recipes;
+                            });
+                        });
+                    },
+                    calc: function () {
+                        g_debug_simplex_cnt = 0;
+                        var dateBegin = new Date();
+                        this.init_tasks(this.textarea);
+
+                        var objective_function = new Object();
+                        var constraint_list = [];
+                        this.build_constraint(objective_function, constraint_list);
+
+                        this.calc_result = [];
+                        this.total_time = 0;
+                        var result = [];
+                        var objective_value = new Object();
+                        g_log_objective_value = false;
+                        var r = solve_int(objective_function, constraint_list, result, objective_value);
+                        if (r == 1) {
+                            this.total_time = display_time(objective_value.value);
+                            this.generate_result(result);
+                        }
+                        else {
+                            this.total_time = "无解";
+                        }
+                        var dateEnd = new Date();
+                        this.calc_time = dateEnd.getTime() - dateBegin.getTime();
+                    },
+                    generate_result(result) {
+                        for (let i = 0; i < result.length; i++) {
+                            const pair = result[i];
+                            var cnt = Math.round(pair[1]);
+                            //var cnt = pair[1];
+                            if (cnt == 0)
+                                continue;
+                            if (pair[0].charAt(0) != "X")
+                                continue;
+                            var arr = pair[0].split("_");
+                            var id = parseInt(arr[1]);
+                            var recipe = this.get_recipe_by_id(id);
+                            this.calc_result.push({
+                                id: recipe.recipeId,
+                                name: recipe.name,
+                                cnt: cnt,
+                                time: recipe.time,
+                                rarity: recipe.rarity,
+                                materials_name: recipe.materials_name,
+                                cook_name: recipe.cook_name,
+                            });
+                        }
+                    },
+                    build_constraint(objective_function, constraint_list) {
+                        objective_function.is_max = false; // 时间最小
+                        objective_function.items = [];
+
+                        let var_set = new Set();
+
+                        for (const task of this.tasks) {
+                            var constraint_cnt = new Object(); // 份数限制
+                            constraint_cnt.opr_type = 1; // >=
+                            constraint_cnt.value = task.cnt; // 份数
+                            constraint_cnt.items = [];
+                            constraint_list.push(constraint_cnt);
+                            if (task.hasOwnProperty('use_material')) {
+                                // 材料数量
+                                let material = task.use_material;
+                                for (const recipe of this.recipes) {
+                                    if (this.no_use_mastery && recipe.is_mastery)
+                                        continue;
+                                    let m = recipe.get_material(material);
+                                    if (m) {
+                                        let var_name = this.get_var_name(recipe, var_set);
+                                        constraint_cnt.items.push([m.quantity, var_name]);
+                                    }
+                                }
+                            }
+                            else {
+                                // 份数
+                                for (const recipe of this.recipes) {
+                                    if (this.no_use_mastery && recipe.is_mastery)
+                                        continue;
+                                    if (eval(task.filter)) {
+                                        let var_name = this.get_var_name(recipe, var_set);
+                                        constraint_cnt.items.push([1, var_name]);
+                                    }
+                                }
+                            }
+                        }
+
+                        for (const recipe of this.recipes) {
+                            let var_name = "X_" + recipe.recipeId;
+                            if (var_set.has(var_name)) {
+                                objective_function.items.push([recipe.time, var_name]);
+                            }
+                        }
+                        //objective_function.items.push([time, var_name]);
+                    },
+                    get_var_name(recipe, var_set) {
+                        let var_name = "X_" + recipe.recipeId; // 份数
+                        if (!var_set.has(var_name))
+                            var_set.add(var_name);
+                        return var_name;
+                    },
+                    get_recipe_by_id(id) {
+                        for (const recipe of this.recipes) {
+                            if (recipe.recipeId == id)
+                                return recipe;
+                        }
+                        return null;
+                    },
+                }
+            }
+        );
+
+    </script>
+
+</body>
+
+</html>

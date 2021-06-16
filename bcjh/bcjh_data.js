@@ -17923,9 +17923,9 @@ var g_bcjh_data = {
 		}, {
 			"guest": "诸葛亮"
 		}, {
-			"guest": ""
+			"guest": "王子"
 		}],
-		"gift": "未知",
+		"gift": "焦虫",
 		"condiment": "Tasty"
 	}, {
 		"recipeId": 528,
@@ -19505,6 +19505,42 @@ var g_bcjh_data = {
 		}],
 		"gift": "油火虫",
 		"condiment": "Spicy"
+	}, {
+		"recipeId": 572,
+		"galleryId": "572",
+		"name": "桂花冰粉",
+		"rarity": 1,
+		"unlock": "-",
+		"stirfry": 0,
+		"boil": 20,
+		"knife": 42,
+		"fry": 0,
+		"bake": 0,
+		"steam": 0,
+		"materials": [{
+			"material": 11,
+			"quantity": 3
+		}, {
+			"material": 36,
+			"quantity": 1
+		}, {
+			"material": 35,
+			"quantity": 1
+		}],
+		"price": 218,
+		"exPrice": 11,
+		"time": 453,
+		"limit": 40,
+		"origin": "联动兑换",
+		"guests": [{
+			"guest": "白富美"
+		}, {
+			"guest": "大胃王"
+		}, {
+			"guest": "屠夫老王"
+		}],
+		"gift": "剪刀蟹",
+		"condiment": "Sweet"
 	}, {
 		"recipeId": 573,
 		"galleryId": "573",
@@ -30576,6 +30612,32 @@ var g_bcjh_data = {
 		"spicy": 0,
 		"salty": 80,
 		"bitter": 0,
+		"tasty": 0
+	}, {
+		"chefId": 1077,
+		"galleryId": "1077",
+		"name": "无限师父",
+		"rarity": 5,
+		"stirfry": 66,
+		"bake": 66,
+		"boil": 66,
+		"steam": 66,
+		"fry": 66,
+		"knife": 666,
+		"skill": 504,
+		"meat": 0,
+		"fish": 7,
+		"veg": 7,
+		"creation": 0,
+		"ultimateGoal": [3037, 3001, 3062],
+		"ultimateSkill": 681,
+		"origin": "限时礼包",
+		"tags": [1],
+		"sweet": 0,
+		"sour": 0,
+		"spicy": 0,
+		"salty": 0,
+		"bitter": 95,
 		"tasty": 0
 	}, {
 		"chefId": 1080,
@@ -59339,6 +59401,40 @@ var g_bcjh_data = {
 			"cal": "Percent"
 		}, {
 			"type": "UseBoil",
+			"value": 20,
+			"condition": "Self",
+			"cal": "Percent"
+		}]
+	}, {
+		"skillId": 681,
+		"desc": "任意技法料理售价+20%",
+		"effect": [{
+			"type": "UseFry",
+			"value": 20,
+			"condition": "Self",
+			"cal": "Percent"
+		}, {
+			"type": "UseStirfry",
+			"value": 20,
+			"condition": "Self",
+			"cal": "Percent"
+		}, {
+			"type": "UseBoil",
+			"value": 20,
+			"condition": "Self",
+			"cal": "Percent"
+		}, {
+			"type": "UseSteam",
+			"value": 20,
+			"condition": "Self",
+			"cal": "Percent"
+		}, {
+			"type": "UseKnife",
+			"value": 20,
+			"condition": "Self",
+			"cal": "Percent"
+		}, {
+			"type": "UseBake",
 			"value": 20,
 			"condition": "Self",
 			"cal": "Percent"

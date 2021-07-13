@@ -53,8 +53,7 @@ g_filter_material = "";
 g_filter_recipe = "";
 g_first_guest_name = "";
 
-function calc_price2(recipe, chef, chefs, price_add, ChefTagEffect)
-{
+function calc_price2(recipe, chef, chefs, price_add, ChefTagEffect) {
     var temp = price_add;
     if (ChefTagEffect && chef.tags) {
         for (let i = 0; i < chef.tags.length; i++) {
@@ -85,9 +84,9 @@ function get_best_chefs(recipe, chefs, price_add, ChefTagEffect, all_chefs) {
 
 // 从n个数里选m个，范围[0..n-1]
 function combination(n, m) {
-    if (n == m) {
-        var result = new Array(m);
-        for (let i = 0; i < m; i++) {
+    if (n <= m) {
+        var result = new Array(n);
+        for (let i = 0; i < n; i++) {
             result[i] = i;
         }
         return [result];
@@ -168,19 +167,17 @@ function calc_rate(recipe, chef) {
         if (recipe[type] > 0)
             n = Math.min(n, Math.floor(chef[type] / recipe[type]));
     }
-    return n;
+    return Math.max(n, 0);
 }
 
-function calc_rate_diff(recipe, chef, rate)
-{
+function calc_rate_diff(recipe, chef, rate) {
     var result = [];
     for (let i = 0; i < g_cook_types.length; i++) {
         const type = g_cook_types[i];
-        if (recipe[type] > 0)
-        {
+        if (recipe[type] > 0) {
             let diff = chef[type] - recipe[type] * rate;
             if (diff < 0)
-                result.push({"type":type,"diff":-diff});
+                result.push({ "type": type, "diff": -diff });
         }
     }
     return result;
@@ -359,79 +356,63 @@ function get_tags(id) {
     return [];
 }
 
+function _init_chef(chef){
+    for (let j = 0; j < g_cook_types.length; j++) {
+        const type = g_cook_types[j];
+        chef[type] = parseInt(chef[type]);
+        chef[type + "_raw"] = chef[type];
+    }
+    for (let j = 0; j < g_material_types.length; j++) {
+        const type = g_material_types[j];
+        chef[type] = parseInt(chef[type]);
+        chef[type + "_raw"] = chef[type];
+    }
+    chef.skill = get_skill(chef.skill_id);
+    chef.ultimate_skill = get_skill(chef.ultimate_skill_id);
+    chef.equip = get_equip(chef.equip_id);
+    chef.equip_skills = [];
+    chef.tags = get_tags(chef.id);
+    chef.skill_name = function () {
+        return this.skill == null ? "" : this.skill.desc;
+    }
+    chef.ultimate_skill_conditions = [];
+    chef.ultimate_skill_name = function () {
+        if (this.ultimate_skill != null)
+            return this.ultimate_skill.desc;
+        else {
+            //if (this.ultimate_skill_conditions.length >= 3)
+            if (this.ultimate_skill_conditions2)
+                return this.ultimate_skill_conditions2.join("\n");
+            else
+                return this.ultimate_skill_conditions.join("\n");
+        }
+        return "";
+    }
+    chef.equip_name = function () {
+        return this.equip == null ? "" : this.equip.name;
+    }
+    if (chef.skill) {
+        chef.skill.effect.forEach(e => {
+            e.effect_chef(chef, chef);
+        });
+    }
+    if (chef.equip) {
+        chef.equip.skill.forEach(id => {
+            e_skill = get_skill(id);
+            if (e_skill) {
+                e_skill.effect.forEach(e => {
+                    e.effect_chef(chef, chef);
+                });
+                chef.equip_skills.push(e_skill);
+            }
+        });
+    }
+}
+
 function init_chefs(chefs, partial_chefs) {
     for (let i = 0; i < chefs.length; i++) {
         var chef = chefs[i];
-        for (let j = 0; j < g_cook_types.length; j++) {
-            const type = g_cook_types[j];
-            chef[type] = parseInt(chef[type]);
-            chef[type + "_raw"] = chef[type];
-        }
-        for (let j = 0; j < g_material_types.length; j++) {
-            const type = g_material_types[j];
-            chef[type] = parseInt(chef[type]);
-            chef[type + "_raw"] = chef[type];
-        }
-        chef.skill = get_skill(chef.skill_id);
-        chef.ultimate_skill = get_skill(chef.ultimate_skill_id);
-        chef.equip = get_equip(chef.equip_id);
-        chef.equip_skills = [];
-        chef.tags = get_tags(chef.id);
-        chef.skill_name = function () {
-            return this.skill == null ? "" : this.skill.desc;
-        }
-        chef.ultimate_skill_conditions = [];
-        chef.ultimate_skill_name = function () {
-            if (this.ultimate_skill != null)
-                return this.ultimate_skill.desc;
-            else {
-                //if (this.ultimate_skill_conditions.length >= 3)
-                if (this.ultimate_skill_conditions2)
-                    return this.ultimate_skill_conditions2.join("\n");
-                else
-                    return this.ultimate_skill_conditions.join("\n");
-            }
-            return "";
-        }
-        chef.ultimate_skill_name3 = function () {
-            if (this.ultimate_skill == null)
-            {
-                if (this.ultimate_skill_conditions.length < 3 && (!this.ultimate_skill_conditions2 || this.ultimate_skill_conditions2.length < 3))
-                {
-                    let result = [];
-                    this.ultimate_skill_conditions3.forEach(element => {
-                        let arr = [];
-                        element.diffs.forEach(d => {
-                            let index = g_cook_types.indexOf(d.type);
-                            arr.push(g_cook_type_names[index]+":"+d.diff);
-                        });
-                        result.push(element.recipe + "("+arr.join(",")+")");
-                    });
-                    
-                    return result.join("\n");
-                }
-            }
-            return "";
-        }
-        chef.equip_name = function () {
-            return this.equip == null ? "" : this.equip.name;
-        }
-        if (chef.skill) {
-            chef.skill.effect.forEach(e => {
-                e.effect_chef(chef, chef);
-            });
-        }
-        if (chef.equip) {
-            chef.equip.skill.forEach(id => {
-                e_skill = get_skill(id);
-                if (e_skill) {
-                    e_skill.effect.forEach(e => {
-                        e.effect_chef(chef, chef);
-                    });
-                    chef.equip_skills.push(e_skill);
-                }
-            });
-        }
+        _init_chef(chef);
     }
     //global
     for (let i = 0; i < chefs.length; i++) {
@@ -446,14 +427,11 @@ function init_chefs(chefs, partial_chefs) {
             });
         }
     }
-    if(partial_chefs)
-    {
+    if (partial_chefs) {
         for (const partial_chef of partial_chefs) {
-            if(partial_chef.ultimate_skill)
-            {
+            if (partial_chef.ultimate_skill) {
                 partial_chef.ultimate_skill.effect.forEach(e => {
-                    if(e.condition == "Partial")
-                    {
+                    if (e.condition == "Partial") {
                         for (let j = 0; j < chefs.length; j++) {
                             const c = chefs[j];
                             e.effect_chef(c, chef, true);
@@ -462,6 +440,42 @@ function init_chefs(chefs, partial_chefs) {
                 });
             }
         }
+    }
+}
+
+function init_chef(current, chefs, partial_chefs) {
+    _init_chef(current);
+    //global
+    for (let i = 0; i < chefs.length; i++) {
+        var chef = chefs[i];
+
+        if (chef.ultimate_skill) {
+            chef.ultimate_skill.effect.forEach(e => {
+                e.effect_chef(current, chef);
+            });
+        }
+    }
+    if (partial_chefs) {
+        for (const partial_chef of partial_chefs) {
+            if (partial_chef.ultimate_skill) {
+                partial_chef.ultimate_skill.effect.forEach(e => {
+                    if (e.condition == "Partial") {
+                        e.effect_chef(current, chef, true);
+                    }
+                });
+            }
+        }
+    }
+}
+
+function clear_chef(chef){
+    for (let j = 0; j < g_cook_types.length; j++) {
+        const type = g_cook_types[j];
+        chef[type] = chef[type + "_raw"];
+    }
+    for (let j = 0; j < g_material_types.length; j++) {
+        const type = g_material_types[j];
+        chef[type] = chef[type + "_raw"];
     }
 }
 
@@ -589,7 +603,7 @@ function build_recipes(recipes, my_recipes, my_chefs) {
             recipes[i].recipe_chefs = display_recipe_chefs(recipe_chefs, recipes[i].rate);
             recipes[i].recipe_chefs_arr = recipe_chefs;
             recipes[i].get_recipe_chefs_name = function (index) {
-//                var chefs = index <= this.rate || this.recipe_chefs_arr2 == null || this.recipe_chefs_arr[index].length > 0 ? this.recipe_chefs_arr[index] : this.recipe_chefs_arr2[index];
+                //                var chefs = index <= this.rate || this.recipe_chefs_arr2 == null || this.recipe_chefs_arr[index].length > 0 ? this.recipe_chefs_arr[index] : this.recipe_chefs_arr2[index];
                 var chefs = this.recipe_chefs_arr2 == null ? this.recipe_chefs_arr[index] : this.recipe_chefs_arr2[index];
                 return get_chef_names(chefs);
             }
@@ -745,15 +759,13 @@ function recipe_by_id(id) {
     return null;
 }
 
-function get_partial_chefs(chefs){
+function get_partial_chefs(chefs) {
     let result = [];
     for (let i = 0; i < chefs.length; i++) {
         const chef = chefs[i];
-        if(chef.ultimate_skill)
-        {
+        if (chef.ultimate_skill && chef.ultimate_skill.desc.indexOf("场上") >= 0) {
             for (const e of chef.ultimate_skill.effect) {
-                if(e.condition == "Partial")
-                {
+                if (e.condition == "Partial") {
                     result.push(chef);
                     break;
                 }
@@ -761,4 +773,22 @@ function get_partial_chefs(chefs){
         }
     }
     return result;
+}
+
+function intersection(setA, setB) {
+    let _intersection = new Set()
+    for (let elem of setB) {
+        if (setA.has(elem)) {
+            _intersection.add(elem)
+        }
+    }
+    return _intersection
+}
+
+function union(setA, setB) {
+    let _union = new Set(setA)
+    for (let elem of setB) {
+        _union.add(elem)
+    }
+    return _union
 }

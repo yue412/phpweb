@@ -6,6 +6,13 @@
         else if($value=="false")
             $value=0;
     }
+
+    function transfer_text(&$value)
+    {
+        $value = str_replace("\\","\\\\",$value);
+        $value = str_replace("'","\\'",$value);
+    }
+    
     function insert_record($db, $table_name, &$fields)
     {
         $keys = array();
@@ -16,6 +23,7 @@
             {
                 adjust_bool_value($value);
                 $keys[] = $key;
+                transfer_text($value);
                 $values[] = '\''.urldecode($value).'\'';
             }
         }

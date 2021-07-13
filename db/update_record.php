@@ -29,6 +29,7 @@
             $value = 'NULL';
         else {
             adjust_bool_value($value);
+            transfer_text($value);
             $value = '\''.$value.'\'';
         }
         $list[] = '`'.$key.'` = '.urldecode($value);

@@ -402,6 +402,7 @@
         阈值：<el-input-number v-model="calc_limit"></el-input-number>
         <el-button @click="display_price()">非整数计算</el-button>
         <el-button @click="display_price2()">整数计算（FAST）</el-button>
+        <el-checkbox v-model="only_one">只有1份</el-checkbox>
         <div id="chefs">
             <div v-for="rarity in rarity_list">
                 <input type="checkbox" v-bind:id="'ck_all_'+rarity" v-bind:value="rarity" v-model="selected_raritys">
@@ -429,6 +430,7 @@
                     selected_raritys: [],
                     recipe_filter: '',
                     calc_limit: 6,
+                    only_one: false,
                 },
                 created: function () {
                 },
@@ -640,7 +642,7 @@
                             const recipe = new_recipes[i];
                             // price count
                             var price = calc_price2(recipe, chef, this.chefs, 0);
-                            var count = recipe.limit;
+                            var count = this.only_one ? 1 : recipe.limit;
                             if (price == 0 || count == 0)
                                 continue;
                             list.push([recipe, price, count]);

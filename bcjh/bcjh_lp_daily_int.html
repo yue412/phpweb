@@ -134,6 +134,7 @@
         <div>
             餐桌加成：<input type="number" v-model="price_add" />%
             时间限制(h)：<input type="number" v-model="time_limit" />
+            价格下限：<input type="number" v-model="price_limit" />
             <input type="button" value="计算" @click="calc()" />
             <input type="button" value="计算采集" @click="calc_c()" />
         </div>
@@ -194,6 +195,7 @@
                     price_add: 0,
                     time_limit: 0,
                     map_quantity: 0,
+                    price_limit: 10000,
                     disable_milk: true,
                     disable_master: false,
                     maps: g_bcjh_data.maps,
@@ -394,6 +396,15 @@
 
                         }
                     },
+                    filter_recipe_by_price(recipes){
+                        let results = [];
+                        for (const recipe of recipes) {
+                            let price = Math.ceil(recipe.best_price / recipe.time * 3600);
+                            if (price >= this.price_limit)
+                                results.push(recipe);
+                        }
+                        return results;
+                    },
                     calc: function () {
                         filter_chefs = this.selected_chefs;
 
@@ -413,6 +424,7 @@
                                     new_recipes.push(recipe);
                             }
                         }
+                        new_recipes = this.filter_recipe_by_price(new_recipes);
 
                         var best_recipe_map = new Map();
                         for (let k = 0; k < new_recipes.length; k++) {

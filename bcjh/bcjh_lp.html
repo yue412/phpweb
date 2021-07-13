@@ -49,6 +49,16 @@
                 }
                 return effect; 
             }
+            else if(rule.SkillEffect)
+            {
+                let effect = 0;
+                for (let i = 0; i < g_cook_types.length; i++) {
+                    const type = g_cook_types[i];
+                    if(recipe[type]>0)
+                        effect += rule.SkillEffect[type];
+                }    
+                return effect;
+            }
             return null;
         }
 

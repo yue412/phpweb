@@ -6,12 +6,12 @@
     <title>
         公式生成器
     </title>
-    <link type="text/css" rel="stylesheet" href="math.css" media="screen" /> 
-    <link type="text/css" rel="stylesheet" href="print.css" media="print" /> 
+    <link type="text/css" rel="stylesheet" href="math.css" media="screen" />
+    <link type="text/css" rel="stylesheet" href="print.css" media="print" />
     <script type="text/javascript" src="common.js">
     </script>
     <script type="text/javascript" src="../mustache.js">
-    </script>    
+    </script>
     <script id="formula_tables_schema" type="text/html">
         <p>日期：</p>
         <table id="formula_table">
@@ -23,34 +23,29 @@
         </table>
     </script>
     <script type="text/javascript">
-        function output_formulas(col_cnt, result)
-        {
+        function output_formulas(col_cnt, result) {
             var arr = [];
             var col_arr = [];
             for (let i = 0; i < result.length; i++) {
                 const item = result[i];
-                if(col_arr.length >= col_cnt)
-                {
-                    arr.push({"cols":col_arr});
+                if (col_arr.length >= col_cnt) {
+                    arr.push({ "cols": col_arr });
                     col_arr = [];
                 }
-                col_arr.push({"formula":item});
+                col_arr.push({ "formula": item });
             }
-            arr.push({"cols":col_arr});
+            arr.push({ "cols": col_arr });
             var schemas = document.getElementById("formula_tables_schema").innerHTML;
             Mustache.parse(schemas);
-            return Mustache.render(schemas, {"rows":arr});
+            return Mustache.render(schemas, { "rows": arr });
         }
 
-        function select_formula(count, f_cnt, data)
-        {
+        function select_formula(count, f_cnt, data) {
             var result = [];
             var set = new Set();
-            while(result.length < count)
-            {
-                var index = Math.floor(Math.random()*f_cnt);
-                if(!set.has(index))
-                {
+            while (result.length < count) {
+                var index = Math.floor(Math.random() * f_cnt);
+                if (!set.has(index)) {
                     set.add(index);
                     result.push(data[index]);
                 }
@@ -58,8 +53,7 @@
             return result;
         }
 
-        function select_formula2(count, data)
-        {
+        function select_formula2(count, data) {
             // if(count == data.length)
             // {
             //     var result = data.slice(0);
@@ -68,15 +62,15 @@
             // }
             var result = [];
             //var set = new Set();
-            while(result.length < count)
-            {
-                var index = Math.floor(Math.random()*data.length);
+            while (result.length < count) {
+                var index = Math.floor(Math.random() * data.length);
                 result.push(data[index]);
                 data.splice(index, 1);
             }
             return result;
         }
 
+        /*
         function generate_formulas()
         {
             var params = [];
@@ -109,16 +103,102 @@
                 window.print();
             });
         }
+        */
+        function generate_formulas1() {
+            let list = [];
+            // 进位加 add
+            for (let i = 1; i < 10; i++) {
+                for (let j = 10 - i; j < 10; j++) {
+                    list.push(i + "+" + j);
+                }
+            }
+            // 退位减法 sub
+            for (let i = 18; i > 9; i--) {
+                for (let j = i - 9; j < 10; j++) {
+                    list.push(i + "-" + j);
+                }
+            }
+            return list;
+        }
+        // 十位非进退位加减法
+        function generate_formulas2() {
+            let list = [];
+            // add
+            // 十位
+            for (let m = 1; m < 10; m++) {
+                for (let n = 1; n < 10 - m; n++) {
+                    // 个位
+                    for (let i = 0; i < 10; i++) {
+                        for (let j = 0; j < 10 - i; j++) {
+                            list.push((m * 10 + i) + "+" + (n * 10 + j));
+                        }
+                    }
+                }
+            }
+            for (let m = 1; m < 10; m++) {
+                //for (let n = 1; n < 10 - m; n++) {
+                    // 个位
+                    for (let i = 1; i < 10; i++) {
+                        for (let j = 10 - i; j < 10; j++) {
+                            list.push((m * 10 + i) + "+" + j);
+                            list.push(j + "+" + (m * 10 + i));
+                        }
+                    }
+                //}
+            }
+            // sub
+            for (let m = 1; m < 10; m++) {
+                for (let n = 1; n <= m; n++) {
+                    // 个位
+                    for (let i = 0; i < 10; i++) {
+                        for (let j = 0; j <= i; j++) {
+                            list.push((m * 10 + i) + "-" + (n * 10 + j));
+                        }
+                    }
+                }
+            }
+            // 退位减, 减数是个位
+            for (let m = 2; m < 10; m++) {
+                //for (let n = 1; n <= m; n++) {
+                    // 个位
+                    for (let i = 0; i < 10; i++) {
+                        for (let j = i+1; j < 10; j++) {
+                            list.push((m * 10 + i) + "-" + j);
+                        }
+                    }
+                //}
+            }
+            return list;
+        }
+        function generate_formulas() {
+            let list1 = generate_formulas1();
+            let list2 = generate_formulas2();
+            var s = "";
+            var page_cnt = document.getElementById("page_cnt").value;
+            for (let i = 0; i < page_cnt; i++) {
+                if (list1.length < 15)
+                    list1 = generate_formulas1();
+                if (list2.length < 15)
+                    list2 = generate_formulas2();
+                s += output_formulas(3, select_formula2(30, select_formula2(15, list1).concat(select_formula2(15, list2))));
+                s += "<br><hr />";
+                if (list1.length < 15)
+                    list1 = generate_formulas1();
+                if (list2.length < 15)
+                    list2 = generate_formulas2();
+                s += output_formulas(3, select_formula2(30, select_formula2(15, list1).concat(select_formula2(15, list2))));
+                s += "<div class='pagebreak'/>";
+            }
+            var e = document.getElementById("main");
+            e.innerHTML = s;
+            window.print();
+        }
     </script>
 </head>
+
 <body>
     <div class="noprint">
-        <p>范围：<input id="range" type="number" value="20"/></p>
-        <p><input id="nonnegative" type="checkbox" checked/>结果不能为负；</p>
-        <p><input id="carry" type="checkbox"/>能否进退位；</p>
-        <p><input id="add" type="checkbox" checked/>加<input id="sub" type="checkbox"/>减<input id="mul" type="checkbox"/>乘<input id="div" type="checkbox"/>除</p>
-        <p>每页公式数量：<input id="formula_cnt" type="number" value="30"/></p>
-        <p>生成页数：<input id="page_cnt" type="number" value="1"/></p>
+        <p>生成页数：<input id="page_cnt" type="number" value="1" /></p>
         <div class="button" onclick="generate_formulas()">打印公式</div>
     </div>
     <div id="main"></div>
